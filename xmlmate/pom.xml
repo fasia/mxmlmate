@@ -336,12 +336,6 @@
                     <artifactId>xercesImpl</artifactId>
                     <version>2.11.0</version>
                 </dependency>
-                <!--<dependency>
-                    &lt;!&ndash; LGPL &ndash;&gt;
-                    <groupId>xom</groupId>
-                    <artifactId>xom</artifactId>
-                    <version>1.2.5</version>
-                </dependency>-->
                 <dependency>
                     <!-- LGPL -->
                     <groupId>com.io7m.xom</groupId>

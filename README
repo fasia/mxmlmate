@@ -1,0 +1,2 @@
+To get the PINtools to compile you need to set the PIN_ROOT variable to where you have PIN installed.
+e.g. export PIN_ROOT=~/Downloads/pin 
