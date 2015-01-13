@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/exp" xmlns:tns="http://www.example.org/exp" elementFormDefault="qualified">
+
+<complexType name="Division">
+<sequence minOccurs="2" maxOccurs="2">
+<choice>
+<element name="num" type="tns:Number"/>
+<element name="sub" type="tns:Subtraction"/>
+</choice>
+</sequence>
+</complexType>
+
+<complexType name="Subtraction">
+<sequence>
+<element name="num" type="tns:Number" minOccurs="2" maxOccurs="2"/>
+</sequence>
+</complexType>
+
+<simpleType name="Number">
+<restriction base="positiveInteger">
+<!-- <pattern value="([1-9][0-9]*)" /> -->
+<totalDigits value="3"/>
+<maxExclusive value="400"/>
+</restriction>
+</simpleType>
+
+<element name="div" type="tns:Division"/>
+
+</schema>

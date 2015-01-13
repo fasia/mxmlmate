@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <!--Appenders-->
+
+    <timestamp key="bySecond" datePattern="dd.MM.yyyy HH_mm"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>xmlmate-${bySecond}.log</file>
+        <encoder>
+            <!--<immediateFlush>false</immediateFlush>-->
+            <outputPatternAsHeader>true</outputPatternAsHeader>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!--<queueSize>1024</queueSize>-->
+        <appender-ref ref="FILE" />
+    </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Loggers  -->
+
+    <logger name="org.xmlmate" level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="org.evosuite" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!-- main root logger. Note: it is turned OFF to avoid SUT using it-->
+    <root level="OFF"/>
+
+</configuration>
