@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="iCCPChunkDataType">
+		<annotation>
+			<documentation>Each value is encoded as a four-byte PNG unsigned
+				integer, representing the x or y value times 100000.
+				EXAMPLE A value
+				of 0.3127 would be stored as the integer 31270.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="profileName">
+				<annotation>
+					<documentation>The profile name may be any convenient name for
+						referring to the profile. It is case-sensitive. Profile names
+						shall contain only printable Latin-1 characters and spaces (only
+						character codes 32-126 and 161-255 decimal are allowed). Leading,
+						trailing, and consecutive spaces are not permitted
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<minLength value="1"></minLength>
+						<maxLength value="79"></maxLength>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="nullSeparator" type="tns:NullSeparator"></element>
+			<element name="compressionMethod" type="tns:CompressionMethod">
+				<annotation>
+					<documentation>The only compression method defined in this
+						International Standard is method 0 (zlib datastream with deflate
+						compression)
+					</documentation>
+				</annotation>
+			</element>
+			<element name="compressedProfile" type="string">
+				<annotation>
+					<documentation>embedded ICC profile</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="iCCPChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="iCCP"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:iCCPChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>

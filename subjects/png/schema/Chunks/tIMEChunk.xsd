@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="tIMEChunkDataType">
+		<sequence>
+			<element name="year" type="unsignedShort"></element>
+			<element name="month" default="1">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
+						<maxInclusive value="12"></maxInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="day" default="1">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
+						<maxInclusive value="31"></maxInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="hour">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<minInclusive value="0"></minInclusive>
+						<maxInclusive value="23"></maxInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="minute">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<minInclusive value="0"></minInclusive>
+						<maxInclusive value="59"></maxInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="second">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<minInclusive value="0"></minInclusive>
+						<maxInclusive value="60"></maxInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="tIMEChunkType">
+		<annotation>
+			<documentation>The tIME chunk gives the time of the last image
+				modification (not the time of initial image creation)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="tIME"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:tIMEChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+
+</schema>

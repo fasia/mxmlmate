@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+
+	<complexType name="IDATChunkDataRowType">
+		<sequence maxOccurs="unbounded">
+			<element name="filter">
+				<annotation>
+					<documentation>
+						0 None Filt(x) = Orig(x)
+						Recon(x) = Filt(x)
+
+						1 Sub
+						Filt(x) = Orig(x) - Orig(a)
+						Recon(x) = Filt(x) + Recon(a)
+
+						2 Up
+						Filt(x) = Orig(x) - Orig(b)
+						Recon(x) = Filt(x) + Recon(b)
+
+						3 Average
+						Filt(x) = Orig(x) - floor((Orig(a) + Orig(b)) / 2)
+						Recon(x) =
+						Filt(x) + floor((Recon(a) + Recon(b)) / 2)
+
+						4 Paeth Filt(x) =
+						Orig(x) - PaethPredictor(Orig(a), Orig(b),
+						Orig(c))
+						Recon(x) =
+						Filt(x) + PaethPredictor(Recon(a), Recon(b), Recon(c))
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="unsignedByte">
+						<minInclusive value="0"></minInclusive>
+						<maxInclusive value="4"></maxInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="rawData" type="string">
+				<annotation>
+					<documentation>Depending on color type and bit depth this may
+						contain gray values, rgb values, indexes to palette, gray + alpha
+						or rgb+alpha</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="IDATChunkDataType">
+		<sequence>
+			<element name="lastBlock">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<enumeration value="0"></enumeration>
+						<enumeration value="1"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="blockType" type="unsignedByte">
+				<annotation>
+					<documentation>Blocktype :
+						1 = raw
+					</documentation>
+				</annotation>
+			</element>
+			<element name="dataLength" type="unsignedShort"></element>
+			<element name="dataLengthInv" type="unsignedShort"></element>
+			<sequence>
+			</sequence>
+		</sequence>
+	</complexType>
+
+	<complexType name="IDATChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="IDAT"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="string"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>

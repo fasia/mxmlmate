@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+
+	<include schemaLocation="Chunks/CommonTypes.xsd" />
+	<include schemaLocation="Chunks/IHDRChunk.xsd" />
+	<include schemaLocation="Chunks/bKGDChunk.xsd" />
+	<include schemaLocation="Chunks/cHRMChunk.xsd" />
+	<include schemaLocation="Chunks/gAMAChunk.xsd" />
+	<include schemaLocation="Chunks/hISTChunk.xsd" />
+	<include schemaLocation="Chunks/iCCPChunk.xsd" />
+	<include schemaLocation="Chunks/IDATChunk.xsd" />
+	<include schemaLocation="Chunks/IENDChunk.xsd" />
+	<include schemaLocation="Chunks/iTXtChunk.xsd" />
+	<include schemaLocation="Chunks/pHYsChunk.xsd" />
+	<include schemaLocation="Chunks/PLTEChunk.xsd" />
+	<include schemaLocation="Chunks/sBITChunk.xsd" />
+	<include schemaLocation="Chunks/sPLTChunk.xsd" />
+	<include schemaLocation="Chunks/sRGBChunk.xsd" />
+	<include schemaLocation="Chunks/tEXtChunk.xsd" />
+	<include schemaLocation="Chunks/tIMEChunk.xsd" />
+	<include schemaLocation="Chunks/tRNSChunk.xsd" />
+	<include schemaLocation="Chunks/zTXtChunk.xsd" />
+
+
+	<!-- ############################################################################################# -->
+	<simpleType name="signatureType">
+		<restriction base="hexBinary">
+			<enumeration value="89504e470d0a1a0a"></enumeration>
+		</restriction>
+	</simpleType>
+	<!-- ############################################################################################# -->
+	<complexType name="PNGFileType">
+		<sequence>
+			<element name="Signature" type="tns:signatureType" minOccurs="1"
+				maxOccurs="1" />
+			<!-- <element name="Chunks" type="tns:chunkType" maxOccurs="unbounded"> 
+				</element> -->
+			<element name="Chunks">
+				<complexType>
+					<sequence>
+						<element name="IHDR" type="tns:IHDRChunkType" minOccurs="1"
+							maxOccurs="1" />
+						<!-- ## BEFORE PLTE AND IDAT ## -->
+						<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+							maxOccurs="1" />
+
+						<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<choice>
+							<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+								maxOccurs="1" />
+							<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+								maxOccurs="1" />
+						</choice>
+						<element name="sBIT" type="tns:sBITChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<!-- ## PLTE ## -->
+						<element name="PLTE" type="tns:PLTEChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<!-- ## AFTER PLTE BEFORE IDAT ## -->
+						<element name="bKGD" type="tns:bKGDChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<element name="tRNS" type="tns:tRNSChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<!-- ## BEFORE IDAT ## -->
+						<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+							maxOccurs="unbounded" />
+						<!-- ## IDAT ## -->
+						<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+							maxOccurs="unbounded" />
+						<!-- ## NO CONSTRAINTS ## -->
+						<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+							maxOccurs="1" />
+						<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+							maxOccurs="unbounded" />
+						<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+							maxOccurs="unbounded" />
+						<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+							maxOccurs="unbounded" />
+						<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+						<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+							maxOccurs="1" />
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+
+	<element name="PNG" type="tns:PNGFileType"></element>
+</schema>

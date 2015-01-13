@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="tEXtChunkDataType">
+		<sequence>
+			<element name="keyword" type="tns:TextKeywords"></element>
+			<element name="nullSeparator" type="tns:NullSeparator"></element>
+			<element name="text" type="string"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="tEXtChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="iCCP"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:tEXtChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="sBITChunkDataTypeCol0">
+		<annotation>
+			<documentation>sBIT for color type 0 (color type defined in IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="sGrayBits" type="byte">
+				<annotation>
+					<documentation>significant greyscale bits</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="sBITChunkDataTypeCol23">
+		<annotation>
+			<documentation>sBIT for color types 2 and 3 (color type defined in
+				IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="sRedBits" type="byte">
+				<annotation>
+					<documentation>significant red bits</documentation>
+				</annotation>
+			</element>
+			<element name="sGreenBits" type="byte">
+				<annotation>
+					<documentation>significant green bits</documentation>
+				</annotation>
+			</element>
+			<element name="sBlueBits" type="byte">
+				<annotation>
+					<documentation>significant blue bits</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="sBITChunkDataTypeCol4">
+		<annotation>
+			<documentation>sBIT for color type 4 (color type defined in
+				IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="sGreyBits" type="byte">
+				<annotation>
+					<documentation>significant greyscale bits</documentation>
+				</annotation>
+			</element>
+			<element name="sAlphaBits" type="byte">
+				<annotation>
+					<documentation>significant alpha bits</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="sBITChunkDataTypeCol6">
+		<annotation>
+			<documentation>sBIT for color type 6 (color type defined in
+				IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="sRedBits" type="byte">
+				<annotation>
+					<documentation>significant red bits</documentation>
+				</annotation>
+			</element>
+			<element name="sGreenBits" type="byte">
+				<annotation>
+					<documentation>significant green bits</documentation>
+				</annotation>
+			</element>
+			<element name="sBlueBits" type="byte">
+				<annotation>
+					<documentation>significant blue bits</documentation>
+				</annotation>
+			</element>
+			<element name="sAlphaBits" type="byte">
+				<annotation>
+					<documentation>significant alpha bits</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="sBITChunkDataType">
+		<choice minOccurs="1" maxOccurs="1">
+			<element name="sBITColType0" type="tns:sBITChunkDataTypeCol0"></element>
+			<element name="sBITColType23" type="tns:sBITChunkDataTypeCol23"></element>
+			<element name="sBITColType4" type="tns:sBITChunkDataTypeCol4"></element>
+			<element name="sBITColType6" type="tns:sBITChunkDataTypeCol6"></element>
+		</choice>
+	</complexType>
+	<complexType name="sBITChunkType">
+		<annotation>
+			<documentation>To simplify decoders, PNG specifies that only certain
+				sample depths may be used, and further specifies that sample values
+				should be scaled to the full range of possible values at the sample
+				depth. The sBIT chunk defines the original number of significant
+				bits (which can be less than or equal to the sample depth). This
+				allows PNG decoders to recover the original data losslessly even if
+				the data had a sample depth not directly supported by PNG
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="sBIT"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:sBITChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>

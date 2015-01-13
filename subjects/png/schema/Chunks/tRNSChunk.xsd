@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+
+	<complexType name="tRNSChunkDataTypeCol0">
+		<sequence>
+			<element name="tRNSGrey" type="unsignedShort"></element>
+		</sequence>
+	</complexType>
+	<complexType name="tRNSChunkDataTypeCol2">
+		<sequence>
+			<element name="tRNSRed" type="unsignedShort"></element>
+			<element name="tRNSGreen" type="unsignedShort"></element>
+			<element name="tRNSBlue" type="unsignedShort"></element>
+		</sequence>
+	</complexType>
+	<complexType name="tRNSChunkDataTypeCol3">
+		<sequence>
+			<element name="bKGDPaletteIndex" type="byte" maxOccurs="unbounded"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="tRNSChunkDataType">
+		<choice minOccurs="1" maxOccurs="1">
+			<element name="tRNSColType0" type="tns:tRNSChunkDataTypeCol0"></element>
+			<element name="tRNSColType2" type="tns:tRNSChunkDataTypeCol2"></element>
+			<element name="tRNSColType3" type="tns:tRNSChunkDataTypeCol3"></element>
+		</choice>
+	</complexType>
+
+	<complexType name="tRNSChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="tRNS"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:tRNSChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>

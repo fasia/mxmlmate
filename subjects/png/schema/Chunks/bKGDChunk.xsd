@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="bKGDChunkDataTypeCol04">
+		<annotation>
+			<documentation>default background color for color types 0 and 4
+				(color type defined in IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="bKGDGreyscale" type="unsignedShort"></element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCol26">
+		<annotation>
+			<documentation>default background color for color types 2 and 6
+				(color type defined in IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="bKGDRed" type="unsignedShort"></element>
+			<element name="bKGDGreen" type="unsignedShort"></element>
+			<element name="bKGDBlue" type="unsignedShort"></element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCol3">
+		<annotation>
+			<documentation>default background color for color type 3 (color type
+				defined in IHDR)
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="bKGDPaletteIndex" type="byte"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="bKGDChunkDataType">
+		<choice minOccurs="1" maxOccurs="1">
+			<element name="bKGDColType04" type="tns:bKGDChunkDataTypeCol04"></element>
+			<element name="bKGDColType26" type="tns:bKGDChunkDataTypeCol26"></element>
+			<element name="bKGDColType3" type="tns:bKGDChunkDataTypeCol3"></element>
+		</choice>
+	</complexType>
+
+	<complexType name="bKGDChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>			
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+
+
+
+</schema>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="cHRMChunkDataType">
+		<annotation>
+			<documentation>Each value is encoded as a four-byte PNG unsigned
+				integer, representing the x or y value times 100000.
+				EXAMPLE A value
+				of 0.3127 would be stored as the integer 31270.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="whiteX" type="unsignedInt"></element>
+			<element name="whiteY" type="unsignedInt"></element>
+			<element name="redX" type="unsignedInt"></element>
+			<element name="redY" type="unsignedInt"></element>
+			<element name="greenX" type="unsignedInt"></element>
+			<element name="greenY" type="unsignedInt"></element>
+			<element name="blueX" type="unsignedInt"></element>
+			<element name="blueY" type="unsignedInt"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="cHRMChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="cHRM"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:cHRMChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>

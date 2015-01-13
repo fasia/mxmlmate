@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<complexType name="IHDRChunkDataType">
+		<sequence>
+			<element name="width" type="int"></element>
+			<element name="height" type="int"></element>
+			<element name="bitDepth" type="byte"></element>
+			<element name="colorType" type="byte"></element>
+			<element name="compressionMethod" type="byte"></element>
+			<element name="filterMethod" type="byte"></element>
+			<element name="interlaceMethod" type="byte"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="IHDRChunkType">
+		<sequence>
+			<element name="size" type="tns:chunkSize"></element>
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="IHDR"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:IHDRChunkDataType"></element>
+			<element name="crc" type="tns:chunkCRC"></element>
+		</sequence>
+	</complexType>
+</schema>
