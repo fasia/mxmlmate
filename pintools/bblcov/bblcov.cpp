@@ -60,6 +60,7 @@ VOID OutputResults() {
 }
 
 VOID SendResults() {
+	*out << "Sending results: " << executedBlocks.size() << endl;
 	std::stringstream out;
 	out << executedBlocks.size();
 	std::string s = out.str();
@@ -85,6 +86,7 @@ VOID PIN_FAST_ANALYSIS_CALL Block(UINT32 instr, ADDRINT addr) {
 }
 
 VOID resetCounters() {
+	*out << "Resetting PIN counters" << endl;
 	threadCount = 0;
 	insCount = 0;
 	executedBlocks.clear();
@@ -133,6 +135,7 @@ VOID ThreadStart(THREADID threadIndex, CONTEXT *ctxt, INT32 flags, VOID *v) {
 }
 
 VOID Routine(RTN rtn, VOID *v) {
+	cerr << "Routine " << RTN_Name(rtn) << endl;
 	if ("PIN_SCORE_START" == RTN_Name(rtn)) {
 		RTN_Open(rtn);
 		RTN_InsertCall(rtn, IPOINT_ANYWHERE, (AFUNPTR)resetCounters, 0);
@@ -146,6 +149,10 @@ VOID Routine(RTN rtn, VOID *v) {
 
 VOID Fini(INT32 code, VOID *v) {
 	DisposeZMQ();
+}
+
+BOOL FollowChild(CHILD_PROCESS childProcess, VOID * userData) {
+    return TRUE; // FIXME this seems to cause a problem
 }
 
 /*!
@@ -175,11 +182,15 @@ int main(int argc, char *argv[]) {
 		return Usage();
 	}
 
+	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
+
 	// Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);
 
 	// Register Routine to be called to instrument trace
 	TRACE_AddInstrumentFunction(Trace, 0);
+
+	RTN_AddInstrumentFunction(Routine, 0);
 
 	// Register function to be called for every thread before it starts running
 	PIN_AddThreadStartFunction(ThreadStart, 0);
@@ -187,7 +198,7 @@ int main(int argc, char *argv[]) {
 	// Register function to be called when the application exits
 	PIN_AddFiniFunction(Fini, 0);
 
-	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
+	PIN_AddFollowChildProcessFunction(FollowChild, 0);
 
 	// Start the program, never returns
 	PIN_StartProgram();
