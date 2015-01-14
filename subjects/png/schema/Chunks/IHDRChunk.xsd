@@ -16,7 +16,13 @@
 
 	<complexType name="IHDRChunkType">
 		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
+			<element name="size">
+				<simpleType>
+					<restriction base="unsignedInt">
+						<enumeration value="13"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
 			<element name="type">
 				<simpleType>
 					<restriction base="string">

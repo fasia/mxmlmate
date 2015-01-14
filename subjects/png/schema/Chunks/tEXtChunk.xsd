@@ -16,7 +16,7 @@
 			<element name="type">
 				<simpleType>
 					<restriction base="string">
-						<enumeration value="iCCP"></enumeration>
+						<enumeration value="tEXt"></enumeration>
 					</restriction>
 				</simpleType>
 			</element>

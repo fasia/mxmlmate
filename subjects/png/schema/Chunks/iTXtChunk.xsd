@@ -59,7 +59,7 @@
 			<element name="type">
 				<simpleType>
 					<restriction base="string">
-						<enumeration value="iCCP"></enumeration>
+						<enumeration value="iTXt"></enumeration>
 					</restriction>
 				</simpleType>
 			</element>

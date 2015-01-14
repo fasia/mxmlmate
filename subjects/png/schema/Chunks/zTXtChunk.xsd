@@ -29,7 +29,7 @@
 			<element name="type">
 				<simpleType>
 					<restriction base="string">
-						<enumeration value="iCCP"></enumeration>
+						<enumeration value="zTXt"></enumeration>
 					</restriction>
 				</simpleType>
 			</element>

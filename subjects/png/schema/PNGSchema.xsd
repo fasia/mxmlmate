@@ -82,7 +82,8 @@
 							maxOccurs="unbounded" />
 						<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 							maxOccurs="unbounded" />
-						<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+						<element name="Chunk" type="tns:chunkType" minOccurs="1"
+							maxOccurs="unbounded"></element>
 						<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
 							maxOccurs="1" />
 					</sequence>
