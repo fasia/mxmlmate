@@ -6,12 +6,18 @@
 		<sequence minOccurs="1" maxOccurs="unbounded">
 			<element name="pixelsPerUnitX" type="unsignedInt"></element>
 			<element name="pixelsPerUnitY" type="unsignedInt"></element>
-			<element name="unit" type="byte">
+			<element name="unit">
 				<annotation>
 					<documentation>0 - unit is unknown
 						1 - unit is the metre
 					</documentation>
 				</annotation>
+				<simpleType>
+					<restriction base="unsignedByte">
+						<enumeration value="0"></enumeration>
+						<enumeration value="1"></enumeration>
+					</restriction>
+				</simpleType>
 			</element>
 		</sequence>
 	</complexType>

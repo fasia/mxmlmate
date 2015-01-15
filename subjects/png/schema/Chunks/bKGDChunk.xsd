@@ -31,7 +31,7 @@
 			</documentation>
 		</annotation>
 		<sequence>
-			<element name="bKGDPaletteIndex" type="byte"></element>
+			<element name="bKGDPaletteIndex" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
 

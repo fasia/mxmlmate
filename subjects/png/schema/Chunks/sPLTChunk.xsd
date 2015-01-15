@@ -21,7 +21,7 @@
 					</documentation>
 				</annotation>
 				<simpleType>
-					<restriction base="byte">
+					<restriction base="unsignedByte">
 						<enumeration value="8"></enumeration>
 						<enumeration value="16"></enumeration>
 					</restriction>

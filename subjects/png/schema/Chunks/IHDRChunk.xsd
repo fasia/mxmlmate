@@ -4,13 +4,96 @@
 	<include schemaLocation="CommonTypes.xsd" />
 	<complexType name="IHDRChunkDataType">
 		<sequence>
-			<element name="width" type="int"></element>
-			<element name="height" type="int"></element>
-			<element name="bitDepth" type="byte"></element>
-			<element name="colorType" type="byte"></element>
-			<element name="compressionMethod" type="byte"></element>
-			<element name="filterMethod" type="byte"></element>
-			<element name="interlaceMethod" type="byte"></element>
+			<element name="width">
+				<simpleType>
+					<restriction base="unsignedInt">
+						<minInclusive value="1"></minInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="height">
+				<simpleType>
+					<restriction base="unsignedInt">
+						<minInclusive value="1"></minInclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bitDepth">
+				<annotation>
+					<documentation>ColType0 - 1, 2, 4, 8, 16
+						ColType2 - 8, 16
+						ColType3 -
+						1, 2, 4, 8
+						ColType4 - 8, 16
+						ColType6 - 8, 16
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="byte">
+						<enumeration value="1"></enumeration>
+						<enumeration value="2"></enumeration>
+						<enumeration value="4"></enumeration>
+						<enumeration value="8"></enumeration>
+						<enumeration value="16"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="colorType">
+				<annotation>
+					<documentation>0 - Greyscale
+						2 - Truecolor (R, G, B)
+						3 -
+						Indexed-color (Palette)
+						4 - Greyscale with alpha
+						6 - Truecolor with
+						alpha
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="byte">
+						<enumeration value="0"></enumeration>
+						<enumeration value="2"></enumeration>
+						<enumeration value="3"></enumeration>
+						<enumeration value="4"></enumeration>
+						<enumeration value="6"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="compressionMethod">
+				<annotation>
+					<documentation>0 - Deflate/Inflate. Sliding windows at most 32768
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="byte">
+						<enumeration value="0"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="filterMethod">
+				<annotation>
+					<documentation>0 - (adaptive filtering with five basic filter types
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="byte">
+						<enumeration value="0"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="interlaceMethod">
+				<annotation>
+					<documentation>0 - standard
+						1 - Adam7
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="byte">
+						<enumeration value="0"></enumeration>
+						<enumeration value="1"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
 		</sequence>
 	</complexType>
 

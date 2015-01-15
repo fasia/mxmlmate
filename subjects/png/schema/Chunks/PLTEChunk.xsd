@@ -5,9 +5,9 @@
 
 	<complexType name="PLTEChunkDataType">
 		<sequence minOccurs="1" maxOccurs="256">
-			<element name="red" type="byte"></element>
-			<element name="green" type="byte"></element>
-			<element name="blue" type="byte"></element>
+			<element name="red" type="unsignedByte"></element>
+			<element name="green" type="unsignedByte"></element>
+			<element name="blue" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
 

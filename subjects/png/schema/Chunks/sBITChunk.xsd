@@ -8,7 +8,7 @@
 			</documentation>
 		</annotation>
 		<sequence>
-			<element name="sGrayBits" type="byte">
+			<element name="sGrayBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant greyscale bits</documentation>
 				</annotation>
@@ -22,17 +22,17 @@
 			</documentation>
 		</annotation>
 		<sequence>
-			<element name="sRedBits" type="byte">
+			<element name="sRedBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant red bits</documentation>
 				</annotation>
 			</element>
-			<element name="sGreenBits" type="byte">
+			<element name="sGreenBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant green bits</documentation>
 				</annotation>
 			</element>
-			<element name="sBlueBits" type="byte">
+			<element name="sBlueBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant blue bits</documentation>
 				</annotation>
@@ -46,12 +46,12 @@
 			</documentation>
 		</annotation>
 		<sequence>
-			<element name="sGreyBits" type="byte">
+			<element name="sGreyBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant greyscale bits</documentation>
 				</annotation>
 			</element>
-			<element name="sAlphaBits" type="byte">
+			<element name="sAlphaBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant alpha bits</documentation>
 				</annotation>
@@ -65,22 +65,22 @@
 			</documentation>
 		</annotation>
 		<sequence>
-			<element name="sRedBits" type="byte">
+			<element name="sRedBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant red bits</documentation>
 				</annotation>
 			</element>
-			<element name="sGreenBits" type="byte">
+			<element name="sGreenBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant green bits</documentation>
 				</annotation>
 			</element>
-			<element name="sBlueBits" type="byte">
+			<element name="sBlueBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant blue bits</documentation>
 				</annotation>
 			</element>
-			<element name="sAlphaBits" type="byte">
+			<element name="sAlphaBits" type="unsignedByte">
 				<annotation>
 					<documentation>significant alpha bits</documentation>
 				</annotation>

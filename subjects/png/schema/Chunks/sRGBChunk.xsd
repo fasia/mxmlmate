@@ -29,7 +29,7 @@
 					</documentation>
 				</annotation>
 				<simpleType>
-					<restriction base="byte">
+					<restriction base="unsignedByte">
 						<minInclusive value="0"></minInclusive>
 						<maxInclusive value="3"></maxInclusive>
 					</restriction>
