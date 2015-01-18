@@ -135,24 +135,21 @@ VOID ThreadStart(THREADID threadIndex, CONTEXT *ctxt, INT32 flags, VOID *v) {
 }
 
 VOID Routine(RTN rtn, VOID *v) {
-	cerr << "Routine " << RTN_Name(rtn) << endl;
-	if ("PIN_SCORE_START" == RTN_Name(rtn)) {
-		RTN_Open(rtn);
-		RTN_InsertCall(rtn, IPOINT_ANYWHERE, (AFUNPTR)resetCounters, 0);
-		RTN_Close(rtn);
-	} else if ("PIN_SCORE_END" == RTN_Name(rtn)) {
-		RTN_Open(rtn);
-		RTN_InsertCall(rtn, IPOINT_ANYWHERE, (AFUNPTR)SendResults, 0);
-		RTN_Close(rtn);
-	}
+	if (RTN_Name(rtn).find("PIN_SCORE_START") != std::string::npos) {
+			cout << "Detected PIN_SCORE_START" << endl;
+			RTN_Open(rtn);
+			RTN_InsertCall(rtn, IPOINT_BEFORE, (AFUNPTR) resetCounters, IARG_END);
+			RTN_Close(rtn);
+		} else if (RTN_Name(rtn).find("PIN_SCORE_END") != std::string::npos) {
+			cout << "Detected PIN_SCORE_END" << endl;
+			RTN_Open(rtn);
+			RTN_InsertCall(rtn, IPOINT_BEFORE, (AFUNPTR) SendResults, IARG_END);
+			RTN_Close(rtn);
+		}
 }
 
 VOID Fini(INT32 code, VOID *v) {
 	DisposeZMQ();
-}
-
-BOOL FollowChild(CHILD_PROCESS childProcess, VOID * userData) {
-    return TRUE; // FIXME this seems to cause a problem
 }
 
 /*!
@@ -163,6 +160,9 @@ BOOL FollowChild(CHILD_PROCESS childProcess, VOID * userData) {
  *                              including pin -t <toolname> -- ...
  */
 int main(int argc, char *argv[]) {
+
+	PIN_InitSymbols();
+
 	// Initialize PIN library. Print help message if -h(elp) is specified
 	// in the command line or the command line is invalid
 	if (PIN_Init(argc, argv)) {
@@ -197,8 +197,6 @@ int main(int argc, char *argv[]) {
 
 	// Register function to be called when the application exits
 	PIN_AddFiniFunction(Fini, 0);
-
-	PIN_AddFollowChildProcessFunction(FollowChild, 0);
 
 	// Start the program, never returns
 	PIN_StartProgram();
