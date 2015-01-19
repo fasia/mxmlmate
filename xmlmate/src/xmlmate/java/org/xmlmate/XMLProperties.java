@@ -105,7 +105,6 @@ public class XMLProperties {
         options.addOption("measure", true, "Measure the schema coverage of all suites in the given directory.");
         options.addOption("schemaCoverage", false, "Use the schema coverage as sole fitness function.");
         options.addOption("hybridCoverage", false, "Use the hybrid coverage as fitness function maximizing both branch and schema coverages.");
-        options.addOption("bblCoverage", true, "Use PIN instrumentation framework and measure basic block coverage for given binary subject.");
         int maxTargetBinaryArgs = 5;
         Option bblCoverage = new Option("bblCoverage",true,"Use PIN instrumentation framework and measure basic block coverage. Followed by working directory, path to PIN, path to PINtool, and path to target binary and any arguments. (max "+maxTargetBinaryArgs+")");
         bblCoverage.setArgs(4 + maxTargetBinaryArgs);

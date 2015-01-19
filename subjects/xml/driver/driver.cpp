@@ -4,6 +4,8 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 void PIN_SCORE_START() __attribute__((noinline));
 void PIN_SCORE_END() __attribute__((noinline));
@@ -55,7 +57,6 @@ int main(int argc, char* argv[]) {
 	memcpy((void *) readiness.data(), "rdy", 3);
 	controlSocket.send(readiness);
 
-
 	while (true) {
 		std::cout << "Wrapper waiting for tasks" << std::endl;
 		// Wait for data from xmlmate
@@ -64,7 +65,28 @@ int main(int argc, char* argv[]) {
 //		std::cout << "Received " << items.size() << " work items" << std::endl;
 
 		PIN_SCORE_START();
-		// TODO implement calling SUT here
+		/*
+		 * this initialize the library and check potential ABI mismatches
+		 * between the version it was compiled for and the actual shared
+		 * library used.
+		 */
+		LIBXML_TEST_VERSION
+		for (std::vector<std::string>::const_iterator i = items.begin(); i != items.end(); ++i) {
+			xmlDocPtr doc; /* the resulting document tree */
+			doc = xmlReadFile(i->c_str(), NULL, 0);
+			if (doc == NULL) {
+				fprintf(stderr, "Failed to parse %s\n", i->c_str());
+			}
+			xmlFreeDoc(doc);
+		}
+		/*
+		 * Cleanup function for the XML library.
+		 */
+		xmlCleanupParser();
+		/*
+		 * this is to debug memory for regression tests
+		 */
+		xmlMemoryDump();
 		PIN_SCORE_END();
 	}
 

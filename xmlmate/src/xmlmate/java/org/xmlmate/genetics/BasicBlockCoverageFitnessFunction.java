@@ -27,16 +27,16 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 	private Socket dataOut;
 	private Socket coverageIn;
 	private ProcessBuilder processBuilder;
-	private Process wrapperProcess;
+	private Process driverProcess;
 
-	public BasicBlockCoverageFitnessFunction(File workDir, List<String> wrapperCall) {
+	public BasicBlockCoverageFitnessFunction(File workDir, List<String> driverCall) {
 		// prepare for starting the SUT
-		processBuilder = new ProcessBuilder(wrapperCall);
+		processBuilder = new ProcessBuilder(driverCall);
 		processBuilder.directory(workDir);
 //		processBuilder.inheritIO();
 		processBuilder.redirectOutput(new File("/dev/null"));
 		processBuilder.redirectError(new File("/dev/null"));
-		logger.debug("Created a process builder for "+StringUtils.join(wrapperCall,' ')+" in "+workDir.getAbsolutePath());
+		logger.debug("Created a process builder for "+StringUtils.join(driverCall,' ')+" in "+workDir.getAbsolutePath());
 
 		// bind socket for receiving coverage results
 		context = ZMQ.context(1);
@@ -53,7 +53,7 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 	public void startAndReadyWorkers() {
 		logger.debug("starting up worker");
 		try {
-			wrapperProcess = processBuilder.start(); 
+			driverProcess = processBuilder.start(); 
 		} catch (IOException e) {
 			logger.error("Could not start wrapper process!", e);
 			throw new RuntimeException(e);
@@ -123,7 +123,7 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 	}
 	
 	public void destroyWorkers() {
-		wrapperProcess.destroy();		
+		driverProcess.destroy();		
 	}
 
 }
