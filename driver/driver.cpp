@@ -35,10 +35,9 @@ void PIN_SCORE_END() {
 /* EXPECTED ARGUMENTS:
  * controlSocket transport address // TODO
  * dataIn transport address // TODO
- * path to driver
  */
 int main(int argc, char* argv[]) {
-	assert(argc > 3);
+	assert(argc > 2);
 	// Prepare our context and socket
 	zmq::context_t context(1);
 	zmq::socket_t controlSocket(context, ZMQ_REQ);
@@ -60,38 +59,10 @@ int main(int argc, char* argv[]) {
 		std::string data = s_recv(dataIn);
 		std::vector<std::string> items = split(data, ':');
 //		std::cout << "Received " << items.size() << " work items" << std::endl;
-		char **args = new char*[items.size()+argc-2];
-		int i = 0;
-		for(i = 0; i < argc-3; ++i) {
-			args[i] = argv[i+3];
-		}
-		for (std::vector<std::string>::iterator it = items.begin(); it != items.end(); ++it) {
-			args[i] = const_cast<char*>(it->c_str());
-			i += 1;
-		}
-		args[i] = NULL;
 
-		pid_t pid = fork();
-		switch (pid) {
-		case -1:
-			// error forking
-			std::cerr << "ERROR: Could not fork driver process!" << std::endl;
-			delete args;
-			return 1;
-		case 0:
-			// child process
-			PIN_SCORE_START();
-			execv(argv[3], args); // call driver here
-			return 0;
-		default:
-			// parent process
-			int status;
-			waitpid(pid, &status, 0);
-//			std::cout << "driver exited with code " << status << std::endl;
-			delete args;
-			PIN_SCORE_END();
-			break;
-		}
+		PIN_SCORE_START();
+		// TODO implement calling SUT here
+		PIN_SCORE_END();
 	}
 
 	// unreachable

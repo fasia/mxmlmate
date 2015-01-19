@@ -182,6 +182,7 @@ int main(int argc, char *argv[]) {
 		return Usage();
 	}
 
+	cout << "Connecting socket in PIN tool" << endl;
 	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
 
 	// Register ImageLoad to be called when an image is loaded
