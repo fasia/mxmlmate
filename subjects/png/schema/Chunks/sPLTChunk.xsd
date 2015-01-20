@@ -42,6 +42,9 @@
 					<element name="alphaDpp16" type="unsignedShort"></element>
 					<element name="frequencyDpp16" type="unsignedShort"></element>
 				</sequence>
+				<!-- <element name="paletteRAW" type="string"> <annotation> <documentation>In 
+					case non of the above is applicable (because of size)</documentation> </annotation> 
+					</element> -->
 			</choice>
 		</sequence>
 	</complexType>

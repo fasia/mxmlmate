@@ -4,6 +4,8 @@ import binascii
 import zlib
 
 def txtToInt(txt, mod=0xFFFFFFFF):
+    if not txt: 
+        return 0
     num = 0 
     ord0 = ord('0')
     for i in txt:
@@ -68,7 +70,8 @@ def parseiCCPData(elem):
     ret.extend(profileName.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
-    ret.extend(compressedProfile.text)
+    if compressedProfile.text:
+        ret.extend(compressedProfile.text)
     return ret
     
 def parsesRGBData(elem):
@@ -194,6 +197,7 @@ def parsesPLTData(elem):
     ret.extend(chr(txtToInt(sampleDepth.text, 0xFF)))
     
     sampleDepthNumber = txtToInt(sampleDepth.text, 0xFF)   
+    
     i = 3
     while i < len(elemChildren):
         if sampleDepthNumber == 16:
@@ -316,7 +320,7 @@ def parseIDATData(elem):
         
     compressedText = zlib.compress(elem.text)
     ret.extend(compressedText)
-    #ret.extend(elem.text)
+    # ret.extend(elem.text)
     
     return ret
 
@@ -343,7 +347,7 @@ def getCRC(data):
 
 def parseTopLevel(topLevelElement):
     childs = topLevelElement.getchildren()
-    chunk_size = childs[0].text.strip()
+    chunk_size = childs[0].text.strip()    
     chunk_type = childs[1].text.strip()
     if len(childs) == 4:
         chunk_data_elem = childs[2]
@@ -424,4 +428,5 @@ def xml2png(pathToXML, pathToPNG):
         fw.write(pngData)    
     
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
-xml2png('/home/gmaisuradze/Desktop/testPNG1.xml', 'result.png')
+# xml2png('/home/gmaisuradze/Desktop/testPNG1.xml', 'result.png')
+xml2png('/home/gmaisuradze/Desktop/testPNG2.xml', '/home/gmaisuradze/Desktop/testPNG2.png')
