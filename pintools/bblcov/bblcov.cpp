@@ -60,6 +60,7 @@ VOID OutputResults() {
 }
 
 VOID SendResults() {
+//	*out << "Sending results: " << executedBlocks.size() << endl;
 	std::stringstream out;
 	out << executedBlocks.size();
 	std::string s = out.str();
@@ -85,6 +86,7 @@ VOID PIN_FAST_ANALYSIS_CALL Block(UINT32 instr, ADDRINT addr) {
 }
 
 VOID resetCounters() {
+//	*out << "Resetting PIN counters" << endl;
 	threadCount = 0;
 	insCount = 0;
 	executedBlocks.clear();
@@ -97,8 +99,9 @@ VOID resetCounters() {
 // Pin calls this function every time a new img is loaded
 // Note that imgs (including shared libraries) are loaded lazily
 VOID ImageLoad(IMG img, VOID *v) {
-	*out << "Loading target image " << IMG_Name(img) << endl;
-	if (targetImage == IMG_Name(img)) {
+	*out << "Loading image " << IMG_Name(img) << endl;
+	if (IMG_Name(img).find(targetImage) != std::string::npos) {
+		*out << "Loaded target image " << IMG_Name(img) << endl;
 		imgLow = IMG_LowAddress(img);
 		imgHigh = IMG_HighAddress(img);
 	}
@@ -111,9 +114,7 @@ VOID Trace(TRACE trace, VOID *v) {
 			ADDRINT addr = BBL_Address(bbl);
 			if (addr < imgLow || addr > imgHigh)
 				continue;
-
-			BBL_InsertCall(bbl, IPOINT_ANYWHERE, (AFUNPTR)Block,
-					IARG_FAST_ANALYSIS_CALL, IARG_UINT32, BBL_NumIns(bbl), IARG_ADDRINT, BBL_Address(bbl), IARG_END);
+			BBL_InsertCall(bbl, IPOINT_ANYWHERE, (AFUNPTR)Block, IARG_FAST_ANALYSIS_CALL, IARG_UINT32, BBL_NumIns(bbl), IARG_ADDRINT, BBL_Address(bbl), IARG_END);
 		}
 	}
 }
@@ -133,19 +134,22 @@ VOID ThreadStart(THREADID threadIndex, CONTEXT *ctxt, INT32 flags, VOID *v) {
 }
 
 VOID Routine(RTN rtn, VOID *v) {
-	if ("PIN_SCORE_START" == RTN_Name(rtn)) {
+	if (RTN_Name(rtn).find("PIN_SCORE_START") != std::string::npos) {
+		cout << "Detected PIN_SCORE_START" << endl;
 		RTN_Open(rtn);
-		RTN_InsertCall(rtn, IPOINT_ANYWHERE, (AFUNPTR)resetCounters, 0);
+		RTN_Replace(rtn, (AFUNPTR) resetCounters);
 		RTN_Close(rtn);
-	} else if ("PIN_SCORE_END" == RTN_Name(rtn)) {
+	} else if (RTN_Name(rtn).find("PIN_SCORE_END") != std::string::npos) {
+		cout << "Detected PIN_SCORE_END" << endl;
 		RTN_Open(rtn);
-		RTN_InsertCall(rtn, IPOINT_ANYWHERE, (AFUNPTR)SendResults, 0);
+		RTN_Replace(rtn, (AFUNPTR) SendResults);
 		RTN_Close(rtn);
 	}
 }
 
 VOID Fini(INT32 code, VOID *v) {
 	DisposeZMQ();
+//	OutputResults();
 }
 
 /*!
@@ -156,6 +160,9 @@ VOID Fini(INT32 code, VOID *v) {
  *                              including pin -t <toolname> -- ...
  */
 int main(int argc, char *argv[]) {
+
+	PIN_InitSymbols();
+
 	// Initialize PIN library. Print help message if -h(elp) is specified
 	// in the command line or the command line is invalid
 	if (PIN_Init(argc, argv)) {
@@ -175,19 +182,22 @@ int main(int argc, char *argv[]) {
 		return Usage();
 	}
 
+	cout << "Connecting socket in PIN tool" << endl;
+	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
+
 	// Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);
 
 	// Register Routine to be called to instrument trace
 	TRACE_AddInstrumentFunction(Trace, 0);
 
+	RTN_AddInstrumentFunction(Routine, 0);
+
 	// Register function to be called for every thread before it starts running
 	PIN_AddThreadStartFunction(ThreadStart, 0);
 
 	// Register function to be called when the application exits
 	PIN_AddFiniFunction(Fini, 0);
-
-	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
 
 	// Start the program, never returns
 	PIN_StartProgram();
