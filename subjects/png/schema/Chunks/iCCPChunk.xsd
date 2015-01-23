@@ -36,7 +36,7 @@
 					</documentation>
 				</annotation>
 			</element>
-			<element name="compressedProfile" type="string">
+			<element name="compressedProfile" type="hexBinary">
 				<annotation>
 					<documentation>embedded ICC profile</documentation>
 				</annotation>

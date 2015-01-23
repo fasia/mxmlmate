@@ -21,7 +21,7 @@ class Chunk:
     def getCRC(self):        
         crc = 0
         crc = binascii.crc32(self.chunk_type, crc)
-        crc = binascii.crc32(self.data, crc)     
+        crc = binascii.crc32(self.data, crc)
         return crc & 0xffffffff
     
     def updateCRC(self):
@@ -33,6 +33,13 @@ def isIntAlready(dt):
         return True
     except TypeError:
         return False
+
+def byteArrayToHex(dt):
+    if not dt: return ''
+    res = ''    
+    for i in dt:
+        res += '{:02x}'.format(i)
+    return res
 
 def bytesToBigEndianInt(dt, mod=0xFFFFFFFF):
     if isIntAlready(dt): return dt & mod
@@ -111,7 +118,7 @@ def extractcHRMData(elem, data):
     
 def extractgAMAData(elem, data):
     imageGamma = ET.SubElement(elem, getTag('imageGamma'))
-    imageGamma.text = str(bytesToBigEndianInt(data[0], 0xFF))
+    imageGamma.text = str(bytesToBigEndianInt(data[0:4], 0xFFFFFFFF))
     
 def extractiCCPData(elem, data):
     for i in range(len(data)):
@@ -134,7 +141,7 @@ def extractiCCPData(elem, data):
     CompressionMethod.text = str(bytesToBigEndianInt(data[i + 1], 0xFF))
         
     compressedProfile = ET.SubElement(elem, getTag('compressedProfile'))    
-    compressedProfile.text = str(data[i + 2:])
+    compressedProfile.text = byteArrayToHex(data[i + 2:])
     
 def extractsRGBData(elem, data):
     renderingIntent = ET.SubElement(elem, getTag('renderingIntent'))
@@ -446,7 +453,7 @@ def extractiTXtData(elem, data):
     nullSeparator2.text = str(bytesToBigEndianInt(data[k], 0xFF))    
     
     text = ET.SubElement(elem, getTag('text'))
-    text.text = str(data[k + 1:])
+    text.text = byteArrayToHex(data[k + 1:])
     
     
 def extracttEXtData(elem, data):
@@ -489,22 +496,22 @@ def extractzTXtData(elem, data):
     compressionMethod.text = str(bytesToBigEndianInt(data[i + 1], 0xFF))
     
     compressedText = ET.SubElement(elem, getTag('compressedText'))
-    compressedText.text = str(data[i + 2:])
+    compressedText.text = byteArrayToHex(data[i + 2:])
 
 def extractIEndData(elem, data):
     pass
     
 def extractChunkData(elem, data):
-    elem.text = str(data)
+    elem.text = byteArrayToHex(data)
     
 def extractIDATData(elem, data):    
-    elem.text = zlib.decompress(str(data))
+    elem.text = byteArrayToHex(bytearray(zlib.decompress(str(data))))
 
 def extractSignature(pngData, root):    
     sg = pngData[0:8]
     
     signature = ET.SubElement(root, getTag('Signature'))
-    signature.text = hex(bytesToBigEndianInt(sg, 0xFFFFFFFFFFFFFFFF))
+    signature.text = byteArrayToHex(sg)  # hex(bytesToBigEndianInt(sg, 0xFFFFFFFFFFFFFFFF))
 
 def getCRC(data):
     # chars = getCharsFromInt32(self.size)
@@ -600,7 +607,7 @@ def getTag(tag):
     return tag
 
 XML_NAMESPACE = '{http://www.example.org/PNGSchema}'
-def pngToxml(pathToPNG, pathToXML):
+def png2xml(pathToPNG, pathToXML):
     pngFile = io.open(pathToPNG, mode='rb')
     pngData = bytearray(pngFile.read())
     pngFile.close()
@@ -619,13 +626,13 @@ def pngToxml(pathToPNG, pathToXML):
     for chunk in chunks:
         extractTopLevel(chunksElement, chunk)
     
-    #print root.getchildren()[1].getchildren()[15]
-    #print ET.tostring(root)
+    # print root.getchildren()[1].getchildren()[15]
+    # print ET.tostring(root)
     ET.ElementTree(root).write(pathToXML)
     # with io.open(pathToXML, mode='wb') as fw:
     #    fw.write(ET.tostring(root, 'UTF8'))
     
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
 
-pngToxml('/home/gmaisuradze/Desktop/result.png', '/home/gmaisuradze/Desktop/testPNG2.xml')
+png2xml('/home/gmaisuradze/Desktop/ftp0n2c08.png', '/home/gmaisuradze/Desktop/ftp0n2c08.xml')
 

@@ -3,6 +3,13 @@ import io
 import binascii
 import zlib
 
+def hexStringToByteArray(hx):
+    res = bytearray()
+    if not hx: return res
+    for i in range(0, len(hx), 2):
+        res.append(int(hx[i: i + 2], 16))
+    return res
+
 def txtToInt(txt, mod=0xFFFFFFFF):
     if not txt: 
         return 0
@@ -60,7 +67,7 @@ def parsecHRMData(elem):
     
 def parsegAMAData(elem):
     ret = bytearray()
-    imageGama = elem.getchildren()[0]
+    imageGama = elem.getchildren()[0]     
     ret.extend(intToCharBigEndian(txtToInt(imageGama.text)))
     return ret
     
@@ -71,7 +78,7 @@ def parseiCCPData(elem):
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedProfile.text:
-        ret.extend(compressedProfile.text)
+        ret.extend(hexStringToByteArray(compressedProfile.text))
     return ret
     
 def parsesRGBData(elem):
@@ -279,7 +286,7 @@ def parseiTXtData(elem):
         ret.extend(translatedKeyword.text)
     ret.extend(chr(txtToInt(nullSeparator3.text, 0xFF)))
     if text.text:
-        ret.extend(text.text)
+        ret.extend(hexStringToByteArray(text.text))
     
     return ret
     
@@ -302,7 +309,7 @@ def parsezTXtData(elem):
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))    
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedText.text:
-        ret.extend(compressedText.text)
+        ret.extend(hexStringToByteArray(compressedText.text))
     
     return ret
 
@@ -311,14 +318,14 @@ def parseIEndData(elem):
     
 def parseChunkData(elem):
     ret = bytearray()
-    ret.extend(elem.text.strip())
+    ret.extend(hexStringToByteArray(elem.text.strip()))
     
     return ret
     
 def parseIDATData(elem):
     ret = bytearray()
         
-    compressedText = zlib.compress(elem.text)
+    compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
     ret.extend(compressedText)
     # ret.extend(elem.text)
     
@@ -429,4 +436,4 @@ def xml2png(pathToXML, pathToPNG):
     
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
 # xml2png('/home/gmaisuradze/Desktop/testPNG1.xml', 'result.png')
-xml2png('/home/gmaisuradze/Desktop/testPNG2.xml', '/home/gmaisuradze/Desktop/testPNG2.png')
+xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')

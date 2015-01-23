@@ -14,7 +14,7 @@
 					</documentation>
 				</annotation>
 			</element>
-			<element name="compressedText" type="string">
+			<element name="compressedText" type="hexBinary">
 				<annotation>
 					<documentation>zlib datastream with deflate compression
 					</documentation>

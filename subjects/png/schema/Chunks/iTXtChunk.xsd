@@ -43,7 +43,7 @@
 				</annotation>
 			</element>
 			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="text" type="string">
+			<element name="text" type="hexBinary">
 				<annotation>
 					<documentation>Either compressed or not depending on the
 						compression flag

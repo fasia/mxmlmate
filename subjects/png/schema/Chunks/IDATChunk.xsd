@@ -38,7 +38,7 @@
 					</restriction>
 				</simpleType>
 			</element>
-			<element name="rawData" type="string">
+			<element name="rawData" type="hexBinary">
 				<annotation>
 					<documentation>Depending on color type and bit depth this may
 						contain gray values, rgb values, indexes to palette, gray + alpha
