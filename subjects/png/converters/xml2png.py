@@ -18,8 +18,8 @@ def txtToInt(txt, mod=0xFFFFFFFF):
     for i in txt:
         num = num * 10
         num = num + ord(i) - ord0
-    num = abs(num)
-    return num % mod
+    #num = abs(num)    
+    return num & mod
 
 def shortToCharLittleEndian(num):    
     rt = shortToCharBigEndian(num)
@@ -122,7 +122,7 @@ def parsePLTEData(elem):
     ret = bytearray()    
     elemChildren = elem.getchildren()
     for i in elemChildren:
-        ret.extend(chr(txtToInt(i.text, 0xFF)))    
+        ret.extend(chr(txtToInt(i.text, 0xFF)))
     return ret
     
 def parsebKGDData(elem):
@@ -318,7 +318,8 @@ def parseIEndData(elem):
     
 def parseChunkData(elem):
     ret = bytearray()
-    ret.extend(hexStringToByteArray(elem.text.strip()))
+    if elem and elem.text:
+        ret.extend(hexStringToByteArray(elem.text.strip()))
     
     return ret
     
@@ -436,4 +437,4 @@ def xml2png(pathToXML, pathToPNG):
     
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
 # xml2png('/home/gmaisuradze/Desktop/testPNG1.xml', 'result.png')
-xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')
+# xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')

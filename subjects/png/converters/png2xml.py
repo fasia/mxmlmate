@@ -186,7 +186,7 @@ def extractPLTEData(elem, data):
     cols = ['red', 'green', 'blue']    
     for i in range(len(data)):
         tp = ET.SubElement(elem, getTag(cols[i % 3]))
-        tp.text = str(bytesToBigEndianInt(data[i], 0xFF))
+        tp.text = str(bytesToBigEndianInt(data[i], 0xFF))        
     
 def extractbKGDData(elem, data):
     if len(data) == 3:
@@ -229,7 +229,7 @@ def extracttRNSData(elem, data):
         tRNSGrey = ET.SubElement(tRNSColType0, getTag('tRNSGrey'))
         tRNSGrey.text = str(bytesToBigEndianInt(data[0], 0xFF))
     
-def extractpHYsData(elem, data):    
+def extractpHYsData(elem, data):
 #     <sequence minOccurs="1" maxOccurs="unbounded">
 #             <element name="pixelsPerUnitX" type="unsignedInt"></element>
 #             <element name="pixelsPerUnitY" type="unsignedInt"></element>
@@ -253,7 +253,7 @@ def extractpHYsData(elem, data):
         pixelsPerUnitY = ET.SubElement(elem, getTag('pixelsPerUnitY'))
         unit = ET.SubElement(elem, getTag('unit'))
         
-        if i + 4 > len(data):                        
+        if i + 4 > len(data):
             pixelsPerUnitX.text = str(bytesToBigEndianInt(data[i:], 0xFFFFFFFF))
             break
         pixelsPerUnitX.text = str(bytesToBigEndianInt(data[i:i + 4], 0xFFFFFFFF))
@@ -268,7 +268,8 @@ def extractpHYsData(elem, data):
         if i >= len(data):
             break        
         unit.text = str(bytesToBigEndianInt(data[i], 0xFF))
-    
+        i = i + 1
+        
     
 def extractsPLTData(elem, data):
     # <tns:paletteName>tns:paletteName</tns:paletteName>
@@ -547,7 +548,7 @@ def extractTopLevel(topElement, chunk):
     
     chunkCrcElem = ET.SubElement(chunkElem, getTag('crc'))
     chunkCrcElem.text = str(chunk.crc)
-    
+     
     if tag == 'IHDR':
         extractIHDRData(chunkDataElem, chunk.data)
     elif tag == 'cHRM':
@@ -623,6 +624,18 @@ def png2xml(pathToPNG, pathToXML):
     chunks = extractChunks(pngData)
     
     chunksElement = ET.SubElement(root, getTag('Chunks'))
+    
+    # combine IDATs
+    firstIdatInd = -1
+    i = 0
+    while i < len(chunks):    
+        if chunks[i].chunk_type == 'IDAT' and firstIdatInd == -1:
+            firstIdatInd = i            
+        elif chunks[i].chunk_type == 'IDAT':
+            chunks[firstIdatInd].data.extend(chunks.pop(i).data)
+            continue        
+        i += 1            
+        
     for chunk in chunks:
         extractTopLevel(chunksElement, chunk)
     
@@ -634,5 +647,5 @@ def png2xml(pathToPNG, pathToXML):
     
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
 
-png2xml('/home/gmaisuradze/Desktop/ftp0n2c08.png', '/home/gmaisuradze/Desktop/ftp0n2c08.xml')
+# png2xml('/home/gmaisuradze/Desktop/ftp0n2c08.png', '/home/gmaisuradze/Desktop/ftp0n2c08.xml')
 
