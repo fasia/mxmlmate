@@ -72,7 +72,7 @@
 							maxOccurs="unbounded" />
 						<!-- ## IDAT ## -->
 						<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
-							maxOccurs="unbounded" />
+							maxOccurs="1" />
 						<!-- ## NO CONSTRAINTS ## -->
 						<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
 							maxOccurs="1" />
@@ -82,8 +82,8 @@
 							maxOccurs="unbounded" />
 						<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 							maxOccurs="unbounded" />
-						<element name="Chunk" type="tns:chunkType" minOccurs="1"
-							maxOccurs="unbounded"></element>
+						<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1"
+							maxOccurs="unbounded"></element> -->
 						<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
 							maxOccurs="1" />
 					</sequence>

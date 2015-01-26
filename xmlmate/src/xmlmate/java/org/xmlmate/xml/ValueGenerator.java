@@ -26,8 +26,8 @@ public final class ValueGenerator {
     private static final HashMap<XSSimpleTypeDefinition, Automaton> cache = new HashMap<>();
     private static final DatatypesAutomatonProvider automatonProvider = new DatatypesAutomatonProvider()
     {
-        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
-//        private final Automaton	charAutomaton	= new RegExp("[a-zA-Z0-9]").toAutomaton();
+//        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
+        private final Automaton	charAutomaton	= new RegExp("[a-zA-Z0-9]").toAutomaton();
         private final Automaton hexBinary = new RegExp("([A-Fa-f0-9][A-Fa-f0-9])+").toAutomaton();
         
         @Override

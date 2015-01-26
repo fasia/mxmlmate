@@ -81,8 +81,12 @@ public class XMLTestChromosome extends ExecutableChromosome {
     public File writeToFile() throws IOException {
         return writeToFile(null);
     }
-
+    
     public File writeToFile(File f) throws IOException {
+    	return writeToFile(f, false);
+    }
+
+    public File writeToFile(File f, boolean keepOriginal) throws IOException {
         if (null == f)
             f = new File(XMLProperties.OUTPUT_PATH, System.currentTimeMillis() + "_" + Randomness.nextShort() + XMLProperties.FILE_EXTENSION);
 
@@ -97,6 +101,8 @@ public class XMLTestChromosome extends ExecutableChromosome {
 //            serializer.write(doc);
             if (convert) {
             	output = new File(converter.convert(f.getAbsolutePath(), FilenameUtils.removeExtension(f.getAbsolutePath())));
+            	if (!keepOriginal && !f.delete())
+            		f.deleteOnExit();
             }
 
         }

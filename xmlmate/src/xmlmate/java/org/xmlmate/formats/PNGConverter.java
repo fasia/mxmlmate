@@ -6,7 +6,7 @@ import java.io.IOException;
 public class PNGConverter implements FormatConverter {
 
 	@Override
-	public String convert(String xml, String output) {
+	public String convert(String xml, String output) throws IOException {
 		ProcessBuilder pb = new ProcessBuilder(
 				"/home/nikolas/lunaworkspace/xmlmate/subjects/png/converters/xml2png.py",
 				xml, output + ".png");
@@ -14,17 +14,11 @@ public class PNGConverter implements FormatConverter {
 		Process process;
 		try {
 			process = pb.start();
-			process.waitFor();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			int ret = process.waitFor();
+			if (0 != ret)
+				throw new IOException("Converter returned " + ret);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			File file = new File(xml);
-			if (!file.delete())
-				file.deleteOnExit();
 		}
 		return output + ".png";
 	}

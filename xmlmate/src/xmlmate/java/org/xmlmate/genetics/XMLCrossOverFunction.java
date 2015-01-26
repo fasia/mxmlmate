@@ -255,8 +255,10 @@ public class XMLCrossOverFunction extends CrossOverFunction {
                         switch (mgroup.getCompositor()) {
                             case XSModelGroup.COMPOSITOR_SEQUENCE:
                                 // TODO implement the subtle differences in handling of SEQUENCE
+                            	break;
                             case XSModelGroup.COMPOSITOR_ALL:
                                 // it's the same for choice and all for now...
+                            	break;
                             case XSModelGroup.COMPOSITOR_CHOICE: {
                                 // we can freely swap any children of choice elements
                                 HashSet<AwareElement> choices1 = new HashSet<>();

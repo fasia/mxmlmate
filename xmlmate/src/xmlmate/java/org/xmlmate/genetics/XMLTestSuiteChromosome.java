@@ -175,7 +175,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             File xmlFile = new File(projectDir, String.format("file%d%s", i, XMLProperties.FILE_EXTENSION));
             i += 1;
             try {
-                c.writeToFile(xmlFile);
+                c.writeToFile(xmlFile, true);
             } catch (IOException e) {
                 logger.error("Could not create {}", xmlFile.getAbsolutePath());
             }
