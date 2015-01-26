@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import xml.etree.ElementTree as ET
 import io
 import binascii
