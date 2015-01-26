@@ -201,7 +201,8 @@ def parsesPLTData(elem):
     nullSeparator = elemChildren[1]
     sampleDepth = elemChildren[2]
     
-    ret.extend(paletteName.text)
+    if paletteName.text:
+        ret.extend(paletteName.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))    
     ret.extend(chr(txtToInt(sampleDepth.text, 0xFF)))
     
@@ -277,7 +278,8 @@ def parseiTXtData(elem):
     ret = bytearray()
     keyword, nullSeparator1, compressionFlag, compressionMethod, langTag, nullSeparator2, translatedKeyword, nullSeparator3, text = elem.getchildren()
     
-    ret.extend(keyword.text)
+    if keyword.text:
+        ret.extend(keyword.text)
     ret.extend(chr(txtToInt(nullSeparator1.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionFlag.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
@@ -297,7 +299,8 @@ def parsetEXtData(elem):
     ret = bytearray()
     keyword, nullSeparator, text = elem.getchildren()
     
-    ret.extend(keyword.text)
+    if keyword.text:
+        ret.extend(keyword.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     if text.text:
         ret.extend(text.text)    
@@ -308,7 +311,8 @@ def parsezTXtData(elem):
     ret = bytearray()
     keyword, nullSeparator, compressionMethod, compressedText = elem.getchildren()
     
-    ret.extend(keyword.text)
+    if keyword.text:
+        ret.extend(keyword.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))    
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedText.text:
@@ -321,7 +325,7 @@ def parseIEndData(elem):
     
 def parseChunkData(elem):
     ret = bytearray()
-    if elem and elem.text:
+    if elem is not None and elem.text:
         ret.extend(hexStringToByteArray(elem.text.strip()))
     
     return ret
@@ -330,7 +334,8 @@ def parseIDATData(elem):
     ret = bytearray()
         
     compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
-    ret.extend(compressedText)
+    if compressedText:
+        ret.extend(compressedText)
     # ret.extend(elem.text)
     
     return ret
