@@ -448,5 +448,5 @@ def xml2png(pathToXML, pathToPNG):
 # xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')
 
 if __name__ == '__main__':
-    # xml2png(sys.argv[1], sys.argv[2])
-    xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
+    xml2png(sys.argv[1], sys.argv[2])
+    # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
