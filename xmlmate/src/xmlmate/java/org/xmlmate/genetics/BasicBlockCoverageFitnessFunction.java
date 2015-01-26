@@ -79,9 +79,9 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 		for (XMLTestChromosome c : individual.getTestChromosomes()) {
 			File f = new File(XMLProperties.OUTPUT_PATH, String.format( "%d-%d%s", System.currentTimeMillis(), Randomness.nextShort(), XMLProperties.FILE_EXTENSION));
 			try {
-				c.writeToFile(f);
-				files.add(f);
-				paths.add(f.getAbsolutePath());
+				File outputFile = c.writeToFile(f);
+				files.add(outputFile);
+				paths.add(outputFile.getAbsolutePath());
 			} catch (IOException e) {
 				logger.error("Could not write chromosome out to file " + f.getAbsolutePath());
 				if (f.exists() && !f.delete()) {
@@ -106,7 +106,7 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 
 		// clean up temporary files
 		for (File file : files) {
-			if (!file.delete()) {
+			if (file.exists() && !file.delete()) {
 				logger.warn("Could not delete temporary file after evaluating " + file.getAbsolutePath());
 				file.deleteOnExit();
 			}

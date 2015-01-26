@@ -27,12 +27,17 @@ public final class ValueGenerator {
     private static final DatatypesAutomatonProvider automatonProvider = new DatatypesAutomatonProvider()
     {
         private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
+//        private final Automaton	charAutomaton	= new RegExp("[a-zA-Z0-9]").toAutomaton();
+        private final Automaton hexBinary = new RegExp("([A-Fa-f0-9][A-Fa-f0-9])+").toAutomaton();
+        
         @Override
         public Automaton getAutomaton(String name) {
             if ("Char".equalsIgnoreCase(name))
                 return charAutomaton;
             if ("string".equalsIgnoreCase(name))
                 return charAutomaton.repeat();
+            if ("hexBinary".equalsIgnoreCase(name))
+            	return hexBinary;
             return super.getAutomaton(name);
         }
     };

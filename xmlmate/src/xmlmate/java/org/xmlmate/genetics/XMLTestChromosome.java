@@ -1,27 +1,8 @@
 package org.xmlmate.genetics;
 
-import nu.xom.Serializer;
-import nu.xom.canonical.Canonicalizer;
-import org.apache.commons.io.IOUtils;
-import org.apache.xerces.xs.XSElementDeclaration;
-import org.evosuite.Properties;
-import org.evosuite.ga.Chromosome;
-import org.evosuite.ga.ConstructionFailedException;
-import org.evosuite.ga.SecondaryObjective;
-import org.evosuite.localsearch.LocalSearchObjective;
-import org.evosuite.testcase.*;
-import org.evosuite.testsuite.TestSuiteFitnessFunction;
-import org.evosuite.utils.Randomness;
-import org.xmlmate.XMLProperties;
-import org.xmlmate.execution.XMLNoIOTestRunner;
-import org.xmlmate.execution.XMLTestRunner;
-import org.xmlmate.formats.FormatConverter;
-import org.xmlmate.xml.AwareDocument;
-import org.xmlmate.xml.AwareElement;
-import org.xmlmate.xml.AwareInstantiator;
-
-import javax.xml.namespace.QName;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +10,31 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
+
+import javax.xml.namespace.QName;
+
+import nu.xom.canonical.Canonicalizer;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.xerces.xs.XSElementDeclaration;
+import org.evosuite.Properties;
+import org.evosuite.ga.Chromosome;
+import org.evosuite.ga.ConstructionFailedException;
+import org.evosuite.ga.SecondaryObjective;
+import org.evosuite.localsearch.LocalSearchObjective;
+import org.evosuite.testcase.ExecutableChromosome;
+import org.evosuite.testcase.ExecutionResult;
+import org.evosuite.testcase.InterfaceTestRunnable;
+import org.evosuite.testcase.TestCaseExecutor;
+import org.evosuite.testcase.TimeoutHandler;
+import org.evosuite.testsuite.TestSuiteFitnessFunction;
+import org.evosuite.utils.Randomness;
+import org.xmlmate.XMLProperties;
+import org.xmlmate.execution.XMLTestRunner;
+import org.xmlmate.formats.FormatConverter;
+import org.xmlmate.xml.AwareDocument;
+import org.xmlmate.xml.AwareElement;
+import org.xmlmate.xml.AwareInstantiator;
 
 public class XMLTestChromosome extends ExecutableChromosome {
     private static final long serialVersionUID = 436444840380164621L;
@@ -80,24 +86,21 @@ public class XMLTestChromosome extends ExecutableChromosome {
         if (null == f)
             f = new File(XMLProperties.OUTPUT_PATH, System.currentTimeMillis() + "_" + Randomness.nextShort() + XMLProperties.FILE_EXTENSION);
 
+        File output = f;
         boolean convert = null != converter;
-        try (FileOutputStream fop = new FileOutputStream(f); OutputStream ostream = convert ? new ByteArrayOutputStream() : fop) {
+        try (FileOutputStream fop = new FileOutputStream(f);) {
 
-            Canonicalizer canonicalizer = new Canonicalizer(ostream, Canonicalizer.EXCLUSIVE_XML_CANONICALIZATION);
+            Canonicalizer canonicalizer = new Canonicalizer(fop, Canonicalizer.EXCLUSIVE_XML_CANONICALIZATION);
             canonicalizer.write(doc);
 //            Serializer serializer = new Serializer(ostream, "UTF-8");
 //            serializer.setIndent(4);
 //            serializer.write(doc);
-
             if (convert) {
-                String xml = ((ByteArrayOutputStream) ostream).toString("UTF-8");
-                assert null != converter;
-                String converted = converter.convert(xml);
-                IOUtils.write(converted, fop, "UTF-8");
+            	output = new File(converter.convert(f.getAbsolutePath(), FilenameUtils.removeExtension(f.getAbsolutePath())));
             }
 
         }
-        return f;
+        return output;
     }
 
     @Override

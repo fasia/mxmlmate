@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.evosuite.ga.FitnessFunction;
 import org.evosuite.ga.GeneticAlgorithm;
+import org.xmlmate.formats.PNGConverter;
 import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
+import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosomeFactory;
 import org.xmlmate.monitoring.EventRecounter;
@@ -19,6 +21,7 @@ public class BasicBlockCoverageUseCase extends EvolveBranchCoverageUseCase {
 	public BasicBlockCoverageUseCase(XMLTestSuiteChromosomeFactory factory, File workDir, List<String> commands) {
 		super(factory);
 		fitnessFunction = new BasicBlockCoverageFitnessFunction(workDir, commands);
+		XMLTestChromosome.setConverter(new PNGConverter());
 	}
 
 	@Override
