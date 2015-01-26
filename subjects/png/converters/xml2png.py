@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import io
 import binascii
 import zlib
+import sys
 
 def hexStringToByteArray(hx):
     res = bytearray()
@@ -18,7 +19,7 @@ def txtToInt(txt, mod=0xFFFFFFFF):
     for i in txt:
         num = num * 10
         num = num + ord(i) - ord0
-    #num = abs(num)    
+    # num = abs(num)    
     return num & mod
 
 def shortToCharLittleEndian(num):    
@@ -438,3 +439,6 @@ def xml2png(pathToXML, pathToPNG):
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
 # xml2png('/home/gmaisuradze/Desktop/testPNG1.xml', 'result.png')
 # xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')
+
+if __name__ == '__main__':    
+    xml2png(sys.argv[1], sys.argv[2])
