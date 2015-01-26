@@ -7,7 +7,7 @@
 			<element name="paletteName">
 				<simpleType>
 					<restriction base="string">
-						<minLength value="0"></minLength>
+						<minLength value="1"></minLength>
 						<maxLength value="79"></maxLength>
 					</restriction>
 				</simpleType>
@@ -28,14 +28,14 @@
 				</simpleType>
 			</element>
 			<choice>
-				<sequence minOccurs="0" maxOccurs="unbounded">
+				<sequence minOccurs="1" maxOccurs="unbounded">
 					<element name="redDpp8" type="byte"></element>
 					<element name="greenDpp8" type="byte"></element>
 					<element name="blueDpp8" type="byte"></element>
 					<element name="alphaDpp8" type="byte"></element>
 					<element name="frequencyDpp8" type="unsignedShort"></element>
 				</sequence>
-				<sequence minOccurs="0" maxOccurs="unbounded">
+				<sequence minOccurs="1" maxOccurs="unbounded">
 					<element name="redDpp16" type="unsignedShort"></element>
 					<element name="greenDpp16" type="unsignedShort"></element>
 					<element name="blueDpp16" type="unsignedShort"></element>

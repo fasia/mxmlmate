@@ -82,7 +82,7 @@
 					</restriction>
 				</simpleType>
 			</element>
-			<element name="data" type="string"></element>
+			<element name="data" type="hexBinary"></element>
 			<element name="crc" type="tns:chunkCRC"></element>
 		</sequence>
 	</complexType>

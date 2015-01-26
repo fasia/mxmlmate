@@ -287,7 +287,7 @@ def parseiTXtData(elem):
     if translatedKeyword.text:
         ret.extend(translatedKeyword.text)
     ret.extend(chr(txtToInt(nullSeparator3.text, 0xFF)))
-    if text.text:
+    if text.text:        
         ret.extend(hexStringToByteArray(text.text))
     
     return ret
@@ -299,7 +299,8 @@ def parsetEXtData(elem):
     
     ret.extend(keyword.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
-    ret.extend(text.text)
+    if text.text:
+        ret.extend(text.text)    
     
     return ret
 
@@ -441,5 +442,6 @@ def xml2png(pathToXML, pathToPNG):
 # xml2png('/home/gmaisuradze/Desktop/testPNG1.xml', 'result.png')
 # xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')
 
-if __name__ == '__main__':    
-    xml2png(sys.argv[1], sys.argv[2])
+if __name__ == '__main__':
+    # xml2png(sys.argv[1], sys.argv[2])
+    xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
