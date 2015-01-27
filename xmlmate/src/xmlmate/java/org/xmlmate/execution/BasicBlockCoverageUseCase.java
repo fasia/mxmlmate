@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.List;
 
 import org.evosuite.ga.FitnessFunction;
+import org.evosuite.ga.FitnessReplacementFunction;
 import org.evosuite.ga.GeneticAlgorithm;
+import org.evosuite.ga.SelectionFunction;
+import org.evosuite.ga.SteadyStateGA;
+import org.evosuite.ga.TournamentSelection;
 import org.xmlmate.formats.PNGConverter;
 import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
 import org.xmlmate.genetics.XMLTestChromosome;
@@ -30,7 +34,14 @@ public class BasicBlockCoverageUseCase extends EvolveBranchCoverageUseCase {
 	}
 
 	@Override
-	protected void addMonitoring(GeneticAlgorithm<XMLTestSuiteChromosome> ga) {
+	protected void setupGAAdditions(SteadyStateGA<XMLTestSuiteChromosome> ga) {
+        // selection function
+        SelectionFunction<XMLTestSuiteChromosome> selectionFunction = new TournamentSelection<>();
+        selectionFunction.setMaximize(true);
+        ga.setSelectionFunction(selectionFunction);
+        // replacement function
+		ga.setReplacementFunction(new FitnessReplacementFunction(true));
+		// monitoring
 		ga.addListener(new EventRecounter());
 	}
 

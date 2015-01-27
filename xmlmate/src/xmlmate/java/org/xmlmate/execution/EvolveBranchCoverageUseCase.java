@@ -3,6 +3,7 @@ package org.xmlmate.execution;
 import net.sf.corn.cps.CPScanner;
 import net.sf.corn.cps.ClassFilter;
 import net.sf.corn.cps.CombinedFilter;
+
 import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
 import org.evosuite.coverage.exception.ExceptionCoverageSuiteFitness;
@@ -46,7 +47,12 @@ public class EvolveBranchCoverageUseCase implements UseCase {
     	loadClasses();    	
     }
     
-	protected void addMonitoring(GeneticAlgorithm<XMLTestSuiteChromosome> ga) {
+	protected void setupGAAdditions(SteadyStateGA<XMLTestSuiteChromosome> ga) {
+        // selection function
+        SelectionFunction<XMLTestSuiteChromosome> selectionFunction = new TournamentSelection<>();
+        selectionFunction.setMaximize(false);
+        ga.setSelectionFunction(selectionFunction);
+        // monitoring
 		ga.addListener(new BothCoveragesMonitor());
         ga.addListener(new EventRecounter());
 	}
@@ -56,7 +62,7 @@ public class EvolveBranchCoverageUseCase implements UseCase {
     	initialize();
 
         Properties.LOCAL_SEARCH_PROBABILITY = 0.0d; // disable local search
-        GeneticAlgorithm<XMLTestSuiteChromosome> ga = new SteadyStateGA<>(factory);
+        SteadyStateGA<XMLTestSuiteChromosome> ga = new SteadyStateGA<>(factory);
 
 
         // fitness function
@@ -82,17 +88,12 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         CrossOverFunction crossoverFunction = new XMLCrossOverFunction();
         ga.setCrossOverFunction(crossoverFunction);
 
-        // selection function
-        SelectionFunction<XMLTestSuiteChromosome> selectionFunction = new TournamentSelection<>();
-        selectionFunction.setMaximize(false);
-        ga.setSelectionFunction(selectionFunction);
-
         // bloat control
         ga.addBloatControl(new RelativeSuiteLengthBloatControl());
         ga.addBloatControl(new MaxSizeBloatControl());
 
         // progress monitors
-        addMonitoring(ga);
+        setupGAAdditions(ga);
 
         try {
             System.setErr(new PrintStream(new FileOutputStream("/dev/null")));
@@ -113,7 +114,7 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         System.exit(0);
     }
 
-    protected void freeResources() {
+	protected void freeResources() {
 		// nop
 	}
 
