@@ -4,7 +4,8 @@ import io
 import binascii
 import zlib
 import sys
-
+import random
+        
 def hexStringToByteArray(hx):
     res = bytearray()
     if not hx: return res
@@ -39,10 +40,33 @@ def intToCharLittleEndian(num):
 def intToCharBigEndian(num):
     return [chr((num >> 24) & 0xFF), chr((num >> 16) & 0xFF), chr((num >> 8) & 0xFF), chr(num & 0xFF)]
 
+
+class IHDRChunk:
+    def __init__(self):        
+        self.width = 0 
+        self.height = 0 
+        self.bitDepth = 0
+        self.colorType = 0
+        self.compressionMethod = 0
+        self.filterMethod = 0
+        self.interlaceMethod = 0
+        
+    def extractFromArray(self, arr):
+        self.width = txtToInt(arr[0].text)
+        self.height = txtToInt(arr[1].text)
+        self.bitDepth = txtToInt(arr[2].text, 0xFF)
+        self.colorType = txtToInt(arr[3].text, 0xFF)
+        self.compressionMethod = txtToInt(arr[4].text, 0xFF)
+        self.filterMethod = txtToInt(arr[5].text, 0xFF)
+        self.interlaceMethod = txtToInt(arr[6].text, 0xFF)
+
+HeaderInfo = IHDRChunk()
 def parseIHDRData(elem):
     ret = bytearray()
     width, height, bitDepth, colorType, compressionMethod, filterMethod, interlaceMethod = elem.getchildren()    
-    
+    global HeaderInfo
+    HeaderInfo.extractFromArray(elem.getchildren())
+        
     ret.extend(intToCharBigEndian(txtToInt(width.text)))
     ret.extend(intToCharBigEndian(txtToInt(height.text)))        
     ret.extend(chr(txtToInt(bitDepth.text, 0xFF)))
@@ -330,10 +354,34 @@ def parseChunkData(elem):
     
     return ret
     
+def generateIDATData():
+    ret = bytearray()
+    for i in range(HeaderInfo.height):
+        ret.append(random.randint(0, 4))  # filter type
+        for j in range(HeaderInfo.width):
+            if HeaderInfo.colorType == 0: # greyscale 1 byte per pixel
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 2: # Truecolor, 3 byte per pixel
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 3: # Index, 1 byte, index into PLTE chunk. PLTE must appear
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 4: # Greyscale 1 byte + alpha 1 byte
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 5: # truecolor 3 byte + alpha 1 byte
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+    return ret
+
 def parseIDATData(elem):
     ret = bytearray()
-        
-    compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
+    
+    #compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
+    compressedText = zlib.compress(str(generateIDATData()))
     if compressedText:
         ret.extend(compressedText)
     # ret.extend(elem.text)
@@ -361,9 +409,10 @@ def getCRC(data):
     #    crc = binascii.crc32(chr(i), crc)        
     return crc & 0xffffffff
 
+
 def parseTopLevel(topLevelElement):
     childs = topLevelElement.getchildren()
-    chunk_size = childs[0].text.strip()    
+    chunk_size = childs[0].text.strip()
     chunk_type = childs[1].text.strip()
     if len(childs) == 4:
         chunk_data_elem = childs[2]
