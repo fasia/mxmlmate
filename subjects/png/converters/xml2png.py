@@ -105,7 +105,7 @@ def parseiCCPData(elem):
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedProfile.text:        
         compressedText = zlib.compress(str(hexStringToByteArray(compressedProfile.text)))
-        #ret.extend(hexStringToByteArray(compressedProfile.text))
+        # ret.extend(hexStringToByteArray(compressedProfile.text))
         ret.extend(compressedText)
     return ret
     
@@ -315,8 +315,14 @@ def parseiTXtData(elem):
     if translatedKeyword.text:
         ret.extend(translatedKeyword.text)
     ret.extend(chr(txtToInt(nullSeparator3.text, 0xFF)))
-    if text.text:        
-        ret.extend(hexStringToByteArray(text.text))
+    if text.text:
+        if txtToInt(compressionFlag.text, 0xFF) == 1:
+            compressedText = zlib.compress(str(hexStringToByteArray(text.text)))
+            # ret.extend(hexStringToByteArray(text.text))
+            ret.extend(compressedText)
+        else:
+            ret.extend(hexStringToByteArray(text.text))
+        
     
     return ret
     
@@ -342,7 +348,9 @@ def parsezTXtData(elem):
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))    
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedText.text:
-        ret.extend(hexStringToByteArray(compressedText.text))
+        compressedText = zlib.compress(str(hexStringToByteArray(compressedText.text)))
+        # ret.extend(hexStringToByteArray(compressedText.text))
+        ret.extend(compressedText)        
     
     return ret
 
@@ -361,18 +369,18 @@ def generateIDATData():
     for i in range(HeaderInfo.height):
         ret.append(random.randint(0, 4))  # filter type
         for j in range(HeaderInfo.width):
-            if HeaderInfo.colorType == 0: # greyscale 1 byte per pixel
+            if HeaderInfo.colorType == 0:  # greyscale 1 byte per pixel
                 ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 2: # Truecolor, 3 byte per pixel
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 3: # Index, 1 byte, index into PLTE chunk. PLTE must appear
-                ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 4: # Greyscale 1 byte + alpha 1 byte
+            elif HeaderInfo.colorType == 2:  # Truecolor, 3 byte per pixel
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 5: # truecolor 3 byte + alpha 1 byte
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 4:  # Greyscale 1 byte + alpha 1 byte
+                ret.append(random.randint(0, 255))
+                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 5:  # truecolor 3 byte + alpha 1 byte
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
@@ -382,7 +390,7 @@ def generateIDATData():
 def parseIDATData(elem):
     ret = bytearray()
     
-    #compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
+    # compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
     compressedText = zlib.compress(str(generateIDATData()))
     if compressedText:
         ret.extend(compressedText)
