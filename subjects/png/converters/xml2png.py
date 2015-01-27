@@ -103,8 +103,10 @@ def parseiCCPData(elem):
     ret.extend(profileName.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
-    if compressedProfile.text:
-        ret.extend(hexStringToByteArray(compressedProfile.text))
+    if compressedProfile.text:        
+        compressedText = zlib.compress(hexStringToByteArray(compressedProfile.text))
+        #ret.extend(hexStringToByteArray(compressedProfile.text))
+        ret.extend(compressedText)
     return ret
     
 def parsesRGBData(elem):
