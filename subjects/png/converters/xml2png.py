@@ -104,7 +104,7 @@ def parseiCCPData(elem):
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedProfile.text:        
-        compressedText = zlib.compress(hexStringToByteArray(compressedProfile.text))
+        compressedText = zlib.compress(str(hexStringToByteArray(compressedProfile.text)))
         #ret.extend(hexStringToByteArray(compressedProfile.text))
         ret.extend(compressedText)
     return ret
