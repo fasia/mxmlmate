@@ -2,50 +2,205 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
 	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
 	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="bKGDChunkDataTypeCol04">
-		<annotation>
-			<documentation>default background color for color types 0 and 4
-				(color type defined in IHDR)
-			</documentation>
-		</annotation>
+	<complexType name="bKGDChunkDataTypeCT04BD1">
 		<sequence>
-			<element name="bKGDGreyscale" type="unsignedShort"></element>
+			<element name="bKGDGreyscale">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="1"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
 		</sequence>
 	</complexType>
-	<complexType name="bKGDChunkDataTypeCol26">
-		<annotation>
-			<documentation>default background color for color types 2 and 6
-				(color type defined in IHDR)
-			</documentation>
-		</annotation>
+	<complexType name="bKGDChunkDataTypeCT04BD2">
 		<sequence>
-			<element name="bKGDRed" type="unsignedShort"></element>
-			<element name="bKGDGreen" type="unsignedShort"></element>
-			<element name="bKGDBlue" type="unsignedShort"></element>
+			<element name="bKGDGreyscale">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="4"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
 		</sequence>
 	</complexType>
-	<complexType name="bKGDChunkDataTypeCol3">
-		<annotation>
-			<documentation>default background color for color type 3 (color type
-				defined in IHDR)
-			</documentation>
-		</annotation>
+	<complexType name="bKGDChunkDataTypeCT04BD4">
+		<sequence>
+			<element name="bKGDGreyscale">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="16"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT04BD8">
+		<sequence>
+			<element name="bKGDGreyscale">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="256"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT04BD16">
+		<sequence>
+			<element name="bKGDGreyscale" type="unsignedShort" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT26BD1">
+		<sequence>
+			<element name="bKGDRed">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="2"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDGreen">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="2"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDBlue">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="2"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT26BD2">
+		<sequence>
+			<element name="bKGDRed">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="4"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDGreen">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="4"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDBlue">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="4"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT26BD4">
+		<sequence>
+			<element name="bKGDRed">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="16"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDGreen">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="16"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDBlue">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="16"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT26BD8">
+		<sequence>
+			<element name="bKGDRed">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="256"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDGreen">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="256"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="bKGDBlue">
+				<simpleType>
+					<restriction base="unsignedShort">
+						<maxExclusive value="256"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT26BD16">
+		<sequence>
+			<element name="bKGDRed" type="unsignedShort" />
+			<element name="bKGDGreen" type="unsignedShort" />
+			<element name="bKGDBlue" type="unsignedShort" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT3BD1">
+		<sequence>
+			<element name="bKGDPaletteIndex">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<maxExclusive value="2"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT3BD2">
+		<sequence>
+			<element name="bKGDPaletteIndex">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<maxExclusive value="4"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT3BD4">
+		<sequence>
+			<element name="bKGDPaletteIndex">
+				<simpleType>
+					<restriction base="unsignedByte">
+						<maxExclusive value="16"></maxExclusive>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkDataTypeCT3BD816">
 		<sequence>
 			<element name="bKGDPaletteIndex" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
+	<!-- ########## MAIN TYPES BELOW ########## -->
 
-	<complexType name="bKGDChunkDataType">
-		<choice minOccurs="1" maxOccurs="1">
-			<element name="bKGDColType04" type="tns:bKGDChunkDataTypeCol04"></element>
-			<element name="bKGDColType26" type="tns:bKGDChunkDataTypeCol26"></element>
-			<element name="bKGDColType3" type="tns:bKGDChunkDataTypeCol3"></element>
-		</choice>
-	</complexType>
-
-	<complexType name="bKGDChunkType">
+	<complexType name="bKGDChunkTypeCT04BD1">
 		<sequence>
-			<element name="size" type="tns:chunkSize"></element>			
+			<element name="size" type="tns:chunkSize" />
 			<element name="type">
 				<simpleType>
 					<restriction base="string">
@@ -53,8 +208,194 @@
 					</restriction>
 				</simpleType>
 			</element>
-			<element name="data" type="tns:bKGDChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT04BD1" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+
+	<complexType name="bKGDChunkTypeCT04BD2">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT04BD2" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+
+	<complexType name="bKGDChunkTypeCT04BD4">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT04BD4" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+
+	<complexType name="bKGDChunkTypeCT04BD8">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT04BD8" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+
+	<complexType name="bKGDChunkTypeCT04BD16">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT04BD16" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT3BD1">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT3BD1" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT3BD2">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT3BD2" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT3BD4">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT3BD4" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT3BD816">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT3BD816" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT26BD1">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT26BD1" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT26BD2">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT26BD2" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT26BD4">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT26BD4" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT26BD8">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT26BD8" />
+			<element name="crc" type="tns:chunkCRC" />
+		</sequence>
+	</complexType>
+	<complexType name="bKGDChunkTypeCT26BD16">
+		<sequence>
+			<element name="size" type="tns:chunkSize" />
+			<element name="type">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="bKGD"></enumeration>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="data" type="tns:bKGDChunkDataTypeCT26BD16" />
+			<element name="crc" type="tns:chunkCRC" />
 		</sequence>
 	</complexType>
 

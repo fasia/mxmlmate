@@ -2,26 +2,26 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
 	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
 
-	<include schemaLocation="Chunks/CommonTypes.xsd" />
-	<include schemaLocation="Chunks/IHDRChunk.xsd" />
-	<include schemaLocation="Chunks/bKGDChunk.xsd" />
-	<include schemaLocation="Chunks/cHRMChunk.xsd" />
-	<include schemaLocation="Chunks/gAMAChunk.xsd" />
-	<include schemaLocation="Chunks/hISTChunk.xsd" />
-	<include schemaLocation="Chunks/iCCPChunk.xsd" />
-	<include schemaLocation="Chunks/IDATChunk.xsd" />
-	<include schemaLocation="Chunks/IENDChunk.xsd" />
-	<include schemaLocation="Chunks/iTXtChunk.xsd" />
-	<include schemaLocation="Chunks/pHYsChunk.xsd" />
-	<include schemaLocation="Chunks/PLTEChunk.xsd" />
-	<include schemaLocation="Chunks/sBITChunk.xsd" />
-	<include schemaLocation="Chunks/sPLTChunk.xsd" />
-	<include schemaLocation="Chunks/sRGBChunk.xsd" />
-	<include schemaLocation="Chunks/tEXtChunk.xsd" />
-	<include schemaLocation="Chunks/tIMEChunk.xsd" />
-	<include schemaLocation="Chunks/tRNSChunk.xsd" />
-	<include schemaLocation="Chunks/zTXtChunk.xsd" />
-
+	<!-- <include schemaLocation="Chunks/CommonTypes.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/IHDRChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/bKGDChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/cHRMChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/gAMAChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/hISTChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/iCCPChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/IDATChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/IENDChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/iTXtChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/pHYsChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/PLTEChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/sBITChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/sPLTChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/sRGBChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/tEXtChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/tIMEChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/tRNSChunk.xsd" /> -->
+	<!-- <include schemaLocation="Chunks/zTXtChunk.xsd" /> -->
+	<include schemaLocation="Chunks/PossibleSequences.xsd"></include>
 
 	<!-- ############################################################################################# -->
 	<simpleType name="signatureType">
@@ -36,59 +36,23 @@
 				maxOccurs="1" />
 			<!-- <element name="Chunks" type="tns:chunkType" maxOccurs="unbounded"> 
 				</element> -->
-			<element name="Chunks">
-				<complexType>
-					<sequence>
-						<element name="IHDR" type="tns:IHDRChunkType" minOccurs="1"
-							maxOccurs="1" />
-						<!-- ## BEFORE PLTE AND IDAT ## -->
-						<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
-							maxOccurs="1" />
-
-						<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<choice>
-							<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
-								maxOccurs="1" />
-							<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
-								maxOccurs="1" />
-						</choice>
-						<element name="sBIT" type="tns:sBITChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<!-- ## PLTE ## -->
-						<element name="PLTE" type="tns:PLTEChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<!-- ## AFTER PLTE BEFORE IDAT ## -->
-						<element name="bKGD" type="tns:bKGDChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<element name="tRNS" type="tns:tRNSChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<!-- ## BEFORE IDAT ## -->
-						<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
-							maxOccurs="unbounded" />
-						<!-- ## IDAT ## -->
-						<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
-							maxOccurs="1" />
-						<!-- ## NO CONSTRAINTS ## -->
-						<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
-							maxOccurs="1" />
-						<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
-							maxOccurs="unbounded" />
-						<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
-							maxOccurs="unbounded" />
-						<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
-							maxOccurs="unbounded" />
-						<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1"
-							maxOccurs="unbounded"></element> -->
-						<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
-							maxOccurs="1" />
-					</sequence>
-				</complexType>
-			</element>
+			<choice>
+				<element ref="tns:ChunksCT0BD1" />
+				<element ref="tns:ChunksCT0BD2" />
+				<element ref="tns:ChunksCT0BD4" />
+				<element ref="tns:ChunksCT0BD8" />
+				<element ref="tns:ChunksCT0BD16" />
+				<element ref="tns:ChunksCT2BD8" />
+				<element ref="tns:ChunksCT2BD16" />
+				<element ref="tns:ChunksCT3BD1" />
+				<element ref="tns:ChunksCT3BD2" />
+				<element ref="tns:ChunksCT3BD4" />
+				<element ref="tns:ChunksCT3BD8" />
+				<element ref="tns:ChunksCT4BD8" />
+				<element ref="tns:ChunksCT4BD16" />
+				<element ref="tns:ChunksCT6BD8" />
+				<element ref="tns:ChunksCT6BD16" />
+			</choice>
 		</sequence>
 	</complexType>
 

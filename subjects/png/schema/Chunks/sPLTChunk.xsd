@@ -13,34 +13,58 @@
 				</simpleType>
 			</element>
 			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="sampleDepth">
-				<annotation>
-					<documentation>Red, green, blue, alpha will by 1 byte if sample
-						depth is 8.
-						They will be 2 bytes if sample depth is 16
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="8"></enumeration>
-						<enumeration value="16"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
+			<!-- <element name="sampleDepth"> -->
+			<!-- <annotation> -->
+			<!-- <documentation>Red, green, blue, alpha will by 1 byte if sample -->
+			<!-- depth is 8. -->
+			<!-- They will be 2 bytes if sample depth is 16 -->
+			<!-- </documentation> -->
+			<!-- </annotation> -->
+			<!-- <simpleType> -->
+			<!-- <restriction base="unsignedByte"> -->
+			<!-- <enumeration value="8"></enumeration> -->
+			<!-- <enumeration value="16"></enumeration> -->
+			<!-- </restriction> -->
+			<!-- </simpleType> -->
+			<!-- </element> -->
 			<choice>
-				<sequence minOccurs="1" maxOccurs="unbounded">
-					<element name="redDpp8" type="byte"></element>
-					<element name="greenDpp8" type="byte"></element>
-					<element name="blueDpp8" type="byte"></element>
-					<element name="alphaDpp8" type="byte"></element>
-					<element name="frequencyDpp8" type="unsignedShort"></element>
+				<sequence>
+					<element name="sampleDepth8">
+						<annotation>
+							<documentation>Red, green, blue, alpha will by 1 byte if sample
+								depth is 8.
+								They will be 2 bytes if sample depth is 16
+							</documentation>
+						</annotation>
+						<simpleType>
+							<restriction base="unsignedByte">
+								<enumeration value="8"></enumeration>
+							</restriction>
+						</simpleType>
+					</element>
+					<sequence minOccurs="1" maxOccurs="unbounded">
+						<element name="redDpp8" type="unsignedByte"></element>
+						<element name="greenDpp8" type="unsignedByte"></element>
+						<element name="blueDpp8" type="unsignedByte"></element>
+						<element name="alphaDpp8" type="unsignedByte"></element>
+						<element name="frequencyDpp8" type="unsignedShort"></element>
+					</sequence>
 				</sequence>
-				<sequence minOccurs="1" maxOccurs="unbounded">
-					<element name="redDpp16" type="unsignedShort"></element>
-					<element name="greenDpp16" type="unsignedShort"></element>
-					<element name="blueDpp16" type="unsignedShort"></element>
-					<element name="alphaDpp16" type="unsignedShort"></element>
-					<element name="frequencyDpp16" type="unsignedShort"></element>
+				<sequence>
+					<element name="sampleDepth16">
+						<simpleType>
+							<restriction base="unsignedByte">
+								<enumeration value="16"></enumeration>
+							</restriction>
+						</simpleType>
+					</element>
+					<sequence minOccurs="1" maxOccurs="unbounded">
+						<element name="redDpp16" type="unsignedShort"></element>
+						<element name="greenDpp16" type="unsignedShort"></element>
+						<element name="blueDpp16" type="unsignedShort"></element>
+						<element name="alphaDpp16" type="unsignedShort"></element>
+						<element name="frequencyDpp16" type="unsignedShort"></element>
+					</sequence>
 				</sequence>
 				<!-- <element name="paletteRAW" type="string"> <annotation> <documentation>In 
 					case non of the above is applicable (because of size)</documentation> </annotation> 

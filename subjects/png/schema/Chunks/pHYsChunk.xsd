@@ -3,7 +3,7 @@
 	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
 	<include schemaLocation="CommonTypes.xsd" />
 	<complexType name="pHYsChunkDataType">
-		<sequence minOccurs="1" maxOccurs="unbounded">
+		<sequence minOccurs="1" maxOccurs="1">
 			<element name="pixelsPerUnitX" type="unsignedInt"></element>
 			<element name="pixelsPerUnitY" type="unsignedInt"></element>
 			<element name="unit">

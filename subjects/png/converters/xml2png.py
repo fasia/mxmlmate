@@ -61,6 +61,7 @@ class IHDRChunk:
         self.interlaceMethod = txtToInt(arr[6].text, 0xFF)
 
 HeaderInfo = IHDRChunk()
+NumPalette = 0
 def parseIHDRData(elem):
     ret = bytearray()
     width, height, bitDepth, colorType, compressionMethod, filterMethod, interlaceMethod = elem.getchildren()    
@@ -149,27 +150,29 @@ def parsesBITData(elem):
 def parsePLTEData(elem):
     ret = bytearray()    
     elemChildren = elem.getchildren()
+    global NumPalette
     for i in elemChildren:
-        ret.extend(chr(txtToInt(i.text, 0xFF)))
+        NumPalette += 1
+        ret.extend(chr(txtToInt(i.text, 0xFF)))    
+    NumPalette /= 3
     return ret
     
 def parsebKGDData(elem):
     ret = bytearray()    
     # elem.getchildren()[0]
-    tag = elem.getchildren()[0].tag.split('}')[1]
-    elem = elem.getchildren()[0]
-    
-    if tag == 'bKGDColType04':
+    # tag = elem.getchildren()[0].tag.split('}')[1]
+    # elem = elem.getchildren()[0]    
+    if HeaderInfo.colorType == 0 or HeaderInfo.colorType == 4:  # tag == 'bKGDColType04':
         bKGDGreyscale = elem.getchildren()[0]
-        ret.extend(chr(txtToInt(bKGDGreyscale.text, 0xFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(bKGDGreyscale.text, 0xFFFF)))
         
-    elif tag == 'bKGDColType26':
+    elif HeaderInfo.colorType == 2 or HeaderInfo.colorType == 6:  # tag == 'bKGDColType26':        
         bKGDRed, bKGDGreen, bKGDBlue = elem.getchildren()
-        ret.extend(chr(txtToInt(bKGDRed.text, 0xFF)))
-        ret.extend(chr(txtToInt(bKGDGreen.text, 0xFF)))
-        ret.extend(chr(txtToInt(bKGDBlue.text, 0xFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(bKGDRed.text, 0xFFFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(bKGDGreen.text, 0xFFFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(bKGDBlue.text, 0xFFFF)))
         
-    elif tag == 'bKGDColType3':
+    elif HeaderInfo.colorType == 3:  # tag == 'bKGDColType3':
         bKGDPaletteIndex = elem.getchildren()[0]
         ret.extend(chr(txtToInt(bKGDPaletteIndex.text, 0xFF)))
     
@@ -186,7 +189,7 @@ def parsetRNSData(elem):
     # elem.getchildren()[0]
     tag = elem.getchildren()[0].tag.split('}')[1]
     elem = elem.getchildren()[0]
-    
+    print tag
     if tag == 'tRNSColType0':
         tRNSGrey = elem.getchildren()[0]
         ret.extend(chr(txtToInt(tRNSGrey.text, 0xFF)))
@@ -238,51 +241,52 @@ def parsesPLTData(elem):
     while i < len(elemChildren):
         if sampleDepthNumber == 16:
             redDPP = elemChildren[i]
-            ret.extend(shortToCharBigEndian(txtToInt(redDPP.text, 0xFFFF)))
+            ret.extend(shortToCharBigEndian(txtToInt(redDPP.text, 0xFFFF)))            
+            i += 1
             
-            i = i + 2
             if i >= len(elemChildren): break            
             greenDPP = elemChildren[i]
             ret.extend(shortToCharBigEndian(txtToInt(greenDPP.text, 0xFFFF)))
+            i += 1
             
-            i = i + 2
             if i >= len(elemChildren): break            
             blueDPP = elemChildren[i]
             ret.extend(shortToCharBigEndian(txtToInt(blueDPP.text, 0xFFFF)))
+            i += 1
             
-            i = i + 2
             if i >= len(elemChildren): break            
             alphaDPP = elemChildren[i]
             ret.extend(shortToCharBigEndian(txtToInt(alphaDPP.text, 0xFFFF)))
+            i += 1
             
-            i = i + 2
-            if i >= len(elemChildren): break            
-            frequencyDPP = elemChildren[i]
-            ret.extend(shortToCharBigEndian(txtToInt(frequencyDPP.text, 0xFFFF)))            
-        else:
-            redDPP = elemChildren[i]
-            ret.extend(chr(txtToInt(redDPP.text, 0xFF)))
-            
-            i = i + 1
-            if i >= len(elemChildren): break            
-            greenDPP = elemChildren[i]
-            ret.extend(chr(txtToInt(greenDPP.text, 0xFF)))
-            
-            i = i + 1
-            if i >= len(elemChildren): break            
-            blueDPP = elemChildren[i]
-            ret.extend(chr(txtToInt(blueDPP.text, 0xFF)))
-            
-            i = i + 1
-            if i >= len(elemChildren): break            
-            alphaDPP = elemChildren[i]
-            ret.extend(chr(txtToInt(alphaDPP.text, 0xFF)))
-            
-            i = i + 1
             if i >= len(elemChildren): break            
             frequencyDPP = elemChildren[i]
             ret.extend(shortToCharBigEndian(txtToInt(frequencyDPP.text, 0xFFFF)))
-        i = i + 2
+            i += 1        
+        else:
+            redDPP = elemChildren[i]
+            ret.extend(chr(txtToInt(redDPP.text, 0xFF)))            
+            i += 1
+            
+            if i >= len(elemChildren): break            
+            greenDPP = elemChildren[i]
+            ret.extend(chr(txtToInt(greenDPP.text, 0xFF)))            
+            i += 1
+            
+            if i >= len(elemChildren): break            
+            blueDPP = elemChildren[i]
+            ret.extend(chr(txtToInt(blueDPP.text, 0xFF)))            
+            i += 1
+            
+            if i >= len(elemChildren): break            
+            alphaDPP = elemChildren[i]
+            ret.extend(chr(txtToInt(alphaDPP.text, 0xFF)))            
+            i += 1
+            
+            if i >= len(elemChildren): break            
+            frequencyDPP = elemChildren[i]
+            ret.extend(shortToCharBigEndian(txtToInt(frequencyDPP.text, 0xFFFF)))            
+            i += 1        
         
     return ret
     
@@ -365,18 +369,22 @@ def parseChunkData(elem):
     return ret
     
 def generateIDATData():
+    global NumPalette
     ret = bytearray()
-    for i in range(HeaderInfo.height):
-        ret.append(random.randint(0, 4))  # filter type
-        for j in range(HeaderInfo.width):
+    for i in range(HeaderInfo.height * HeaderInfo.bitDepth / 8):
+        if HeaderInfo.colorType == 3:
+            ret.append(0)  # filter type
+        else:
+            ret.append(random.randint(0, 4))  # filter type
+        for j in range(HeaderInfo.width * HeaderInfo.bitDepth / 8):
             if HeaderInfo.colorType == 0:  # greyscale 1 byte per pixel
                 ret.append(random.randint(0, 255))
             elif HeaderInfo.colorType == 2:  # Truecolor, 3 byte per pixel
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear
-                ret.append(random.randint(0, 255))
+            elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear                                
+                ret.append(random.randint(0, NumPalette - 1))
             elif HeaderInfo.colorType == 4:  # Greyscale 1 byte + alpha 1 byte
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
@@ -493,10 +501,12 @@ def xml2png(pathToXML, pathToPNG):
     #    for i in tree.iter():
     #        i.text = unicode(i.text).encode('utf8')
    
-    signature = tree.find('.//{http://www.example.org/PNGSchema}Signature')
-    pngData.extend(parseSignature(signature))
-    chunks = tree.find('.//{http://www.example.org/PNGSchema}Chunks')
-    for chunk in chunks:
+    root = tree.getroot()
+    signature, chunks = root.getchildren()  # tree.find('.//{http://www.example.org/PNGSchema}Signature')
+    pngData.extend(parseSignature(signature))        
+    # chunks = tree.find('.//{http://www.example.org/PNGSchema}Chunks*')
+    
+    for chunk in chunks:        
         pngData.extend(parseTopLevel(chunk))
                         
     with io.open(pathToPNG, mode='wb') as fw:
@@ -507,5 +517,5 @@ def xml2png(pathToXML, pathToPNG):
 # xml2png('/home/gmaisuradze/Desktop/ftp0n2c08.xml', '/home/gmaisuradze/Desktop/ftp0n2c08my.png')
 
 if __name__ == '__main__':
-    xml2png(sys.argv[1], sys.argv[2])
-    # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
+    # xml2png(sys.argv[1], sys.argv[2])
+    xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
