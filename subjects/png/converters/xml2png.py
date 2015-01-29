@@ -5,6 +5,7 @@ import binascii
 import zlib
 import sys
 import random
+import math
         
 def hexStringToByteArray(hx):
     res = bytearray()
@@ -120,25 +121,25 @@ def parsesRGBData(elem):
 def parsesBITData(elem):
     ret = bytearray()    
     # elem.getchildren()[0]
-    tag = elem.getchildren()[0].tag.split('}')[1]
-    elem = elem.getchildren()[0]
+    # tag = elem.getchildren()[0].tag.split('}')[1]
+    # elem = elem.getchildren()[0]
     
-    if tag == 'sBITColType0':
+    if HeaderInfo.colorType == 0:  # tag == 'sBITColType0':
         sGrayBits = elem.getchildren()[0]
         ret.extend(chr(txtToInt(sGrayBits.text, 0xFF)))
         
-    elif tag == 'sBITColType23':
+    elif HeaderInfo.colorType == 2 or HeaderInfo.colorType == 3:  # tag == 'sBITColType23':
         sRedBits, sGreenBits, sBlueBits = elem.getchildren()
         ret.extend(chr(txtToInt(sRedBits.text, 0xFF)))
         ret.extend(chr(txtToInt(sGreenBits.text, 0xFF)))
         ret.extend(chr(txtToInt(sBlueBits.text, 0xFF)))
         
-    elif tag == 'sBITColType4':
+    elif HeaderInfo.colorType == 4:  # tag == 'sBITColType4':
         sGreyBits, sAlphaBits = elem.getchildren()
         ret.extend(chr(txtToInt(sGreyBits.text, 0xFF)))
         ret.extend(chr(txtToInt(sAlphaBits.text, 0xFF)))        
             
-    elif tag == 'sBITColType6':
+    elif HeaderInfo.colorType == 6:  # tag == 'sBITColType6':
         sRedBits, sGreenBits, sBlueBits, sAlphaBits = elem.getchildren()
         ret.extend(chr(txtToInt(sRedBits.text, 0xFF)))
         ret.extend(chr(txtToInt(sGreenBits.text, 0xFF)))
@@ -187,20 +188,21 @@ def parsehISTData(elem):
 def parsetRNSData(elem):
     ret = bytearray()    
     # elem.getchildren()[0]
-    tag = elem.getchildren()[0].tag.split('}')[1]
-    elem = elem.getchildren()[0]
-    print tag
-    if tag == 'tRNSColType0':
+    # tag = elem.getchildren()[0].tag.split('}')[1]
+    # elem = elem.getchildren()[0]
+    # print tag
+    
+    if HeaderInfo.colorType == 0:  # tag == 'tRNSColType0':
         tRNSGrey = elem.getchildren()[0]
-        ret.extend(chr(txtToInt(tRNSGrey.text, 0xFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(tRNSGrey.text, 0xFFFF)))
         
-    elif tag == 'tRNSColType2':
+    elif HeaderInfo.colorType == 2:  # tag == 'tRNSColType2':
         tRNSRed, tRNSGreen, tRNSBlue = elem.getchildren()
-        ret.extend(chr(txtToInt(tRNSRed.text, 0xFF)))
-        ret.extend(chr(txtToInt(tRNSGreen.text, 0xFF)))
-        ret.extend(chr(txtToInt(tRNSBlue.text, 0xFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(tRNSRed.text, 0xFFFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(tRNSGreen.text, 0xFFFF)))
+        ret.extend(shortToCharBigEndian(txtToInt(tRNSBlue.text, 0xFFFF)))
         
-    elif tag == 'tRNSColType3':
+    elif HeaderInfo.colorType == 3:  # tag == 'tRNSColType3':
         bKGDPaletteIndex = elem.getchildren()[0]
         ret.extend(chr(txtToInt(bKGDPaletteIndex.text, 0xFF)))
     
@@ -371,12 +373,18 @@ def parseChunkData(elem):
 def generateIDATData():
     global NumPalette
     ret = bytearray()
-    for i in range(HeaderInfo.height * HeaderInfo.bitDepth / 8):
+    # return bytearray([0 for i in range(3 * 7 * 4)])
+    
+    width = int(math.ceil(HeaderInfo.width * HeaderInfo.bitDepth / 8.))
+    
+        
+    for i in range(HeaderInfo.height):
         if HeaderInfo.colorType == 3:
             ret.append(0)  # filter type
         else:
             ret.append(random.randint(0, 4))  # filter type
-        for j in range(HeaderInfo.width * HeaderInfo.bitDepth / 8):
+        
+        for j in range(width):
             if HeaderInfo.colorType == 0:  # greyscale 1 byte per pixel
                 ret.append(random.randint(0, 255))
             elif HeaderInfo.colorType == 2:  # Truecolor, 3 byte per pixel
@@ -384,7 +392,7 @@ def generateIDATData():
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
             elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear                                
-                ret.append(random.randint(0, NumPalette - 1))
+                ret.append(random.randint(0, NumPalette - 1) & 0xFF)
             elif HeaderInfo.colorType == 4:  # Greyscale 1 byte + alpha 1 byte
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
