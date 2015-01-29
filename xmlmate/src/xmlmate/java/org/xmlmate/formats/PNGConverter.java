@@ -1,13 +1,12 @@
 package org.xmlmate.formats;
 
-import java.io.File;
 import java.io.IOException;
 
 public class PNGConverter implements FormatConverter {
 
 	@Override
 	public String convert(String xml, String output) throws IOException {
-		ProcessBuilder pb = new ProcessBuilder(
+		ProcessBuilder pb = new ProcessBuilder("python",
 				"/home/nikolas/lunaworkspace/xmlmate/subjects/png/converters/xml2png.py",
 				xml, output + ".png");
 		pb.inheritIO();
