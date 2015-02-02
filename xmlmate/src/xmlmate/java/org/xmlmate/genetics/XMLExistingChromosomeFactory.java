@@ -1,7 +1,6 @@
 package org.xmlmate.genetics;
 
 import nu.xom.Builder;
-import nu.xom.Serializer;
 import nu.xom.canonical.Canonicalizer;
 import org.apache.xerces.parsers.StandardParserConfiguration;
 import org.apache.xerces.util.DefaultErrorHandler;
