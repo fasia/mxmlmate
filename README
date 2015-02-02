@@ -1,2 +1,5 @@
 To get the PINtools to compile you need to set the PIN_ROOT variable to where you have PIN installed.
 e.g. export PIN_ROOT=~/Downloads/pin 
+You also need to add your zeromq library to your $PIN_TOOL/source/tools/Config/makefile.unix.config
+e.g. TOOL_PATHS = -L/usr/local/lib and TOOL_LIBS += -ldwarf -lelf -ldl -lzmq
+

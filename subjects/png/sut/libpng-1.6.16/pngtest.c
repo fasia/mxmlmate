@@ -1722,12 +1722,12 @@ static int s_send(void *socket, char *string) {
 //  Caller must free returned string. Returns NULL if the context
 //  is being terminated.
 static char *s_recv (void *socket) {
-    char buffer [256]; // TODO increase buffer
-    int size = zmq_recv (socket, buffer, 255, 0);
+    char buffer [1024]; // TODO increase buffer
+    int size = zmq_recv (socket, buffer, 1023, 0);
     if (size == -1)
         return NULL;
-    if (size > 255)
-        size = 255;
+    if (size > 1023)
+        size = 1023;
     buffer [size] = 0;
     return strdup(buffer);
 }
