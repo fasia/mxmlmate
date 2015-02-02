@@ -1,0 +1,5 @@
+To be able to successfully run the xmlmate test driver located in libpng-1.6.16/.libs you have to do the following:
+1. Run ./configure in libpng-1.6.16
+2. Edit the Makefile to contain -L/usr/local/lib and -lzmq the LDFLAGS
+3. Run make
+4. Run sudo make install
