@@ -24,7 +24,7 @@
 	<!-- POSSIBLE COMBINATIONS: -->
 	<!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16, CT2BD8, CT2BD16, CT3BD1, CT3BD2, 
 		CT3BD4, CT3BD8, CT4BD8, CT4BD16, CT6BD8, CT6BD16 -->
-	<!-- CT0BD1 -->
+	<!-- CT0BD1 -->	
 	<element name="ChunksCT0BD1">
 		<complexType>
 			<sequence>
@@ -74,7 +74,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -130,7 +130,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -186,7 +186,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -242,7 +242,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -270,8 +270,8 @@
 					minOccurs="0" maxOccurs="1" />
 				<!-- ## PLTE ## -->
 				<sequence minOccurs="0" maxOccurs="0">
-					<element name="PLTE" type="tns:PLTEChunkTypeBD16" minOccurs="1"
-						maxOccurs="1" />
+					<element name="PLTE" type="tns:PLTEChunkTypeBD16"
+						minOccurs="1" maxOccurs="1" />
 					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
 						maxOccurs="1" />
 				</sequence>
@@ -298,7 +298,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -354,7 +354,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -382,8 +382,8 @@
 					minOccurs="0" maxOccurs="1" />
 				<!-- ## PLTE ## -->
 				<sequence minOccurs="0" maxOccurs="1">
-					<element name="PLTE" type="tns:PLTEChunkTypeBD16" minOccurs="1"
-						maxOccurs="1" />
+					<element name="PLTE" type="tns:PLTEChunkTypeBD16"
+						minOccurs="1" maxOccurs="1" />
 					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
 						maxOccurs="1" />
 				</sequence>
@@ -410,7 +410,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -466,7 +466,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -522,7 +522,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -578,7 +578,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -634,7 +634,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -690,7 +690,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -746,7 +746,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -802,7 +802,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>
@@ -858,7 +858,7 @@
 				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
 					maxOccurs="unbounded" />
 				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
-				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+				<element name="IEND" type="tns:IENDChunkType" minOccurs="1"
 					maxOccurs="1" />
 			</sequence>
 		</complexType>

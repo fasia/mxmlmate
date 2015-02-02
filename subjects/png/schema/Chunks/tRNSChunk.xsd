@@ -17,7 +17,7 @@
 	</complexType>
 	<complexType name="tRNSChunkDataTypeCT3">
 		<sequence>
-			<element name="bKGDPaletteIndex" type="unsignedByte"
+			<element name="tRNSPaletteIndex" type="unsignedByte"
 				maxOccurs="unbounded"></element>
 		</sequence>
 	</complexType>

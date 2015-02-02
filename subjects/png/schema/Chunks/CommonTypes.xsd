@@ -47,17 +47,13 @@
 			</documentation>
 		</annotation>
 		<restriction base="string">
-			<enumeration value="Title"></enumeration>
-			<enumeration value="Author"></enumeration>
-			<enumeration value="Description"></enumeration>
-			<enumeration value="Copyright"></enumeration>
-			<enumeration value="Creation Time"></enumeration>
-			<enumeration value="Software"></enumeration>
-			<enumeration value="Disclaimer"></enumeration>
-			<enumeration value="Warning"></enumeration>
-			<enumeration value="Source"></enumeration>
-			<enumeration value="Comment"></enumeration>
-			<pattern value=".+"></pattern>
+			<pattern
+				value=".+|Title|Author|Description|Copyright|Creation Time|Software|Dislaimer|Warning|Source|Comment"></pattern>
+			<!-- <enumeration value="Title"></enumeration> <enumeration value="Author"></enumeration> 
+				<enumeration value="Description"></enumeration> <enumeration value="Copyright"></enumeration> 
+				<enumeration value="Creation Time"></enumeration> <enumeration value="Software"></enumeration> 
+				<enumeration value="Disclaimer"></enumeration> <enumeration value="Warning"></enumeration> 
+				<enumeration value="Source"></enumeration> <enumeration value="Comment"></enumeration> -->
 			<minLength value="1"></minLength>
 			<maxLength value="79"></maxLength>
 		</restriction>
