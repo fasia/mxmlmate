@@ -10,6 +10,7 @@
 			<element name="sGrayBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="1"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -21,6 +22,7 @@
 			<element name="sGrayBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="2"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -32,6 +34,7 @@
 			<element name="sGrayBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="4"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -43,6 +46,7 @@
 			<element name="sGrayBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -54,6 +58,7 @@
 			<element name="sGrayBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -66,6 +71,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -73,6 +79,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -80,6 +87,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -91,6 +99,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -98,6 +107,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -105,6 +115,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -117,6 +128,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="1"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -124,6 +136,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="1"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -131,6 +144,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="1"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -142,6 +156,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="2"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -149,6 +164,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="2"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -156,6 +172,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="2"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -167,6 +184,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="4"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -174,6 +192,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="4"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -181,6 +200,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="4"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -192,6 +212,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -199,6 +220,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -206,6 +228,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -218,6 +241,7 @@
 			<element name="sGreyBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -225,6 +249,7 @@
 			<element name="sAlphaBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -236,6 +261,7 @@
 			<element name="sGreyBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -243,6 +269,7 @@
 			<element name="sAlphaBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -255,6 +282,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -262,6 +290,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -269,6 +298,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -276,6 +306,7 @@
 			<element name="sAlphaBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="8"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -287,6 +318,7 @@
 			<element name="sRedBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -294,6 +326,7 @@
 			<element name="sGreenBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -301,6 +334,7 @@
 			<element name="sBlueBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>
@@ -308,6 +342,7 @@
 			<element name="sAlphaBits">
 				<simpleType>
 					<restriction base="unsignedByte">
+						<minInclusive value="1"></minInclusive>
 						<maxInclusive value="16"></maxInclusive>
 					</restriction>
 				</simpleType>

@@ -1,0 +1,866 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
+	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+	<include schemaLocation="CommonTypes.xsd" />
+	<include schemaLocation="IHDRChunk.xsd" />
+	<include schemaLocation="bKGDChunk.xsd" />
+	<include schemaLocation="cHRMChunk.xsd" />
+	<include schemaLocation="gAMAChunk.xsd" />
+	<include schemaLocation="hISTChunk.xsd" />
+	<include schemaLocation="iCCPChunk.xsd" />
+	<include schemaLocation="IDATChunk.xsd" />
+	<include schemaLocation="IENDChunk.xsd" />
+	<include schemaLocation="iTXtChunk.xsd" />
+	<include schemaLocation="pHYsChunk.xsd" />
+	<include schemaLocation="PLTEChunk.xsd" />
+	<include schemaLocation="sBITChunk.xsd" />
+	<include schemaLocation="sPLTChunk.xsd" />
+	<include schemaLocation="sRGBChunk.xsd" />
+	<include schemaLocation="tEXtChunk.xsd" />
+	<include schemaLocation="tIMEChunk.xsd" />
+	<include schemaLocation="tRNSChunk.xsd" />
+	<include schemaLocation="zTXtChunk.xsd" />
+
+	<!-- POSSIBLE COMBINATIONS: -->
+	<!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16, CT2BD8, CT2BD16, CT3BD1, CT3BD2, 
+		CT3BD4, CT3BD8, CT4BD8, CT4BD16, CT6BD8, CT6BD16 -->
+	<!-- CT0BD1 -->
+	<element name="ChunksCT0BD1">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT0BD1"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT0BD1"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD1" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD1"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT0" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT0BD2 -->
+	<element name="ChunksCT0BD2">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT0BD2"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT0BD2"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD2" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD2"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT0" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT0BD4 -->
+	<element name="ChunksCT0BD4">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT0BD4"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT0BD4"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD4" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD4"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT0" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT0BD8 -->
+	<element name="ChunksCT0BD8">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT0BD8"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT0BD8"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD8" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD8"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT0" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT0BD16 -->
+	<element name="ChunksCT0BD16">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT0BD16"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT0BD16"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD16" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD16"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT0" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT2BD8 -->
+	<element name="ChunksCT2BD8">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT2BD8"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT2BD8"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD8" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT26BD8"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT2" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT2BD16 -->
+	<element name="ChunksCT2BD16">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT2BD16"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT2BD16"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD16" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT26BD16"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT2" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT3BD1 -->
+	<element name="ChunksCT3BD1">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT3BD1"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT3BD1"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="1" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD1" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT3BD1"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT3" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT3BD2 -->
+	<element name="ChunksCT3BD2">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT3BD2"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT3BD2"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="1" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD2" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT3BD2"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT3" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT3BD4 -->
+	<element name="ChunksCT3BD4">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT3BD4"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT3BD4"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="1" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD4" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT3BD4"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT3" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT3BD8 -->
+	<element name="ChunksCT3BD8">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT3BD8"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT3BD8"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="1" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD8" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT3BD816"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT3" minOccurs="0"
+					maxOccurs="1" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT4BD8 -->
+	<element name="ChunksCT4BD8">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT4BD8"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT4BD8"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD8" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD8"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT46" minOccurs="0"
+					maxOccurs="0" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT4BD16 -->
+	<element name="ChunksCT4BD16">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT4BD16"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT4BD16"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="0">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD16"
+						minOccurs="1" maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT04BD16"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT46" minOccurs="0"
+					maxOccurs="0" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT6BD8 -->
+	<element name="ChunksCT6BD8">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT6BD8"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT6BD8"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD8" minOccurs="1"
+						maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT26BD8"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT46" minOccurs="0"
+					maxOccurs="0" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+	<!-- ################################################################################## -->
+	<!-- CT6BD16 -->
+	<element name="ChunksCT6BD16">
+		<complexType>
+			<sequence>
+				<element name="IHDR" type="tns:IHDRChunkTypeCT6BD16"
+					minOccurs="1" maxOccurs="1" />
+				<!-- ## BEFORE PLTE AND IDAT ## -->
+				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
+					maxOccurs="1" />
+
+				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<choice>
+					<element name="iCCP" type="tns:iCCPChunkType" minOccurs="0"
+						maxOccurs="1" />
+					<element name="sRGB" type="tns:sRGBChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</choice>
+				<element name="sBIT" type="tns:sBITChunkTypeCT6BD16"
+					minOccurs="0" maxOccurs="1" />
+				<!-- ## PLTE ## -->
+				<sequence minOccurs="0" maxOccurs="1">
+					<element name="PLTE" type="tns:PLTEChunkTypeBD16"
+						minOccurs="1" maxOccurs="1" />
+					<element name="hIST" type="tns:hISTChunkType" minOccurs="0"
+						maxOccurs="1" />
+				</sequence>
+				<!-- ## AFTER PLTE BEFORE IDAT ## -->
+				<element name="bKGD" type="tns:bKGDChunkTypeCT26BD16"
+					minOccurs="0" maxOccurs="1" />
+				<element name="tRNS" type="tns:tRNSChunkTypeCT46" minOccurs="0"
+					maxOccurs="0" />
+				<!-- ## BEFORE IDAT ## -->
+				<element name="pHYs" type="tns:pHYsChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="sPLT" type="tns:sPLTChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- ## IDAT ## -->
+				<element name="IDAT" type="tns:IDATChunkType" minOccurs="1"
+					maxOccurs="1" />
+				<!-- ## NO CONSTRAINTS ## -->
+				<element name="tIME" type="tns:tIMEChunkType" minOccurs="0"
+					maxOccurs="1" />
+				<element name="iTXt" type="tns:iTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="tEXt" type="tns:tEXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<element name="zTXt" type="tns:zTXtChunkType" minOccurs="0"
+					maxOccurs="unbounded" />
+				<!-- <element name="Chunk" type="tns:chunkType" minOccurs="1" maxOccurs="unbounded"></element> -->
+				<element name="IEnd" type="tns:IENDChunkType" minOccurs="1"
+					maxOccurs="1" />
+			</sequence>
+		</complexType>
+	</element>
+</schema>
