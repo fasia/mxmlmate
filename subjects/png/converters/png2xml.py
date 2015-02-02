@@ -5,6 +5,10 @@ import io
 import binascii
 import zlib
 import struct
+import os
+import glob
+from hgext.inotify.server import join
+
 
 class Chunk:    
     def __init__(self, size=0, chunk_type='nONE', data=''):
@@ -27,6 +31,7 @@ class Chunk:
     
     def updateCRC(self):
         self.crc = self.getCRC()
+
 
 def isIntAlready(dt):
     try:
@@ -67,14 +72,37 @@ def intToCharLittleEndian(num):
 def intToCharBigEndian(num):
     return [chr((num >> 24) & 0xFF), chr((num >> 16) & 0xFF), chr((num >> 8) & 0xFF), chr(num & 0xFF)]
 
-def extractIHDRData(elem, data):   
-    # <tns:width>0</tns:width>
-    # <tns:height>0</tns:height>
-    # <tns:bitDepth>0</tns:bitDepth>
-    # <tns:colorType>0</tns:colorType>
-    # <tns:compressionMethod>0</tns:compressionMethod>
-    # <tns:filterMethod>0</tns:filterMethod>
-    # <tns:interlaceMethod>0</tns:interlaceMethod>
+
+class IHDRChunk:
+    def __init__(self):        
+        self.width = 0 
+        self.height = 0 
+        self.bitDepth = 0
+        self.colorType = 0
+        self.compressionMethod = 0
+        self.filterMethod = 0
+        self.interlaceMethod = 0
+        
+    def extractFromData(self, arr):
+        self.width = bytesToBigEndianInt(arr[0:4], 0xFFFFFFFF)
+        self.height = bytesToBigEndianInt(arr[4:8], 0xFFFFFFFF)
+        self.bitDepth = bytesToBigEndianInt(arr[8], 0xFF)
+        self.colorType = bytesToBigEndianInt(arr[9], 0xFF)
+        self.compressionMethod = bytesToBigEndianInt(arr[10], 0xFF)
+        self.filterMethod = bytesToBigEndianInt(arr[11], 0xFF)
+        self.interlaceMethod = bytesToBigEndianInt(arr[12], 0xFF)
+        self.printInfo()
+        
+    def printInfo(self):
+        print 'Width:', self.width,
+        print ', Height:', self.height,
+        print ', Bit Depth:', self.bitDepth,
+        print ', Color Type:', self.colorType,
+        print ', Compression Method:', self.compressionMethod,
+        print ', Filter Method:', self.filterMethod,
+        print ', Interlace Method:', self.interlaceMethod
+
+def extractIHDRData(elem, data):
     width = ET.SubElement(elem, getTag('width'))
     width.text = str(bytesToBigEndianInt(data[0:4], 0xFFFFFFFF))  # data[0:4]
     
@@ -95,17 +123,8 @@ def extractIHDRData(elem, data):
     
     interlaceMethod = ET.SubElement(elem, getTag('interlaceMethod'))
     interlaceMethod.text = str(bytesToBigEndianInt(data[12], 0xFF))
-    
-    
-def extractcHRMData(elem, data):    
-    # <element name="whiteX" type="unsignedInt"></element>
-    # <element name="whiteY" type="unsignedInt"></element>
-    # <element name="redX" type="unsignedInt"></element>
-    # <element name="redY" type="unsignedInt"></element>
-    # <element name="greenX" type="unsignedInt"></element>
-    # <element name="greenY" type="unsignedInt"></element>
-    # <element name="blueX" type="unsignedInt"></element>
-    # <element name="blueY" type="unsignedInt"></element>
+        
+def extractcHRMData(elem, data):
     nms = ["whiteX", "whiteY", "redX", "redY", "greenX", "greenY", "blueX", "blueY"]
         
     for i in range(0, len(data), 4):
@@ -113,9 +132,7 @@ def extractcHRMData(elem, data):
         if i + 4 > len(data):
             el.text = str(bytesToBigEndianInt(data[i:], 0xFFFFFFFF))  # data[i:]
             break        
-        el.text = str(bytesToBigEndianInt(data[i:i + 4], 0xFFFFFFFF))  # data[i:i + 4]
-    
-            
+        el.text = str(bytesToBigEndianInt(data[i:i + 4], 0xFFFFFFFF))  # data[i:i + 4]            
     
 def extractgAMAData(elem, data):
     imageGamma = ET.SubElement(elem, getTag('imageGamma'))
@@ -127,18 +144,14 @@ def extractiCCPData(elem, data):
             break
     if i > len(data) - 3:  # there was no null separator
         i = len(data) - 3
-    
-    for p in data:
-        print p,
-    print ''
-    
+        
     profileName = ET.SubElement(elem, getTag('profileName'))
     profileName.text = str(data[:i])
     
     nullSeparator = ET.SubElement(elem, getTag('nullSeparator'))
     nullSeparator.text = str(bytesToBigEndianInt(data[i], 0xFF))
     
-    CompressionMethod = ET.SubElement(elem, getTag('CompressionMethod'))
+    CompressionMethod = ET.SubElement(elem, getTag('compressionMethod'))
     CompressionMethod.text = str(bytesToBigEndianInt(data[i + 1], 0xFF))
         
     compressedProfile = ET.SubElement(elem, getTag('compressedProfile'))    
@@ -149,39 +162,32 @@ def extractsRGBData(elem, data):
     renderingIntent.text = str(bytesToBigEndianInt(data[0], 0xFF))
 
 
-def extractsBITData(elem, data):
-    sBITChunkDataTypeCol0 = ET.SubElement(elem, getTag('sBITColType0'))
-    for i in data:
-        sGrayBits = ET.SubElement(sBITChunkDataTypeCol0, getTag('sGrayBits'))
-        sGrayBits.text = str(bytesToBigEndianInt(i, 0xFF))
-#     ret = bytearray()    
-#     # elem.getchildren()[0]
-#     tag = elem.getchildren()[0].tag.split('}')[1]
-#     elem = elem.getchildren()[0]
-#     
-#     if tag == 'sBITColType0':
-#         sGrayBits = elem.getchildren()[0]
-#         ret.extend(chr(txtToInt(sGrayBits.text, 0xFF)))
-#         
-#     elif tag == 'sBITColType23':
-#         sRedBits, sGreenBits, sBlueBits = elem.getchildren()
-#         ret.extend(chr(txtToInt(sRedBits.text, 0xFF)))
-#         ret.extend(chr(txtToInt(sGreenBits.text, 0xFF)))
-#         ret.extend(chr(txtToInt(sBlueBits.text, 0xFF)))
-#         
-#     elif tag == 'sBITColType4':
-#         sGreyBits, sAlphaBits = elem.getchildren()
-#         ret.extend(chr(txtToInt(sGreyBits.text, 0xFF)))
-#         ret.extend(chr(txtToInt(sAlphaBits.text, 0xFF)))        
-#             
-#     elif tag == 'sBITColType6':
-#         sRedBits, sGreenBits, sBlueBits, sAlphaBits = elem.getchildren()
-#         ret.extend(chr(txtToInt(sRedBits.text, 0xFF)))
-#         ret.extend(chr(txtToInt(sGreenBits.text, 0xFF)))
-#         ret.extend(chr(txtToInt(sBlueBits.text, 0xFF)))
-#         ret.extend(chr(txtToInt(sAlphaBits.text, 0xFF)))
-#     
-#     return ret
+def extractsBITData(elem, data):    
+    if IHDRChunk.colorType == 0:
+        sGrayBits = ET.SubElement(elem, getTag('sGrayBits'))
+        sGrayBits.text = str(bytesToBigEndianInt(data[0], 0xFF))
+    elif IHDRChunk.colorType == 2 or IHDRChunk.colorType == 3:
+        sRedBits = ET.SubElement(elem, getTag('sRedBits'))
+        sRedBits.text = str(bytesToBigEndianInt(data[0], 0xFF))        
+        sGreenBits = ET.SubElement(elem, getTag('sGreenBits'))
+        sGreenBits.text = str(bytesToBigEndianInt(data[1], 0xFF))
+        sBlueBits = ET.SubElement(elem, getTag('sBlueBits'))
+        sBlueBits.text = str(bytesToBigEndianInt(data[2], 0xFF))
+    elif IHDRChunk.colorType == 4:
+        sGrayBits = ET.SubElement(elem, getTag('sGrayBits'))
+        sGrayBits.text = str(bytesToBigEndianInt(data[0], 0xFF))
+        sAlphaBits = ET.SubElement(elem, getTag('sAlphaBits'))
+        sAlphaBits.text = str(bytesToBigEndianInt(data[1], 0xFF))        
+    elif IHDRChunk.colorType == 6:
+        sRedBits = ET.SubElement(elem, getTag('sRedBits'))
+        sRedBits.text = str(bytesToBigEndianInt(data[0], 0xFF))        
+        sGreenBits = ET.SubElement(elem, getTag('sGreenBits'))
+        sGreenBits.text = str(bytesToBigEndianInt(data[1], 0xFF))
+        sBlueBits = ET.SubElement(elem, getTag('sBlueBits'))
+        sBlueBits.text = str(bytesToBigEndianInt(data[2], 0xFF))
+        if len(data) > 3:
+            sAlphaBits = ET.SubElement(elem, getTag('sAlphaBits'))
+            sAlphaBits.text = str(bytesToBigEndianInt(data[3], 0xFF))
 
 def extractPLTEData(elem, data):
     cols = ['red', 'green', 'blue']    
@@ -190,18 +196,19 @@ def extractPLTEData(elem, data):
         tp.text = str(bytesToBigEndianInt(data[i], 0xFF))        
     
 def extractbKGDData(elem, data):
-    if len(data) == 3:
-        bKGDColType26 = ET.SubElement(elem, getTag('bKGDColType26'))
-        bKGDRed = ET.SubElement(bKGDColType26, getTag('bKGDRed'))
+    if IHDRChunk.colorType == 0 or IHDRChunk.colorType == 4:
+        bKGDGreyscale = ET.SubElement(elem, getTag('bKGDGreyscale'))
+        bKGDGreyscale.text = str(bytesToBigEndianInt(data[0], 0xFF))        
+    elif IHDRChunk.colorType == 2 or IHDRChunk.colorType == 6:        
+        bKGDRed = ET.SubElement(elem, getTag('bKGDRed'))
         bKGDRed.text = str(bytesToBigEndianInt(data[0], 0xFF))
-        bKGDGreen = ET.SubElement(bKGDColType26, getTag('bKGDGreen'))
+        bKGDGreen = ET.SubElement(elem, getTag('bKGDGreen'))
         bKGDGreen.text = str(bytesToBigEndianInt(data[1], 0xFF))
-        bKGDBlue = ET.SubElement(bKGDColType26, getTag('bKGDBlue'))
-        bKGDBlue.text = str(bytesToBigEndianInt(data[2], 0xFF))
-    else:
-        bKGDColType04 = ET.SubElement(elem, getTag('bKGDColType04'))
-        bKGDGreyscale = ET.SubElement(bKGDColType04, getTag('bKGDGreyscale'))
-        bKGDGreyscale.text = str(bytesToBigEndianInt(data[0], 0xFF))
+        bKGDBlue = ET.SubElement(elem, getTag('bKGDBlue'))
+        bKGDBlue.text = str(bytesToBigEndianInt(data[2], 0xFF))        
+    elif IHDRChunk.colorType == 3:
+        bKGDPaletteIndex = ET.SubElement(elem, getTag('bKGDPaletteIndex'))
+        bKGDPaletteIndex.text = str(bytesToBigEndianInt(data[0], 0xFF))
 
 def extracthISTData(elem, data):
     for i in range(0, len(data), 2):
@@ -214,21 +221,22 @@ def extracthISTData(elem, data):
     
     
 def extracttRNSData(elem, data):
-    # <tns:tRNSColType0>
-    #    <tns:tRNSGrey>0</tns:tRNSGrey>
-    # </tns:tRNSColType0>    
-    if len(data) == 3:
-        tRNSColType2 = ET.SubElement(elem, getTag('tRNSColType2'))
-        tRNSRed = ET.SubElement(tRNSColType2, getTag('tRNSRed'))
+    if IHDRChunk.colorType == 0:
+        # tRNSColType0 = ET.SubElement(elem, getTag('tRNSColType0'))
+        tRNSGrey = ET.SubElement(elem, getTag('tRNSGrey'))
+        tRNSGrey.text = str(bytesToBigEndianInt(data[0], 0xFF))        
+    elif IHDRChunk.colorType == 2:
+        # tRNSColType2 = ET.SubElement(elem, getTag('tRNSColType2'))
+        tRNSRed = ET.SubElement(elem, getTag('tRNSRed'))
         tRNSRed.text = str(bytesToBigEndianInt(data[0], 0xFF))
-        tRNSGreen = ET.SubElement(tRNSColType2, getTag('tRNSGreen'))
+        tRNSGreen = ET.SubElement(elem, getTag('tRNSGreen'))
         tRNSGreen.text = str(bytesToBigEndianInt(data[1], 0xFF))
-        tRNSBlue = ET.SubElement(tRNSColType2, getTag('tRNSBlue'))
-        tRNSBlue.text = str(bytesToBigEndianInt(data[2], 0xFF))
-    else:
-        tRNSColType0 = ET.SubElement(elem, getTag('tRNSColType0'))
-        tRNSGrey = ET.SubElement(tRNSColType0, getTag('tRNSGrey'))
-        tRNSGrey.text = str(bytesToBigEndianInt(data[0], 0xFF))
+        tRNSBlue = ET.SubElement(elem, getTag('tRNSBlue'))
+        tRNSBlue.text = str(bytesToBigEndianInt(data[2], 0xFF)) 
+    elif IHDRChunk.colorType == 3:
+        # tRNSPaletteIndex = ET.SubElement(elem, getTag('tRNSColType3'))
+        tRNSPaletteIndex = ET.SubElement(elem, getTag('tRNSPaletteIndex'))
+        tRNSPaletteIndex.text = str(bytesToBigEndianInt(data[0], 0xFF))
     
 def extractpHYsData(elem, data):
 #     <sequence minOccurs="1" maxOccurs="unbounded">
@@ -475,7 +483,7 @@ def extracttEXtData(elem, data):
     nullSeparator.text = str(bytesToBigEndianInt(data[i], 0xFF))    
     
     text = ET.SubElement(elem, getTag('text'))
-    text.text = str(data[i + 1:])
+    text.text = str(byteArrayToHex(data[i + 1:]))
 
 def extractzTXtData(elem, data):
     # <tns:keyword>Title</tns:keyword>
@@ -509,7 +517,7 @@ def extractChunkData(elem, data):
 def extractIDATData(elem, data):    
     elem.text = byteArrayToHex(bytearray(zlib.decompress(str(data))))
 
-def extractSignature(pngData, root):    
+def extractSignature(pngData, root):
     sg = pngData[0:8]
     
     signature = ET.SubElement(root, getTag('Signature'))
@@ -534,7 +542,7 @@ def extractTopLevel(topElement, chunk):
     if chunk.chunk_type in ['IHDR', 'cHRM', 'gAMA', 'iCCP', 'sRGB', 'sBIT', 'PLTE', 'bKGD', 'hIST', 'tRNS', 'pHYs', 'sPLT', 'tIME', 'iTXt', 'tEXt', 'zTXt', 'IEND', 'IDAT']:
         chunkType = chunk.chunk_type
     else:
-        chunkType = 'Chunk' 
+        chunkType = 'Chunk'
     
     chunkElem = ET.SubElement(topElement, getTag(chunkType))
     
@@ -608,28 +616,34 @@ def getTag(tag):
         return str(XML_NAMESPACE + tag)
     return tag
 
+def getChunksName():
+    return 'ChunksCT' + str(IHDRChunk.colorType) + 'BD' + str(IHDRChunk.bitDepth)
+
 XML_NAMESPACE = '{http://www.example.org/PNGSchema}'
+IHDRChunk = IHDRChunk()
 def png2xml(pathToPNG, pathToXML):
     pngFile = io.open(pathToPNG, mode='rb')
     pngData = bytearray(pngFile.read())
     pngFile.close()
     
-    ET.register_namespace('tns', XML_NAMESPACE)  # some name
-    
+    ET.register_namespace('tns', XML_NAMESPACE)    
     # build a tree structure
     root = ET.Element(getTag('PNG'))
-    # root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+    root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+    root.set('xsi:schemaLocation', 'http://www.example.org/PNGSchema PNGSchema.xsd')
     
-    extractSignature(pngData, root)
-    
+    extractSignature(pngData, root)    
     chunks = extractChunks(pngData)
     
-    chunksElement = ET.SubElement(root, getTag('Chunks'))
+    global IHDRChunk
+    IHDRChunk.extractFromData(chunks[0].data)    
+    
+    chunksElement = ET.SubElement(root, getTag(getChunksName()))  # 'Chunks')
     
     # combine IDATs
     firstIdatInd = -1
     i = 0
-    while i < len(chunks):    
+    while i < len(chunks):
         if chunks[i].chunk_type == 'IDAT' and firstIdatInd == -1:
             firstIdatInd = i            
         elif chunks[i].chunk_type == 'IDAT':
@@ -649,4 +663,13 @@ def png2xml(pathToPNG, pathToXML):
 # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xml', '/home/gmaisuradze/Desktop/EclipseWorkspace/XMLExamples/MySchemas/PNGSchema.xsd')
 
 # png2xml('/home/gmaisuradze/Desktop/ftp0n2c08.png', '/home/gmaisuradze/Desktop/ftp0n2c08.xml')
+# png2xml('/home/gmaisuradze/Desktop/fileformatvuln/libpng/CraftedPNGs/IMG4.png', '/home/gmaisuradze/Desktop/fileformatvuln/libpng/CraftedPNGs/IMG4.xml')
 
+def convertFiles():
+    # origWD = os.getcwd()
+    # os.chdir(folder)
+    pngs = glob.glob('samples/*.png')
+    for pngFile in pngs:
+        xmlName = '.'.join(pngFile.split('.')[:-1]) + '.xml'        
+        png2xml(pngFile, xmlName)
+convertFiles()

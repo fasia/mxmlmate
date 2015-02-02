@@ -6,7 +6,8 @@ import zlib
 import sys
 import random
 import math
-        
+import glob    
+    
 def hexStringToByteArray(hx):
     res = bytearray()
     if not hx: return res
@@ -60,6 +61,16 @@ class IHDRChunk:
         self.compressionMethod = txtToInt(arr[4].text, 0xFF)
         self.filterMethod = txtToInt(arr[5].text, 0xFF)
         self.interlaceMethod = txtToInt(arr[6].text, 0xFF)
+        # self.printInfo()        
+        
+    def printInfo(self):
+        print 'Width:', self.width,
+        print ', Height:', self.height,
+        print ', Bit Depth:', self.bitDepth,
+        print ', Color Type:', self.colorType,
+        print ', Compression Method:', self.compressionMethod,
+        print ', Filter Method:', self.filterMethod,
+        print ', Interlace Method:', self.interlaceMethod
 
 HeaderInfo = IHDRChunk()
 NumPalette = 0
@@ -106,8 +117,7 @@ def parseiCCPData(elem):
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     ret.extend(chr(txtToInt(compressionMethod.text, 0xFF)))
     if compressedProfile.text:        
-        compressedText = zlib.compress(str(hexStringToByteArray(compressedProfile.text)))
-        # ret.extend(hexStringToByteArray(compressedProfile.text))
+        compressedText = zlib.compress(str(hexStringToByteArray(compressedProfile.text)))        
         ret.extend(compressedText)
     return ret
     
@@ -140,11 +150,16 @@ def parsesBITData(elem):
         ret.extend(chr(txtToInt(sAlphaBits.text, 0xFF)))        
             
     elif HeaderInfo.colorType == 6:  # tag == 'sBITColType6':
-        sRedBits, sGreenBits, sBlueBits, sAlphaBits = elem.getchildren()
+        children = elem.getchildren()
+        if len(children) == 4:
+            sRedBits, sGreenBits, sBlueBits, sAlphaBits = children
+        else:
+            sRedBits, sGreenBits, sBlueBits = children        
         ret.extend(chr(txtToInt(sRedBits.text, 0xFF)))
         ret.extend(chr(txtToInt(sGreenBits.text, 0xFF)))
         ret.extend(chr(txtToInt(sBlueBits.text, 0xFF)))
-        ret.extend(chr(txtToInt(sAlphaBits.text, 0xFF)))
+        if len(children) == 4:
+            ret.extend(chr(txtToInt(sAlphaBits.text, 0xFF)))
     
     return ret
 
@@ -203,8 +218,8 @@ def parsetRNSData(elem):
         ret.extend(shortToCharBigEndian(txtToInt(tRNSBlue.text, 0xFFFF)))
         
     elif HeaderInfo.colorType == 3:  # tag == 'tRNSColType3':
-        bKGDPaletteIndex = elem.getchildren()[0]
-        ret.extend(chr(txtToInt(bKGDPaletteIndex.text, 0xFF)))
+        tRNSPaletteIndex = elem.getchildren()[0]
+        ret.extend(chr(txtToInt(tRNSPaletteIndex.text, 0xFF)))
     
     return ret
     
@@ -341,7 +356,7 @@ def parsetEXtData(elem):
         ret.extend(keyword.text)
     ret.extend(chr(txtToInt(nullSeparator.text, 0xFF)))
     if text.text:
-        ret.extend(text.text)    
+        ret.extend(hexStringToByteArray(text.text))
     
     return ret
 
@@ -376,13 +391,12 @@ def generateIDATData():
     # return bytearray([0 for i in range(3 * 7 * 4)])
     
     width = int(math.ceil(HeaderInfo.width * HeaderInfo.bitDepth / 8.))
-    
-        
+            
     for i in range(HeaderInfo.height):
         if HeaderInfo.colorType == 3:
             ret.append(0)  # filter type
         else:
-            ret.append(random.randint(0, 4))  # filter type
+            ret.append(random.randint(0, 4))  # filter type            
         
         for j in range(width):
             if HeaderInfo.colorType == 0:  # greyscale 1 byte per pixel
@@ -390,13 +404,16 @@ def generateIDATData():
             elif HeaderInfo.colorType == 2:  # Truecolor, 3 byte per pixel
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear                                
-                ret.append(random.randint(0, NumPalette - 1) & 0xFF)
+                ret.append(random.randint(0, 255))               
+            elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear
+                if NumPalette!=0:
+                    ret.append(random.randint(0, NumPalette - 1) & 0xFF)
+                else:
+                    ret.append(random.randint(0, 255))
             elif HeaderInfo.colorType == 4:  # Greyscale 1 byte + alpha 1 byte
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
-            elif HeaderInfo.colorType == 5:  # truecolor 3 byte + alpha 1 byte
+            elif HeaderInfo.colorType == 6:  # truecolor 3 byte + alpha 1 byte
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
                 ret.append(random.randint(0, 255))
@@ -407,7 +424,13 @@ def parseIDATData(elem):
     ret = bytearray()
     
     # compressedText = zlib.compress(str(hexStringToByteArray(elem.text)))
-    compressedText = zlib.compress(str(generateIDATData()))
+    generatedData = str(generateIDATData())    
+    origData = str(hexStringToByteArray(elem.text))
+    # print len(origData), len(generatedData)
+    if len(origData) == len(generatedData):
+        generatedData = origData  # If data doesn't need correction leave it original. TODO: make it better
+        # print 'no data generated'
+    compressedText = zlib.compress(generatedData)
     if compressedText:
         ret.extend(compressedText)
     # ret.extend(elem.text)
@@ -527,3 +550,12 @@ def xml2png(pathToXML, pathToPNG):
 if __name__ == '__main__':
     xml2png(sys.argv[1], sys.argv[2])
     # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
+
+# def convertFiles():
+#     # origWD = os.getcwd()
+#     # os.chdir(folder)
+#     xmls = glob.glob('samples/*.xml')
+#     for xmlFile in xmls:
+#         if 'mem-overflow.png.xml' in xmlFile: continue
+#         xml2png(xmlFile, xmlFile + '.png')
+# convertFiles()
