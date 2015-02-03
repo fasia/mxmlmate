@@ -204,7 +204,7 @@ public final class ValueGenerator {
             case XSSimpleTypeDefinition.FACET_LENGTH:
                 return automatonProvider.getAutomaton("Char").repeat(intValue, intValue).intersection(base);
             case XSSimpleTypeDefinition.FACET_MINLENGTH:
-                return automatonProvider.getAutomaton("Char").repeat(intValue).intersection(base);
+                return automatonProvider.getAutomaton("Char").repeat(intValue).intersection(base); // FIXME bug when used with e.g. hexBinary
             case XSSimpleTypeDefinition.FACET_MAXLENGTH:
                 return automatonProvider.getAutomaton("Char").repeat(0, intValue).intersection(base);
             case XSSimpleTypeDefinition.FACET_WHITESPACE:

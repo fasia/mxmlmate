@@ -3,7 +3,6 @@ package org.xmlmate;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.Transition;
 import nu.xom.Element;
-
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,16 +29,9 @@ import org.xmlmate.xml.metrics.SchemaRegexVisitor;
 import org.xmlmate.xml.metrics.SchemaTraverser;
 
 import javax.xml.namespace.QName;
-
 import java.io.File;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

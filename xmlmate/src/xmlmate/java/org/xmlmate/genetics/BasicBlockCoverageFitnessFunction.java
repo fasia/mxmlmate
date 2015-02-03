@@ -21,11 +21,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
 public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSuiteChromosome> {
-	private static final Logger logger = LoggerFactory .getLogger(BasicBlockCoverageFitnessFunction.class);
+	private static final Logger logger = LoggerFactory.getLogger(BasicBlockCoverageFitnessFunction.class);
 	private Context context;
 	private Socket controlSocket;
-	private Socket dataOut;
-	private Socket coverageIn;
+	protected Socket dataOut;
+	protected Socket coverageIn;
 	private ProcessBuilder processBuilder;
 	private Process driverProcess;
 
