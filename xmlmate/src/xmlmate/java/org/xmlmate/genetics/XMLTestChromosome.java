@@ -57,7 +57,8 @@ public class XMLTestChromosome extends ExecutableChromosome {
     public XMLTestChromosome(XMLTestChromosome other) {
         doc = new AwareDocument(other.doc); // copy the doc deeply
         age = other.age;
-        copyCachedResults(other); // should I do this?
+        setChanged(other.isChanged());
+        copyCachedResults(other);
     }
 
     public static void addSecondaryObjective(SecondaryObjective objective) {

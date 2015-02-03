@@ -1,19 +1,23 @@
 package org.xmlmate.genetics;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.evosuite.utils.Randomness;
+import org.msgpack.MessagePack;
+import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
 public class MemoryAccessFitnessFunction extends BasicBlockCoverageFitnessFunction {
 	private static final Logger logger = LoggerFactory.getLogger(MemoryAccessFitnessFunction.class);
+	private final MessagePack msg = new MessagePack();
 
 	public MemoryAccessFitnessFunction(File workDir, List<String> driverCall) {
 		super(workDir, driverCall);
@@ -21,7 +25,7 @@ public class MemoryAccessFitnessFunction extends BasicBlockCoverageFitnessFuncti
 	
 	@Override
 	public double getFitness(XMLTestSuiteChromosome individual) {
-		TIntSet addrs = new TIntHashSet();
+		TLongSet addrs = new TLongHashSet();
 		for (XMLTestChromosome x : individual.getTestChromosomes()) {
 			if (!x.isChanged())
 				addrs.addAll(((MemoryAccessExecutionResult) x.getLastExecutionResult()).getAddresses());
@@ -30,14 +34,17 @@ public class MemoryAccessFitnessFunction extends BasicBlockCoverageFitnessFuncti
 				try {
 					File outputFile = x.writeToFile(f);
 					String path = outputFile.getAbsolutePath();
-					logger.debug("Sending file {}", path);
+					logger.trace("Sending file {}", path);
 					dataOut.send(path);
 					logger.trace("Waiting for coverage");
-					String coverage = coverageIn.recvStr();
-					logger.debug("Received coverage message of length {}", coverage.length());
 					
-					TIntSet set = new TIntHashSet();
-					// TODO use google protobuf here to deserialize the message
+					ByteBuffer buffer = ByteBuffer.wrap(coverageIn.recv());
+					BufferUnpacker unpk = msg.createBufferUnpacker(buffer);
+					unpk.setArraySizeLimit(10000000); // XXX calibrate
+					long[] la = unpk.read(long[].class);
+					logger.trace("received {} items", la.length);
+					TLongSet set = new TLongHashSet(la);
+					la = null;
 					
 					addrs.addAll(set);
 					x.setLastExecutionResult(new MemoryAccessExecutionResult(set));

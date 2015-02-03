@@ -15,5 +15,14 @@ public class MemoryAccessExecutionResult extends ExecutionResult {
 		super(null);
 		addresses = set;
 	}
+	
+	private MemoryAccessExecutionResult(MemoryAccessExecutionResult other) {
+		this(other.addresses);
+	}
+	
+	@Override
+	public ExecutionResult clone() {
+		return new MemoryAccessExecutionResult(this);
+	}
 
 }
