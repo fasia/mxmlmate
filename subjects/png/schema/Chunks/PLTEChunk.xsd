@@ -3,36 +3,37 @@
 	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
 	<include schemaLocation="CommonTypes.xsd" />
 
+	<!-- TODO: change minOccurs back to 1 for every PLTE chunk -->
 	<complexType name="PLTEChunkDataTypeBD1">
-		<sequence minOccurs="1" maxOccurs="2">
+		<sequence minOccurs="0" maxOccurs="2">
 			<element name="red" type="unsignedByte"></element>
 			<element name="green" type="unsignedByte"></element>
 			<element name="blue" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
 	<complexType name="PLTEChunkDataTypeBD2">
-		<sequence minOccurs="1" maxOccurs="4">
+		<sequence minOccurs="0" maxOccurs="4">
 			<element name="red" type="unsignedByte"></element>
 			<element name="green" type="unsignedByte"></element>
 			<element name="blue" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
 	<complexType name="PLTEChunkDataTypeBD4">
-		<sequence minOccurs="1" maxOccurs="16">
+		<sequence minOccurs="0" maxOccurs="16">
 			<element name="red" type="unsignedByte"></element>
 			<element name="green" type="unsignedByte"></element>
 			<element name="blue" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
 	<complexType name="PLTEChunkDataTypeBD8">
-		<sequence minOccurs="1" maxOccurs="256">
+		<sequence minOccurs="0" maxOccurs="256">
 			<element name="red" type="unsignedByte"></element>
 			<element name="green" type="unsignedByte"></element>
 			<element name="blue" type="unsignedByte"></element>
 		</sequence>
 	</complexType>
 	<complexType name="PLTEChunkDataTypeBD16">
-		<sequence minOccurs="1" maxOccurs="65536">
+		<sequence minOccurs="0" maxOccurs="65536">
 			<element name="red" type="unsignedByte"></element>
 			<element name="green" type="unsignedByte"></element>
 			<element name="blue" type="unsignedByte"></element>

@@ -6,7 +6,7 @@
 		<sequence>
 			<element name="keyword" type="tns:TextKeywords"></element>
 			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="text" type="string"></element>
+			<element name="text" type="hexBinary"></element>
 		</sequence>
 	</complexType>
 

@@ -21,10 +21,12 @@
 	<include schemaLocation="tRNSChunk.xsd" />
 	<include schemaLocation="zTXtChunk.xsd" />
 
+
+
 	<!-- POSSIBLE COMBINATIONS: -->
 	<!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16, CT2BD8, CT2BD16, CT3BD1, CT3BD2, 
 		CT3BD4, CT3BD8, CT4BD8, CT4BD16, CT6BD8, CT6BD16 -->
-	<!-- CT0BD1 -->	
+	<!-- CT0BD1 -->
 	<element name="ChunksCT0BD1">
 		<complexType>
 			<sequence>
@@ -593,7 +595,6 @@
 				<!-- ## BEFORE PLTE AND IDAT ## -->
 				<element name="cHRM" type="tns:cHRMChunkType" minOccurs="0"
 					maxOccurs="1" />
-
 				<element name="gAMA" type="tns:gAMAChunkType" minOccurs="0"
 					maxOccurs="1" />
 				<choice>
