@@ -342,15 +342,15 @@ public class AwareElement extends Element {
     private boolean mutateSimple(XSSimpleTypeDefinition simpleType) {
         // XXX process nillable
         logger.trace("Mutating simple type {}", simpleType.getName());
-        removeChildren();
-        boolean changed = false;
-        String newValue = decl.getConstraintValue();
         if (decl.getConstraintType() != XSConstants.VC_FIXED) {
-            newValue = ValueGenerator.generateValue(simpleType);
-            changed = true;
-        }
-        appendChild(newValue);
-        return changed;
+            removeChildren();
+            appendChild(ValueGenerator.generateValue(simpleType));
+            return true;
+        } else if (0 == getChildCount()) {
+            appendChild(decl.getValueConstraintValue().getNormalizedValue());
+            return true;
+        } else
+            return false;
     }
 
     /**

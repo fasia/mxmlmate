@@ -58,8 +58,11 @@ public class XMLExistingChromosomeFactory extends XMLTestChromosomeFactory {
                 return genChromosome(f);
             else if (f.isDirectory()) {
                 File[] files = f.listFiles(ff);
-                if (null != files && files.length > 0)
-                    return genChromosome(files[++currentFileIndex % files.length]);
+                if (null != files && files.length > 0) {
+                    File file = files[++currentFileIndex % files.length];
+                    logger.debug("Processing {}", file.getAbsolutePath());
+                    return genChromosome(file);
+                }
                 // return genChromosome(files[Randomness.nextInt(files.length)]);
                 // otherwise fall through to super.implementation
             }

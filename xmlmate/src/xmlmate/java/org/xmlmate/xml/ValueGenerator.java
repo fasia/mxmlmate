@@ -147,7 +147,7 @@ public final class ValueGenerator {
 
         try {
             if (minExclusive != null)
-                min = Long.parseLong(minExclusive) + 1;
+                min = Math.max(Long.parseLong(minExclusive) + 1, min);
         } catch (NumberFormatException e) {
         }
 
@@ -159,7 +159,7 @@ public final class ValueGenerator {
 
         try {
             if (maxExclusive != null)
-                max = Long.parseLong(maxExclusive) - 1;
+                max = Math.min(Long.parseLong(maxExclusive) - 1, max);
         } catch (NumberFormatException e) {
         }
 

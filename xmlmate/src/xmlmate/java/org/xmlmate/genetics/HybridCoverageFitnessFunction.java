@@ -3,6 +3,7 @@ package org.xmlmate.genetics;
 import org.evosuite.coverage.exception.ExceptionCoverageSuiteFitness;
 import org.evosuite.ga.FitnessFunction;
 
+// XXX can be probably refactored in Scala as a mix-in for minimization functions
 public class HybridCoverageFitnessFunction extends FitnessFunction<XMLTestSuiteChromosome> {
 
     private final SchemaCoverageFitnessFunction schemaCoverage;

@@ -60,6 +60,10 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     public double getSchemaRegexCoverage() {
         if (!isChanged())
             return regexCoverage;
+        if (XMLProperties.SCHEMA_ALL_TRANSITIONS.size() == 0) {
+            regexCoverage = 1.0d;
+            return regexCoverage;
+        }
         Set<Transition> atDiff = new HashSet<>(XMLProperties.SCHEMA_ALL_TRANSITIONS);
         for (XMLTestChromosome x : tests) {
             Set<Transition> regexTransitions = x.getDocument().getRegexTransitions();
@@ -82,6 +86,10 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     public double getSchemaAttributeCoverage() {
         if (!isChanged())
             return attrCoverage;
+        if (XMLProperties.SCHEMA_ALL_ATTRS.size() == 0) {
+            attrCoverage = 1.0d;
+            return attrCoverage;
+        }
         Set<XSAttributeDeclaration> atDiff = new HashSet<>(XMLProperties.SCHEMA_ALL_ATTRS);
         for (XMLTestChromosome x : tests)
             atDiff.removeAll(x.getDocument().getAttributeDeclarations());

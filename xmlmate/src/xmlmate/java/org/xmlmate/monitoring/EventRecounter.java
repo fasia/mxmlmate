@@ -24,22 +24,14 @@ public class EventRecounter implements SearchListener {
         long now = System.currentTimeMillis();
         int length = 0;
         int size = 0;
-        double[] fitnesses = new double[algorithm.getPopulationSize()];
-        int[] sizes = new int[algorithm.getPopulationSize()];
-        int cursor = 0;
         for (Chromosome chromosome : algorithm.getPopulation()) {
             length += ((AbstractTestSuiteChromosome) chromosome).totalLengthOfTestCases();
             size += chromosome.size();
-            sizes[cursor] = chromosome.size();
-            fitnesses[cursor] = chromosome.getFitness();
-            cursor += 1;
         }
         Chromosome bestIndividual = algorithm.getBestIndividual();
         long duration = now - last;
         durations += duration;
         logger.info("Generation {} had size {}, length {}, and took {} sec. Best fitness {} from gen {}", algorithm.getAge(), size, length, duration / 1000d, bestIndividual.getFitness(), bestIndividual.getAge());
-        logger.info("Fitnesses: "+Arrays.toString(fitnesses));
-        logger.info("Sizes:     "+Arrays.toString(sizes));
         last = now;
     }
 
