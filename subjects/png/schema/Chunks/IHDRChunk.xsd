@@ -1,632 +1,327 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="IHDRChunkDataType">
-		<sequence>
-			<element name="width">
-				<simpleType>
-					<restriction base="unsignedInt">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="10000" />
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="height">
-				<simpleType>
-					<restriction base="unsignedInt">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="10000" />
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="bitDepth">
-				<annotation>
-					<documentation>ColType0 - 1, 2, 4, 8, 16
-						ColType2 - 8, 16
-						ColType3 -
-						1, 2, 4, 8
-						ColType4 - 8, 16
-						ColType6 - 8, 16
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="byte">
-						<!-- <enumeration value="1"></enumeration> <enumeration value="2"></enumeration> 
-							<enumeration value="4"></enumeration> <enumeration value="16"></enumeration> -->
-						<enumeration value="8"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<annotation>
-					<documentation>0 - Greyscale
-						2 - Truecolor (R, G, B)
-						3 -
-						Indexed-color (Palette)
-						4 - Greyscale with alpha
-						6 - Truecolor with
-						alpha
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="byte">
-						<enumeration value="0"></enumeration>
-						<enumeration value="2"></enumeration>
-						<enumeration value="3"></enumeration>
-						<enumeration value="4"></enumeration>
-						<enumeration value="6"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="compressionMethod">
-				<annotation>
-					<documentation>0 - Deflate/Inflate. Sliding windows at most 32768
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="byte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="filterMethod">
-				<annotation>
-					<documentation>0 - (adaptive filtering with five basic filter types
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="byte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="interlaceMethod">
-				<annotation>
-					<documentation>
-						0 - standard
-						1 - Adam7
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="byte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="IHDRChunkDataType">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth">
+                <annotation>
+                    <documentation>ColType0 - 1, 2, 4, 8, 16
+                        ColType2 - 8, 16
+                        ColType3 -
+                        1, 2, 4, 8
+                        ColType4 - 8, 16
+                        ColType6 - 8, 16
+                    </documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="byte">
+                        <!-- <enumeration value="1"></enumeration> <enumeration value="2"></enumeration>
+                            <enumeration value="4"></enumeration> <enumeration value="16"></enumeration> -->
+                        <enumeration value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="colorType">
+                <annotation>
+                    <documentation>
+                        0 - Greyscale
+                        2 - Truecolor (R, G, B)
+                        3 -
+                        Indexed-color (Palette)
+                        4 - Greyscale with alpha
+                        6 - Truecolor with
+                        alpha
+                    </documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="byte">
+                        <enumeration value="0"/>
+                        <enumeration value="2"/>
+                        <enumeration value="3"/>
+                        <enumeration value="4"/>
+                        <enumeration value="6"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
 
-	<!-- ######################### Common elements ######################### -->
-	<element name="width">
-		<simpleType>
-			<restriction base="unsignedInt">
-				<minInclusive value="1"></minInclusive>
-				<maxInclusive value="10000" />
-			</restriction>
-		</simpleType>
-	</element>
-	<element name="height">
-		<simpleType>
-			<restriction base="unsignedInt">
-				<minInclusive value="1"></minInclusive>
-				<maxInclusive value="10000" />
-			</restriction>
-		</simpleType>
-	</element>
+    <!-- ######################### Common elements ######################### -->
+    <element name="width" fixed="2" type="unsignedInt"/>
+    <element name="height" fixed="2" type="unsignedInt"/>
+    <element name="compressionMethod" fixed="0" type="unsignedByte"/>
+    <element name="filterMethod" fixed="0" type="unsignedByte"/>
+    <element name="interlaceMethod" fixed="0" type="unsignedByte"/>
 
-	<element name="compressionMethod">
-		<simpleType>
-			<restriction base="unsignedByte">
-				<enumeration value="0"></enumeration>
-			</restriction>
-		</simpleType>
-	</element>
-	<element name="filterMethod">
-		<simpleType>
-			<restriction base="unsignedByte">
-				<enumeration value="0"></enumeration>
-			</restriction>
-		</simpleType>
-	</element>
-	<element name="interlaceMethod">
-		<simpleType>
-			<restriction base="unsignedByte">
-				<enumeration value="0"></enumeration>
-			</restriction>
-		</simpleType>
-	</element>
+    <group name="width_height">
+        <sequence>
+            <element ref="tns:width"/>
+            <element ref="tns:height"/>
+        </sequence>
+    </group>
+    <group name="methods">
+        <sequence>
+            <element ref="tns:compressionMethod"/>
+            <element ref="tns:filterMethod"/>
+            <element ref="tns:interlaceMethod"/>
+        </sequence>
+    </group>
+    <!-- ######################### Separation according to Color types ######################### -->
+    <!-- ########## CT0 ########## -->
+    <complexType name="IHDRChunkDataTypeCT0BD1">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" type="unsignedByte" fixed="1"/>
+            <element name="colorType" fixed="0" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT0BD2">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" type="unsignedByte" fixed="2"/>
+            <element name="colorType" type="unsignedByte" fixed="0"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT0BD4">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" type="unsignedByte" fixed="4"/>
+            <element name="colorType" type="unsignedByte" fixed="0"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT0BD8">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="8" type="unsignedByte"/>
+            <element name="colorType" fixed="0" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT0BD16">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="16" type="unsignedByte"/>
+            <element name="colorType" fixed="0" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <!-- ########## CT2 ########## -->
+    <complexType name="IHDRChunkDataTypeCT2BD8">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="8" type="unsignedByte"/>
+            <element name="colorType" fixed="2" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT2BD16">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="16" type="unsignedByte"/>
+            <element name="colorType" fixed="2" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <!-- ########## CT3 ########## -->
+    <complexType name="IHDRChunkDataTypeCT3BD1">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="1" type="unsignedByte"/>
+            <element name="colorType" fixed="3" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT3BD2">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="2" type="unsignedByte"/>
+            <element name="colorType" fixed="3" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT3BD4">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="4" type="unsignedByte"/>
+            <element name="colorType" fixed="3" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT3BD8">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="8" type="unsignedByte"/>
+            <element name="colorType" fixed="3" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <!-- ########## CT4 ########## -->
+    <complexType name="IHDRChunkDataTypeCT4BD8">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="8" type="unsignedByte"/>
+            <element name="colorType" fixed="4" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT4BD16">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="16" type="unsignedByte"/>
+            <element name="colorType" fixed="4" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <!-- ########## CT6 ########## -->
+    <complexType name="IHDRChunkDataTypeCT6BD8">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="8" type="unsignedByte"/>
+            <element name="colorType" fixed="6" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkDataTypeCT6BD16">
+        <sequence>
+            <group ref="tns:width_height"/>
+            <element name="bitDepth" fixed="16" type="unsignedByte"/>
+            <element name="colorType" fixed="6" type="unsignedByte"/>
+            <group ref="tns:methods"/>
+        </sequence>
+    </complexType>
 
-	<!-- ######################### Separation according to Color types ######################### -->
-	<!-- ########## CT0 ########## -->
-	<complexType name="IHDRChunkDataTypeCT0BD1">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="1"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT0BD2">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="2"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT0BD4">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="4"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT0BD8">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="8"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT0BD16">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="16"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<!-- ########## CT2 ########## -->
-	<complexType name="IHDRChunkDataTypeCT2BD8">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="8"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="2"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT2BD16">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="16"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="2"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<!-- ########## CT3 ########## -->
-	<complexType name="IHDRChunkDataTypeCT3BD1">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="1"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="3"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT3BD2">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="2"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="3"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT3BD4">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="4"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="3"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT3BD8">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="8"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="3"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<!-- ########## CT4 ########## -->
-	<complexType name="IHDRChunkDataTypeCT4BD8">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="8"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="4"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT4BD16">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="16"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="4"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<!-- ########## CT6 ########## -->
-	<complexType name="IHDRChunkDataTypeCT6BD8">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="8"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="6"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkDataTypeCT6BD16">
-		<sequence>
-			<element ref="tns:width" />
-			<element ref="tns:height" />
-			<element name="bitDepth">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="16"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="colorType">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="6"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element ref="tns:compressionMethod" />
-			<element ref="tns:filterMethod" />
-			<element ref="tns:interlaceMethod" />
-		</sequence>
-	</complexType>
+    <!-- ######################### Top Level ######################### -->
+    <element name="size" fixed="13" type="unsignedInt"/>
+    <element name="type" fixed="IHDR" type="string"/>
+    <!-- ########## BASES ########## -->
+    <complexType name="IHDRChunkTypeCT0BD1">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT0BD1"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT0BD2">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT0BD2"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT0BD4">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT0BD4"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT0BD8">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT0BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT0BD16">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT0BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<!-- ######################### Top Level ######################### -->
-	<element name="size">
-		<simpleType>
-			<restriction base="unsignedInt">
-				<enumeration value="13"></enumeration>
-			</restriction>
-		</simpleType>
-	</element>
-	<element name="type">
-		<simpleType>
-			<restriction base="string">
-				<enumeration value="IHDR"></enumeration>
-			</restriction>
-		</simpleType>
-	</element>
-	<!-- ########## BASES ########## -->
-	<complexType name="IHDRChunkTypeCT0BD1">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT0BD1" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT0BD2">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT0BD2" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT0BD4">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT0BD4" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT0BD8">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT0BD8" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT0BD16">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT0BD16" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="IHDRChunkTypeCT2BD8">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT2BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT2BD16">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT2BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="IHDRChunkTypeCT2BD8">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT2BD8" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT2BD16">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT2BD16" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="IHDRChunkTypeCT3BD1">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT3BD1"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT3BD2">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT3BD2"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT3BD4">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT3BD4"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT3BD8">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT3BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="IHDRChunkTypeCT3BD1">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT3BD1" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT3BD2">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT3BD2" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT3BD4">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT3BD4" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT3BD8">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT3BD8" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="IHDRChunkTypeCT4BD8">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT4BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT4BD16">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT4BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="IHDRChunkTypeCT4BD8">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT4BD8" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT4BD16">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT4BD16" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-
-	<complexType name="IHDRChunkTypeCT6BD8">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT6BD8" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="IHDRChunkTypeCT6BD16">
-		<sequence>
-			<element ref="tns:size" />
-			<element ref="tns:type" />
-			<element name="data" type="tns:IHDRChunkDataTypeCT6BD16" />
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="IHDRChunkTypeCT6BD8">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT6BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="IHDRChunkTypeCT6BD16">
+        <sequence>
+            <element ref="tns:size"/>
+            <element ref="tns:type"/>
+            <element name="data" type="tns:IHDRChunkDataTypeCT6BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

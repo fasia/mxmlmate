@@ -1,113 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
 
-	<!-- TODO: change minOccurs back to 1 for every PLTE chunk -->
-	<complexType name="PLTEChunkDataTypeBD1">
-		<sequence minOccurs="0" maxOccurs="2">
-			<element name="red" type="unsignedByte"></element>
-			<element name="green" type="unsignedByte"></element>
-			<element name="blue" type="unsignedByte"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkDataTypeBD2">
-		<sequence minOccurs="0" maxOccurs="4">
-			<element name="red" type="unsignedByte"></element>
-			<element name="green" type="unsignedByte"></element>
-			<element name="blue" type="unsignedByte"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkDataTypeBD4">
-		<sequence minOccurs="0" maxOccurs="16">
-			<element name="red" type="unsignedByte"></element>
-			<element name="green" type="unsignedByte"></element>
-			<element name="blue" type="unsignedByte"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkDataTypeBD8">
-		<sequence minOccurs="0" maxOccurs="256">
-			<element name="red" type="unsignedByte"></element>
-			<element name="green" type="unsignedByte"></element>
-			<element name="blue" type="unsignedByte"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkDataTypeBD16">
-		<sequence minOccurs="0" maxOccurs="65536">
-			<element name="red" type="unsignedByte"></element>
-			<element name="green" type="unsignedByte"></element>
-			<element name="blue" type="unsignedByte"></element>
-		</sequence>
-	</complexType>
+    <!-- TODO: change minOccurs back to 1 for every PLTE chunk -->
+    <complexType name="PLTEChunkDataTypeBD1">
+        <sequence minOccurs="0" maxOccurs="2">
+            <element name="red" type="unsignedByte"/>
+            <element name="green" type="unsignedByte"/>
+            <element name="blue" type="unsignedByte"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkDataTypeBD2">
+        <sequence minOccurs="0" maxOccurs="4">
+            <element name="red" type="unsignedByte"/>
+            <element name="green" type="unsignedByte"/>
+            <element name="blue" type="unsignedByte"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkDataTypeBD4">
+        <sequence minOccurs="0" maxOccurs="16">
+            <element name="red" type="unsignedByte"/>
+            <element name="green" type="unsignedByte"/>
+            <element name="blue" type="unsignedByte"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkDataTypeBD8">
+        <sequence minOccurs="0" maxOccurs="256">
+            <element name="red" type="unsignedByte"/>
+            <element name="green" type="unsignedByte"/>
+            <element name="blue" type="unsignedByte"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkDataTypeBD16">
+        <sequence minOccurs="0" maxOccurs="65536">
+            <element name="red" type="unsignedByte"/>
+            <element name="green" type="unsignedByte"/>
+            <element name="blue" type="unsignedByte"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="PLTEChunkTypeBD1">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="PLTE"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:PLTEChunkDataTypeBD1"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkTypeBD2">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="PLTE"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:PLTEChunkDataTypeBD2"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkTypeBD4">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="PLTE"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:PLTEChunkDataTypeBD4"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkTypeBD8">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="PLTE"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:PLTEChunkDataTypeBD8"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
-	<complexType name="PLTEChunkTypeBD16">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="PLTE"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:PLTEChunkDataTypeBD16"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="PLTEChunkTypeBD1">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="PLTE"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:PLTEChunkDataTypeBD1"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkTypeBD2">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="PLTE"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:PLTEChunkDataTypeBD2"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkTypeBD4">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="PLTE"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:PLTEChunkDataTypeBD4"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkTypeBD8">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="PLTE"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:PLTEChunkDataTypeBD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="PLTEChunkTypeBD16">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="PLTE"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:PLTEChunkDataTypeBD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

@@ -21,19 +21,11 @@
 	<!-- <include schemaLocation="Chunks/tIMEChunk.xsd" /> -->
 	<!-- <include schemaLocation="Chunks/tRNSChunk.xsd" /> -->
 	<!-- <include schemaLocation="Chunks/zTXtChunk.xsd" /> -->
-	<include schemaLocation="Chunks/PossibleSequences.xsd"></include>
+	<include schemaLocation="Chunks/PossibleSequences.xsd"/>
 
-	<!-- ############################################################################################# -->
-	<simpleType name="signatureType">
-		<restriction base="hexBinary">
-			<enumeration value="89504e470d0a1a0a"></enumeration>
-		</restriction>
-	</simpleType>
-	<!-- ############################################################################################# -->
 	<complexType name="PNGFileType">
 		<sequence>
-			<element name="Signature" type="tns:signatureType" minOccurs="1"
-				maxOccurs="1" />
+			<element name="Signature" type="hexBinary" minOccurs="1" maxOccurs="1" fixed="89504e470d0a1a0a" />
 			<!-- <element name="Chunks" type="tns:chunkType" maxOccurs="unbounded"> 
 				</element> -->
 			<choice>
@@ -56,5 +48,5 @@
 		</sequence>
 	</complexType>
 
-	<element name="PNG" type="tns:PNGFileType"></element>
+	<element name="PNG" type="tns:PNGFileType"/>
 </schema>

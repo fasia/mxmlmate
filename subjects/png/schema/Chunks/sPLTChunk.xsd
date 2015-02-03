@@ -1,90 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="sPLTChunkDataType">
-		<sequence>
-			<element name="paletteName">
-				<simpleType>
-					<restriction base="string">
-						<minLength value="1"></minLength>
-						<maxLength value="79"></maxLength>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<!-- <element name="sampleDepth"> -->
-			<!-- <annotation> -->
-			<!-- <documentation>Red, green, blue, alpha will by 1 byte if sample -->
-			<!-- depth is 8. -->
-			<!-- They will be 2 bytes if sample depth is 16 -->
-			<!-- </documentation> -->
-			<!-- </annotation> -->
-			<!-- <simpleType> -->
-			<!-- <restriction base="unsignedByte"> -->
-			<!-- <enumeration value="8"></enumeration> -->
-			<!-- <enumeration value="16"></enumeration> -->
-			<!-- </restriction> -->
-			<!-- </simpleType> -->
-			<!-- </element> -->
-			<choice>
-				<sequence>
-					<element name="sampleDepth8">
-						<annotation>
-							<documentation>Red, green, blue, alpha will by 1 byte if sample
-								depth is 8.
-								They will be 2 bytes if sample depth is 16
-							</documentation>
-						</annotation>
-						<simpleType>
-							<restriction base="unsignedByte">
-								<enumeration value="8"></enumeration>
-							</restriction>
-						</simpleType>
-					</element>
-					<sequence minOccurs="1" maxOccurs="unbounded">
-						<element name="redDpp8" type="unsignedByte"></element>
-						<element name="greenDpp8" type="unsignedByte"></element>
-						<element name="blueDpp8" type="unsignedByte"></element>
-						<element name="alphaDpp8" type="unsignedByte"></element>
-						<element name="frequencyDpp8" type="unsignedShort"></element>
-					</sequence>
-				</sequence>
-				<sequence>
-					<element name="sampleDepth16">
-						<simpleType>
-							<restriction base="unsignedByte">
-								<enumeration value="16"></enumeration>
-							</restriction>
-						</simpleType>
-					</element>
-					<sequence minOccurs="1" maxOccurs="unbounded">
-						<element name="redDpp16" type="unsignedShort"></element>
-						<element name="greenDpp16" type="unsignedShort"></element>
-						<element name="blueDpp16" type="unsignedShort"></element>
-						<element name="alphaDpp16" type="unsignedShort"></element>
-						<element name="frequencyDpp16" type="unsignedShort"></element>
-					</sequence>
-				</sequence>
-				<!-- <element name="paletteRAW" type="string"> <annotation> <documentation>In 
-					case non of the above is applicable (because of size)</documentation> </annotation> 
-					</element> -->
-			</choice>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="sPLTChunkDataType">
+        <sequence>
+            <element name="paletteName">
+                <simpleType>
+                    <restriction base="string">
+                        <minLength value="1"/>
+                        <maxLength value="79"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="nullSeparator" type="tns:NullSeparator"/>
+            <!-- <element name="sampleDepth"> -->
+            <!-- <annotation> -->
+            <!-- <documentation>Red, green, blue, alpha will by 1 byte if sample -->
+            <!-- depth is 8. -->
+            <!-- They will be 2 bytes if sample depth is 16 -->
+            <!-- </documentation> -->
+            <!-- </annotation> -->
+            <!-- <simpleType> -->
+            <!-- <restriction base="unsignedByte"> -->
+            <!-- <enumeration value="8"></enumeration> -->
+            <!-- <enumeration value="16"></enumeration> -->
+            <!-- </restriction> -->
+            <!-- </simpleType> -->
+            <!-- </element> -->
+            <choice>
+                <sequence>
+                    <element name="sampleDepth8">
+                        <annotation>
+                            <documentation>Red, green, blue, alpha will by 1 byte if sample
+                                depth is 8.
+                                They will be 2 bytes if sample depth is 16
+                            </documentation>
+                        </annotation>
+                        <simpleType>
+                            <restriction base="unsignedByte">
+                                <enumeration value="8"/>
+                            </restriction>
+                        </simpleType>
+                    </element>
+                    <sequence minOccurs="1" maxOccurs="unbounded">
+                        <element name="redDpp8" type="unsignedByte"/>
+                        <element name="greenDpp8" type="unsignedByte"/>
+                        <element name="blueDpp8" type="unsignedByte"/>
+                        <element name="alphaDpp8" type="unsignedByte"/>
+                        <element name="frequencyDpp8" type="unsignedShort"/>
+                    </sequence>
+                </sequence>
+                <sequence>
+                    <element name="sampleDepth16">
+                        <simpleType>
+                            <restriction base="unsignedByte">
+                                <enumeration value="16"/>
+                            </restriction>
+                        </simpleType>
+                    </element>
+                    <sequence minOccurs="1" maxOccurs="unbounded">
+                        <element name="redDpp16" type="unsignedShort"/>
+                        <element name="greenDpp16" type="unsignedShort"/>
+                        <element name="blueDpp16" type="unsignedShort"/>
+                        <element name="alphaDpp16" type="unsignedShort"/>
+                        <element name="frequencyDpp16" type="unsignedShort"/>
+                    </sequence>
+                </sequence>
+                <!-- <element name="paletteRAW" type="string"> <annotation> <documentation>In
+                    case non of the above is applicable (because of size)</documentation> </annotation>
+                    </element> -->
+            </choice>
+        </sequence>
+    </complexType>
 
-	<complexType name="sPLTChunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sPLT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sPLTChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="sPLTChunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sPLT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sPLTChunkDataType"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

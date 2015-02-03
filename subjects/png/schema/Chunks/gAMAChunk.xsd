@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="gAMAChunkDataType">
-		<annotation>
-			<documentation>The value is encoded as a four-byte PNG unsigned
-				integer, representing gamma times 100000.
-				EXAMPLE A gamma of 1/2.2
-				would be stored as the integer 45455.
-			</documentation>
-		</annotation>
-		<sequence>
-			<element name="imageGamma" type="unsignedInt"></element>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="gAMAChunkDataType">
+        <annotation>
+            <documentation>The value is encoded as a four-byte PNG unsigned
+                integer, representing gamma times 100000.
+                EXAMPLE A gamma of 1/2.2
+                would be stored as the integer 45455.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="imageGamma" type="unsignedInt"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="gAMAChunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="gAMA"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:gAMAChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="gAMAChunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="gAMA"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:gAMAChunkDataType"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

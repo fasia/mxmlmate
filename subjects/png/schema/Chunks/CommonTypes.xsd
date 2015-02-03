@@ -1,115 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
 
-	<simpleType name="FourCCType">
-		<restriction base="string">
-			<length value="4"></length>
-		</restriction>
-	</simpleType>
+    <simpleType name="FourCCType">
+        <restriction base="string">
+            <length value="4"/>
+        </restriction>
+    </simpleType>
 
-	<simpleType name="NullSeparator">
-		<restriction base="byte">
-			<enumeration value="0"></enumeration>
-		</restriction>
-	</simpleType>
+    <simpleType name="NullSeparator">
+        <restriction base="byte">
+            <enumeration value="0"/>
+        </restriction>
+    </simpleType>
 
-	<simpleType name="CompressionMethod">
-		<annotation>
-			<documentation>The only compression method defined in this
-				International Standard is method 0 (zlib datastream with deflate
-				compression)
-			</documentation>
-		</annotation>
-		<restriction base="byte">
-			<enumeration value="0"></enumeration>
-		</restriction>
-	</simpleType>
+    <simpleType name="CompressionMethod">
+        <annotation>
+            <documentation>
+                The only compression method defined in this
+                International Standard is method 0 (zlib datastream with deflate
+                compression)
+            </documentation>
+        </annotation>
+        <restriction base="byte">
+            <enumeration value="0"/>
+        </restriction>
+    </simpleType>
 
-	<simpleType name="TextKeywords">
-		<annotation>
-			<documentation>Title - Short (one line) title or caption for image;
-				Author - Name of image's creator;
-				Description - Description of image
-				(possibly long);
-				Copyright - Copyright notice;
-				Creation Time - Time of
-				original image creation;
-				Software - Software used to create the
-				image;
-				Disclaimer - Legal disclaimer;
-				Warning - Warning of nature of
-				content;
-				Source - Device used to create the
-				image;
-				Comment -
-				Miscellaneous comment;
-			</documentation>
-		</annotation>
-		<restriction base="string">
-			<pattern
-				value=".+|Title|Author|Description|Copyright|Creation Time|Software|Dislaimer|Warning|Source|Comment"></pattern>
-			<!-- <enumeration value="Title"></enumeration> <enumeration value="Author"></enumeration> 
-				<enumeration value="Description"></enumeration> <enumeration value="Copyright"></enumeration> 
-				<enumeration value="Creation Time"></enumeration> <enumeration value="Software"></enumeration> 
-				<enumeration value="Disclaimer"></enumeration> <enumeration value="Warning"></enumeration> 
-				<enumeration value="Source"></enumeration> <enumeration value="Comment"></enumeration> -->
-			<minLength value="1"></minLength>
-			<maxLength value="79"></maxLength>
-		</restriction>
-	</simpleType>
+    <simpleType name="TextKeywords">
+        <annotation>
+            <documentation>
+                Title - Short (one line) title or caption for image;
+                Author - Name of image's creator;
+                Description - Description of image
+                (possibly long);
+                Copyright - Copyright notice;
+                Creation Time - Time of
+                original image creation;
+                Software - Software used to create the
+                image;
+                Disclaimer - Legal disclaimer;
+                Warning - Warning of nature of
+                content;
+                Source - Device used to create the
+                image;
+                Comment -
+                Miscellaneous comment;
+            </documentation>
+        </annotation>
+        <restriction base="string">
+            <pattern
+                    value=".+|Title|Author|Description|Copyright|Creation Time|Software|Dislaimer|Warning|Source|Comment"/>
+            <!-- <enumeration value="Title"></enumeration> <enumeration value="Author"></enumeration>
+                <enumeration value="Description"></enumeration> <enumeration value="Copyright"></enumeration>
+                <enumeration value="Creation Time"></enumeration> <enumeration value="Software"></enumeration>
+                <enumeration value="Disclaimer"></enumeration> <enumeration value="Warning"></enumeration>
+                <enumeration value="Source"></enumeration> <enumeration value="Comment"></enumeration> -->
+            <minLength value="1"/>
+            <maxLength value="79"/>
+        </restriction>
+    </simpleType>
 
-	<attribute name="sizeField" type="string" fixed="size">
-		<annotation>
-			<documentation>Element having this attribute is size restricted by
-				value written in field specified by the attribute.
-			</documentation>
-		</annotation>
-	</attribute>
-	<attribute name="algorithmName" type="string" fixed="crc">
-		<annotation>
-			<documentation>Type of algorithm for calculating checksum. CRC in our
-				case
-			</documentation>
-		</annotation>
-	</attribute>
-	<attribute name="algorithmFields" type="string" fixed="size,type,data">
-		<annotation>
-			<documentation>Fields needs to be checksumed.</documentation>
-		</annotation>
-	</attribute>
+    <attribute name="sizeField" type="string" fixed="size">
+        <annotation>
+            <documentation>Element having this attribute is size restricted by
+                value written in field specified by the attribute.
+            </documentation>
+        </annotation>
+    </attribute>
+    <attribute name="algorithmName" type="string" fixed="crc">
+        <annotation>
+            <documentation>Type of algorithm for calculating checksum. CRC in our
+                case
+            </documentation>
+        </annotation>
+    </attribute>
+    <attribute name="algorithmFields" type="string" fixed="size,type,data">
+        <annotation>
+            <documentation>Fields needs to be checksumed.</documentation>
+        </annotation>
+    </attribute>
 
-	<complexType name="chunkData">
-		<simpleContent>
-			<extension base="hexBinary">
-				<attribute ref="tns:sizeField" use="required"></attribute>
-			</extension>
-		</simpleContent>
-	</complexType>
+    <complexType name="chunkData">
+        <simpleContent>
+            <extension base="hexBinary">
+                <attribute ref="tns:sizeField" use="required"/>
+            </extension>
+        </simpleContent>
+    </complexType>
 
-	<simpleType name="chunkSize">
-		<annotation>
-			<appinfo>SIZE,../data</appinfo>
-		</annotation>
-		<restriction base="unsignedInt"></restriction>
-	</simpleType>
+    <simpleType name="chunkSize">
+        <annotation>
+            <appinfo>SIZE,../data</appinfo>
+        </annotation>
+        <restriction base="unsignedInt"/>
+    </simpleType>
 
-	<simpleType name="chunkCRC">
-		<annotation>
-			<appinfo>CRC32,../type|../data</appinfo>
-		</annotation>
-		<restriction base="unsignedInt">
-			<!-- <attribute ref="tns:algorithmName" use="required"></attribute> <attribute 
-				ref="tns:algorithmFields" use="required"></attribute> -->
-		</restriction>
-	</simpleType>
+    <simpleType name="chunkCRC">
+        <annotation>
+            <appinfo>CRC32,../type|../data</appinfo>
+        </annotation>
+        <restriction base="unsignedInt">
+            <!-- <attribute ref="tns:algorithmName" use="required"></attribute> <attribute
+                ref="tns:algorithmFields" use="required"></attribute> -->
+        </restriction>
+    </simpleType>
 
-	<complexType name="chunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type" type="tns:FourCCType"></element>
-			<element name="data" type="hexBinary"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="chunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type" type="tns:FourCCType"/>
+            <element name="data" type="hexBinary"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

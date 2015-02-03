@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="sRGBChunkDataType">
-		<sequence>
-			<element name="renderingIntent">
-				<annotation>
-					<documentation>0 - Perceptual for images preferring good adaptation
-						to the output device gamut at the expense of colorimetric
-						accuracy, such as photographs.
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="sRGBChunkDataType">
+        <sequence>
+            <element name="renderingIntent">
+                <annotation>
+                    <documentation>0 - Perceptual for images preferring good adaptation
+                        to the output device gamut at the expense of colorimetric
+                        accuracy, such as photographs.
 
-						1 - Relative colorimetric for images
-						requiring colour appearance
-						matching (relative to the output device
-						white point), such as
-						logos.
+                        1 - Relative colorimetric for images
+                        requiring colour appearance
+                        matching (relative to the output device
+                        white point), such as
+                        logos.
 
-						2 - Saturation for images preferring
-						preservation of saturation at
-						the expense of hue and lightness,
-						such as charts and graphs.
+                        2 - Saturation for images preferring
+                        preservation of saturation at
+                        the expense of hue and lightness,
+                        such as charts and graphs.
 
-						3 - Absolute colorimetric for images
-						requiring preservation of
-						absolute colorimetry, such as previews of
-						images destined for a
-						different output device (proofs).
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="0"></minInclusive>
-						<maxInclusive value="3"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
+                        3 - Absolute colorimetric for images
+                        requiring preservation of
+                        absolute colorimetry, such as previews of
+                        images destined for a
+                        different output device (proofs).
+                    </documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="0"/>
+                        <maxInclusive value="3"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
 
-	<complexType name="sRGBChunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sRGB"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sRGBChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="sRGBChunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sRGB"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sRGBChunkDataType"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

@@ -1,583 +1,582 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
 
-	<!-- POSSIBLE COMBINATIONS: -->
-	<!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16 -->
-	<complexType name="sBITChunkDataTypeCT0BD1">
-		<sequence>
-			<element name="sGrayBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="1"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT0BD2">
-		<sequence>
-			<element name="sGrayBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="2"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT0BD4">
-		<sequence>
-			<element name="sGrayBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="4"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT0BD8">
-		<sequence>
-			<element name="sGrayBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT0BD16">
-		<sequence>
-			<element name="sGrayBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<!-- CT2BD8, CT2BD16 -->
-	<complexType name="sBITChunkDataTypeCT2BD8">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT2BD16">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<!-- CT3BD1, CT3BD2, CT3BD4, CT3BD8 -->
-	<complexType name="sBITChunkDataTypeCT3BD1">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="1"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="1"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="1"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT3BD2">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="2"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="2"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="2"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT3BD4">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="4"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="4"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="4"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT3BD8">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<!-- CT4BD8, CT4BD16 -->
-	<complexType name="sBITChunkDataTypeCT4BD8">
-		<sequence>
-			<element name="sGreyBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sAlphaBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT4BD16">
-		<sequence>
-			<element name="sGreyBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sAlphaBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<!-- CT6BD8, CT6BD16 -->
-	<complexType name="sBITChunkDataTypeCT6BD8">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sAlphaBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="8"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkDataTypeCT6BD16">
-		<sequence>
-			<element name="sRedBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sGreenBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sBlueBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="sAlphaBits">
-				<simpleType>
-					<restriction base="unsignedByte">
-						<minInclusive value="1"></minInclusive>
-						<maxInclusive value="16"></maxInclusive>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
-
-
-	<!-- <annotation> -->
-	<!-- <documentation>To simplify decoders, PNG specifies that only certain -->
-	<!-- sample depths may be used, and further specifies that sample values -->
-	<!-- should be scaled to the full range of possible values at the sample -->
-	<!-- depth. The sBIT chunk defines the original number of significant -->
-	<!-- bits (which can be less than or equal to the sample depth). This -->
-	<!-- allows PNG decoders to recover the original data losslessly even if -->
-	<!-- the data had a sample depth not directly supported by PNG -->
-	<!-- </documentation> -->
-	<!-- </annotation> -->
+    <!-- POSSIBLE COMBINATIONS: -->
+    <!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16 -->
+    <complexType name="sBITChunkDataTypeCT0BD1">
+        <sequence>
+            <element name="sGrayBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT0BD2">
+        <sequence>
+            <element name="sGrayBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="2"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT0BD4">
+        <sequence>
+            <element name="sGrayBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="4"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT0BD8">
+        <sequence>
+            <element name="sGrayBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT0BD16">
+        <sequence>
+            <element name="sGrayBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <!-- CT2BD8, CT2BD16 -->
+    <complexType name="sBITChunkDataTypeCT2BD8">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT2BD16">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <!-- CT3BD1, CT3BD2, CT3BD4, CT3BD8 -->
+    <complexType name="sBITChunkDataTypeCT3BD1">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT3BD2">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="2"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="2"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="2"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT3BD4">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="4"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="4"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="4"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT3BD8">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <!-- CT4BD8, CT4BD16 -->
+    <complexType name="sBITChunkDataTypeCT4BD8">
+        <sequence>
+            <element name="sGreyBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sAlphaBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT4BD16">
+        <sequence>
+            <element name="sGreyBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sAlphaBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <!-- CT6BD8, CT6BD16 -->
+    <complexType name="sBITChunkDataTypeCT6BD8">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sAlphaBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="8"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkDataTypeCT6BD16">
+        <sequence>
+            <element name="sRedBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sGreenBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sBlueBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="sAlphaBits">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <minInclusive value="1"/>
+                        <maxInclusive value="16"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
 
 
+    <!-- <annotation> -->
+    <!-- <documentation>To simplify decoders, PNG specifies that only certain -->
+    <!-- sample depths may be used, and further specifies that sample values -->
+    <!-- should be scaled to the full range of possible values at the sample -->
+    <!-- depth. The sBIT chunk defines the original number of significant -->
+    <!-- bits (which can be less than or equal to the sample depth). This -->
+    <!-- allows PNG decoders to recover the original data losslessly even if -->
+    <!-- the data had a sample depth not directly supported by PNG -->
+    <!-- </documentation> -->
+    <!-- </annotation> -->
 
-	<!-- POSSIBLE COMBINATIONS: -->
-	<!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16 -->
-	<complexType name="sBITChunkTypeCT0BD1">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT0BD1"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT0BD2">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT0BD2"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT0BD4">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT0BD4"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT0BD8">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT0BD8"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT0BD16">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT0BD16"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<!-- CT2BD8, CT2BD16 -->
-	<complexType name="sBITChunkTypeCT2BD8">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT2BD8"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT2BD16">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT2BD16"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<!-- CT3BD1, CT3BD2, CT3BD4, CT3BD8 -->
-	<complexType name="sBITChunkTypeCT3BD1">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT3BD1"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT3BD2">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT3BD2"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT3BD4">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT3BD4"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT3BD8">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT3BD8"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<!-- CT4BD8, CT4BD16 -->
-	<complexType name="sBITChunkTypeCT4BD8">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT4BD8"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT4BD16">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT4BD16"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<!-- CT6BD8, CT6BD16 -->
-	<complexType name="sBITChunkTypeCT6BD8">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT6BD8"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
-	<complexType name="sBITChunkTypeCT6BD16">
-		<sequence>
-			<element name="size" type="tns:chunkSize" />
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="sBIT"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:sBITChunkDataTypeCT6BD16"></element>
-			<element name="crc" type="tns:chunkCRC" />
-		</sequence>
-	</complexType>
+
+    <!-- POSSIBLE COMBINATIONS: -->
+    <!-- CT0BD1, CT0BD2, CT0BD4, CT0BD8, CT0BD16 -->
+    <complexType name="sBITChunkTypeCT0BD1">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT0BD1"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT0BD2">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT0BD2"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT0BD4">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT0BD4"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT0BD8">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT0BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT0BD16">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT0BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <!-- CT2BD8, CT2BD16 -->
+    <complexType name="sBITChunkTypeCT2BD8">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT2BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT2BD16">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT2BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <!-- CT3BD1, CT3BD2, CT3BD4, CT3BD8 -->
+    <complexType name="sBITChunkTypeCT3BD1">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT3BD1"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT3BD2">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT3BD2"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT3BD4">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT3BD4"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT3BD8">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT3BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <!-- CT4BD8, CT4BD16 -->
+    <complexType name="sBITChunkTypeCT4BD8">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT4BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT4BD16">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT4BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <!-- CT6BD8, CT6BD16 -->
+    <complexType name="sBITChunkTypeCT6BD8">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT6BD8"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
+    <complexType name="sBITChunkTypeCT6BD16">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="sBIT"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:sBITChunkDataTypeCT6BD16"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

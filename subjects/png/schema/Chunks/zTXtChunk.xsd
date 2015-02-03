@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="zTXtChunkDataType">
-		<sequence>
-			<element name="keyword" type="tns:TextKeywords"></element>
-			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="compressionMethod" type="tns:CompressionMethod">
-				<annotation>
-					<documentation>The only compression method defined in this
-						International Standard is method 0 (zlib datastream with deflate
-						compression)
-					</documentation>
-				</annotation>
-			</element>
-			<element name="compressedText" type="hexBinary">
-				<annotation>
-					<documentation>zlib datastream with deflate compression
-					</documentation>
-				</annotation>
-			</element>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="zTXtChunkDataType">
+        <sequence>
+            <element name="keyword" type="tns:TextKeywords"/>
+            <element name="nullSeparator" type="tns:NullSeparator"/>
+            <element name="compressionMethod" type="tns:CompressionMethod">
+                <annotation>
+                    <documentation>The only compression method defined in this
+                        International Standard is method 0 (zlib datastream with deflate
+                        compression)
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="compressedText" type="hexBinary">
+                <annotation>
+                    <documentation>zlib datastream with deflate compression
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
 
-	<complexType name="zTXtChunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="zTXt"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:zTXtChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="zTXtChunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="zTXt"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:zTXtChunkDataType"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

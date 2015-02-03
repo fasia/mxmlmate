@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="pHYsChunkDataType">
-		<sequence minOccurs="1" maxOccurs="1">
-			<element name="pixelsPerUnitX" type="unsignedInt"></element>
-			<element name="pixelsPerUnitY" type="unsignedInt"></element>
-			<element name="unit">
-				<annotation>
-					<documentation>0 - unit is unknown
-						1 - unit is the metre
-					</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="unsignedByte">
-						<enumeration value="0"></enumeration>
-						<enumeration value="1"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="pHYsChunkDataType">
+        <sequence minOccurs="1" maxOccurs="1">
+            <element name="pixelsPerUnitX" type="unsignedInt"/>
+            <element name="pixelsPerUnitY" type="unsignedInt"/>
+            <element name="unit">
+                <annotation>
+                    <documentation>0 - unit is unknown
+                        1 - unit is the metre
+                    </documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <enumeration value="0"/>
+                        <enumeration value="1"/>
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
 
-	<complexType name="pHYsChunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="pHYs"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:pHYsChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="pHYsChunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="pHYs"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:pHYsChunkDataType"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

@@ -1,70 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="iTXtChunkDataType">
-		<sequence>
-			<element name="keyword" type="tns:TextKeywords"></element>
-			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="compressionFlag">
-				<annotation>
-					<documentation>0 - uncompressed, 1 - compressed</documentation>
-				</annotation>
-				<simpleType>
-					<restriction base="byte">
-						<enumeration value="0">
-						</enumeration>
-						<enumeration value="1">
-						</enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="compressionMethod" type="tns:CompressionMethod">
-				<annotation>
-					<documentation>The only compression method defined in this
-						International Standard is method 0 (zlib datastream with deflate
-						compression)
-					</documentation>
-				</annotation>
-			</element>
-			<element name="langTag" type="string">
-				<annotation>
-					<documentation>Language Tag. </documentation>
-				</annotation>
-			</element>
-			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="translatedKeyword" type="string">
-				<annotation>
-					<documentation>The translated keyword, if not empty, should contain
-						a translation of the keyword into the language indicated by the
-						language tag, and applications displaying the keyword should
-						display the translated keyword in addition.
-					</documentation>
-				</annotation>
-			</element>
-			<element name="nullSeparator" type="tns:NullSeparator"></element>
-			<element name="text" type="hexBinary">
-				<annotation>
-					<documentation>Either compressed or not depending on the
-						compression flag
-					</documentation>
-				</annotation>
-			</element>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="iTXtChunkDataType">
+        <sequence>
+            <element name="keyword" type="tns:TextKeywords"/>
+            <element name="nullSeparator" type="tns:NullSeparator"/>
+            <element name="compressionFlag">
+                <annotation>
+                    <documentation>0 - uncompressed, 1 - compressed</documentation>
+                </annotation>
+                <simpleType>
+                    <restriction base="byte">
+                        <enumeration value="0">
+                        </enumeration>
+                        <enumeration value="1">
+                        </enumeration>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="compressionMethod" type="tns:CompressionMethod">
+                <annotation>
+                    <documentation>The only compression method defined in this
+                        International Standard is method 0 (zlib datastream with deflate
+                        compression)
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="langTag" type="string">
+                <annotation>
+                    <documentation>Language Tag.</documentation>
+                </annotation>
+            </element>
+            <element name="nullSeparator" type="tns:NullSeparator"/>
+            <element name="translatedKeyword" type="string">
+                <annotation>
+                    <documentation>The translated keyword, if not empty, should contain
+                        a translation of the keyword into the language indicated by the
+                        language tag, and applications displaying the keyword should
+                        display the translated keyword in addition.
+                    </documentation>
+                </annotation>
+            </element>
+            <element name="nullSeparator" type="tns:NullSeparator"/>
+            <element name="text" type="hexBinary">
+                <annotation>
+                    <documentation>Either compressed or not depending on the
+                        compression flag
+                    </documentation>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
 
-	<complexType name="iTXtChunkType">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="iTXt"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:iTXtChunkDataType"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="iTXtChunkType">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="iTXt"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:iTXtChunkDataType"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

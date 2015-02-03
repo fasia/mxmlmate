@@ -1,90 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
 
-	<complexType name="tRNSChunkDataTypeCT0">
-		<sequence>
-			<element name="tRNSGrey" type="unsignedShort"></element>
-		</sequence>
-	</complexType>
-	<complexType name="tRNSChunkDataTypeCT2">
-		<sequence>
-			<element name="tRNSRed" type="unsignedShort"></element>
-			<element name="tRNSGreen" type="unsignedShort"></element>
-			<element name="tRNSBlue" type="unsignedShort"></element>
-		</sequence>
-	</complexType>
-	<complexType name="tRNSChunkDataTypeCT3">
-		<sequence>
-			<element name="tRNSPaletteIndex" type="unsignedByte"
-				maxOccurs="unbounded"></element>
-		</sequence>
-	</complexType>
+    <complexType name="tRNSChunkDataTypeCT0">
+        <sequence>
+            <element name="tRNSGrey" type="unsignedShort"/>
+        </sequence>
+    </complexType>
+    <complexType name="tRNSChunkDataTypeCT2">
+        <sequence>
+            <element name="tRNSRed" type="unsignedShort"/>
+            <element name="tRNSGreen" type="unsignedShort"/>
+            <element name="tRNSBlue" type="unsignedShort"/>
+        </sequence>
+    </complexType>
+    <complexType name="tRNSChunkDataTypeCT3">
+        <sequence>
+            <element name="tRNSPaletteIndex" type="unsignedByte" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="tRNSChunkTypeCT0">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="tRNS"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:tRNSChunkDataTypeCT0"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="tRNSChunkTypeCT0">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="tRNS"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:tRNSChunkDataTypeCT0"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="tRNSChunkTypeCT2">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="tRNS"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:tRNSChunkDataTypeCT2"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="tRNSChunkTypeCT2">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="tRNS"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:tRNSChunkDataTypeCT2"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<complexType name="tRNSChunkTypeCT3">
-		<sequence>
-			<element name="size" type="tns:chunkSize"></element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="tRNS"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="data" type="tns:tRNSChunkDataTypeCT3"></element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <complexType name="tRNSChunkTypeCT3">
+        <sequence>
+            <element name="size" type="tns:chunkSize"/>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="tRNS"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="data" type="tns:tRNSChunkDataTypeCT3"/>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 
-	<!-- CT 4 & 6 must not appear in image -->
-	<complexType name="tRNSChunkTypeCT46">
-		<sequence>
-			<element name="size">
-				<simpleType>
-					<restriction base="unsignedInt">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="tRNS"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+    <!-- CT 4 & 6 must not appear in image -->
+    <complexType name="tRNSChunkTypeCT46">
+        <sequence>
+            <element name="size">
+                <simpleType>
+                    <restriction base="unsignedInt">
+                        <enumeration value="0"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="tRNS"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>

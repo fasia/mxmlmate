@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/PNGSchema"
-	xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
-	<include schemaLocation="CommonTypes.xsd" />
-	<complexType name="IENDChunkType">
-		<sequence>
-			<element name="size">
-				<simpleType>
-					<restriction base="unsignedInt">
-						<enumeration value="0"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="type">
-				<simpleType>
-					<restriction base="string">
-						<enumeration value="IEND"></enumeration>
-					</restriction>
-				</simpleType>
-			</element>
-			<element name="crc" type="tns:chunkCRC"></element>
-		</sequence>
-	</complexType>
+        xmlns:tns="http://www.example.org/PNGSchema" elementFormDefault="qualified">
+    <include schemaLocation="CommonTypes.xsd"/>
+    <complexType name="IENDChunkType">
+        <sequence>
+            <element name="size">
+                <simpleType>
+                    <restriction base="unsignedInt">
+                        <enumeration value="0"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="type">
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="IEND"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="crc" type="tns:chunkCRC"/>
+        </sequence>
+    </complexType>
 </schema>
