@@ -366,6 +366,12 @@
 					<artifactId>trove4j</artifactId>
 					<version>3.0.3</version>
 				</dependency>
+				<dependency>
+					<!-- Apache 2 -->
+					<groupId>org.msgpack</groupId>
+					<artifactId>msgpack</artifactId>
+					<version>0.6.11</version>
+				</dependency>
                 <dependency>
 		            <groupId>org.zeromq</groupId>
 					<artifactId>jeromq</artifactId>

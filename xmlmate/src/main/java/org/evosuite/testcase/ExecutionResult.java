@@ -404,7 +404,7 @@ public class ExecutionResult implements Cloneable {
 	public ExecutionResult clone() {
 		ExecutionResult copy = new ExecutionResult(test, mutation);
 		copy.exceptions.putAll(exceptions);
-		copy.trace = trace.lazyClone();
+		copy.trace = null==trace?null:trace.lazyClone();
 		copy.explicitExceptions.putAll(explicitExceptions);
 		copy.executionTime = executionTime;
 		for (Class<?> clazz : traces.keySet()) {

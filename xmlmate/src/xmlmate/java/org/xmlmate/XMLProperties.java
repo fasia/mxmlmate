@@ -3,6 +3,7 @@ package org.xmlmate;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.Transition;
 import nu.xom.Element;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,8 @@ import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.execution.*;
+import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
+import org.xmlmate.genetics.MemoryAccessFitnessFunction;
 import org.xmlmate.genetics.XMLExistingChromosomeFactory;
 import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestChromosomeFactory;
@@ -29,6 +32,7 @@ import org.xmlmate.xml.metrics.SchemaRegexVisitor;
 import org.xmlmate.xml.metrics.SchemaTraverser;
 
 import javax.xml.namespace.QName;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -101,6 +105,7 @@ public class XMLProperties {
         Option bblCoverage = new Option("bblCoverage",true,"Use PIN instrumentation framework and measure basic block coverage. Followed by working directory, path to PIN, path to PINtool, and path to target binary and any arguments. (max "+maxTargetBinaryArgs+")");
         bblCoverage.setArgs(4 + maxTargetBinaryArgs);
         options.addOption(bblCoverage);
+        options.addOption("memCoverage", false, "Use with PIN to maximize memory accesses.");
         options.addOption("r", "root", true, "Root element of the xml tree.");
         options.addOption("a", "samples", true, "Path to samples (file or folder). If given, root must also be given.");
         options.addOption("t", "timeout", true, "Termination time in sec. Default is " + GLOBAL_TIMEOUT);
@@ -156,6 +161,14 @@ public class XMLProperties {
 			}
 			return true;
 		}
+        if (line.hasOption("memCoverage")) {
+        	// TODO add more warnings and sanity checks
+        	if (line.hasOption("class")) {
+        		logger.error("You may not use the -class options with the -memCoverage option!");
+        		return false;
+        	}
+        	return true;
+        }
         boolean hasRoot = line.hasOption("root");
         if (line.hasOption("class") && line.hasOption("prefix"))
             return !line.hasOption("samples") || hasRoot;
@@ -312,7 +325,11 @@ public class XMLProperties {
         	assert commands.size() > 0;
         	File workDir = new File(workDirPath);
         	assert workDir.isDirectory();
-        	return new BasicBlockCoverageUseCase(factory, workDir, commands);
+        	return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction(workDir, commands));
+        }
+        if (line.hasOption("memCoverage")) {
+			RUN_NAME = "memCoverage " + RUN_NAME;
+			return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction(OUTPUT_PATH, Arrays.asList("dir")));
         }
         RUN_NAME = "branchCoverage " + RUN_NAME;
         return new EvolveBranchCoverageUseCase(factory);

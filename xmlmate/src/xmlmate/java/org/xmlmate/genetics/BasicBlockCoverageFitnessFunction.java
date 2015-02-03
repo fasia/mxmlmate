@@ -93,8 +93,8 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 
 		double fitness = 0d;
 		
-		String message = StringUtils.join(paths, File.pathSeparator); // commons
-//		String message = Joiner.on(File.pathSeparatorChar).join(paths); // guava
+//		String message = StringUtils.join(paths, File.pathSeparator); // commons
+		String message = Joiner.on(File.pathSeparatorChar).join(paths); // guava
 		
 		logger.trace("Sending files to workers");
 		dataOut.send(message);

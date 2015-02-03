@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.evosuite.ga.FitnessFunction;
 import org.evosuite.ga.FitnessReplacementFunction;
-import org.evosuite.ga.GeneticAlgorithm;
 import org.evosuite.ga.SelectionFunction;
 import org.evosuite.ga.SteadyStateGA;
 import org.evosuite.ga.TournamentSelection;
@@ -16,16 +15,14 @@ import org.xmlmate.genetics.XMLTestSuiteChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosomeFactory;
 import org.xmlmate.monitoring.EventRecounter;
 
-public class BasicBlockCoverageUseCase extends EvolveBranchCoverageUseCase {
+public class BinaryBackendUseCase extends EvolveBranchCoverageUseCase {
 
-	private List<String> commands;
-	private File workDir;
 	private BasicBlockCoverageFitnessFunction fitnessFunction;
 
-	public BasicBlockCoverageUseCase(XMLTestSuiteChromosomeFactory factory, File workDir, List<String> commands) {
+	public BinaryBackendUseCase(XMLTestSuiteChromosomeFactory factory, BasicBlockCoverageFitnessFunction fitnessFunction) {
 		super(factory);
-		fitnessFunction = new BasicBlockCoverageFitnessFunction(workDir, commands);
-		XMLTestChromosome.setConverter(new PNGConverter());
+		this.fitnessFunction = fitnessFunction;
+		XMLTestChromosome.setConverter(new PNGConverter()); // FIXME make this a parameter
 	}
 
 	@Override

@@ -1,12 +1,14 @@
 #include <pin.H>
+#include "zmq.hpp"
+#include "zhelpers.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <set>
-#include "zmq.hpp"
+#include <msgpack.hpp>
 
-typedef std::set<ADDRINT> Blocks_T;
+typedef std::set<ADDRINT> Addrs_T;
 
 /* ================================================================== */
 // Global variables 
@@ -16,21 +18,9 @@ static string targetImage = "";	//name of the targeted binary image
 static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
 zmq::context_t context(1);         // Prepare zmq context
-zmq::socket_t socket(context, ZMQ_PUSH); // Prepare zmq socket
-std::stringstream out;
-BUFFER_ID bufId;
-#define NUM_BUF_PAGES 1024
-/*
- * Record of memory references.  Rather than having two separate
- * buffers for reads and writes, we just use one struct that includes a
- * flag for type.
- */
-struct MEMREF {
-	ADDRINT pc;
-	ADDRINT ea;
-	UINT32 size;
-	BOOL read;
-};
+zmq::socket_t dataOut(context, ZMQ_PUSH); // Prepare zmq socket
+static Addrs_T accessedAddresses;
+
 
 /* ===================================================================== */
 // Command line switches
@@ -58,36 +48,29 @@ INT32 Usage() {
 }
 
 VOID DisposeZMQ() {
-	socket.close();
+	dataOut.close();
 	context.close();
 }
 
 VOID resetCounters() {
-	// clean up stream
-	out.str(std::string());
-	out.clear();
+	accessedAddresses.clear();
 }
 
 VOID SendResults() {
-	std::string s = out.str();
-	zmq::message_t reply2(s.length());
-	memcpy((void *) reply2.data(), s.c_str(), s.length());
-	socket.send(reply2);
+	std::stringstream buffer;
+	msgpack::pack(buffer, accessedAddresses);
+	buffer.seekg(0);
+	std::cout << "sending buffer" << std::endl;
+	s_send(dataOut, buffer.str());
+	std::cout << "buffer sent" << std::endl;
 }
 
-/**************************************************************************
- *
- *  Callback Routines
- *
- **************************************************************************/
+/* ===================================================================== */
+// Analysis callbacks
+/* ===================================================================== */
 
-VOID *BufferFull(BUFFER_ID id, THREADID tid, const CONTEXT *ctxt, VOID *buf, UINT64 numElements, VOID *v) {
-	struct MEMREF *reference = (struct MEMREF*) buf;
-	for (UINT64 i = 0; i < numElements; i++, reference++) {
-		if (reference->ea != 0)
-			out << reference->pc << (reference->read?"r":"w") << reference->ea << endl;
-	}
-	return buf;
+VOID RecordMemRead(VOID *ip, VOID *ea) {
+	accessedAddresses.insert((uint64_t)ea);
 }
 
 /* ===================================================================== */
@@ -112,40 +95,15 @@ VOID Trace(TRACE trace, VOID *v) {
 		ADDRINT addr = BBL_Address(bbl);
 		if (addr < imgLow || addr > imgHigh)
 			continue;
-
 		for (INS ins = BBL_InsHead(bbl); INS_Valid(ins); ins = INS_Next(ins)) {
-			UINT32 memoryOperands = INS_MemoryOperandCount(ins);
-
-			for (UINT32 memOp = 0; memOp < memoryOperands; memOp++) {
-				UINT32 refSize = INS_MemoryOperandSize(ins, memOp);
-
-				// Note that if the operand is both read and written we log it once for each.
-				if (INS_MemoryOperandIsRead(ins, memOp)) {
-					INS_InsertFillBuffer(ins, IPOINT_BEFORE, bufId,
-							IARG_INST_PTR, offsetof(struct MEMREF, pc),
-							IARG_MEMORYOP_EA, memOp,
-							offsetof(struct MEMREF, ea), IARG_UINT32, refSize,
-							offsetof(struct MEMREF, size), IARG_BOOL, TRUE,
-							offsetof(struct MEMREF, read),
-							IARG_END);
-				}
-
-				if (INS_MemoryOperandIsWritten(ins, memOp)) {
-					INS_InsertFillBuffer(ins, IPOINT_BEFORE, bufId,
-							IARG_INST_PTR, offsetof(struct MEMREF, pc),
-							IARG_MEMORYOP_EA, memOp,
-							offsetof(struct MEMREF, ea), IARG_UINT32, refSize,
-							offsetof(struct MEMREF, size), IARG_BOOL, FALSE,
-							offsetof(struct MEMREF, read),
-							IARG_END);
+			if (INS_IsMemoryRead(ins) || INS_IsMemoryWrite(ins)) {
+				UINT32 memoryOperands = INS_MemoryOperandCount(ins);
+				for (UINT32 memOp = 0; memOp < memoryOperands; memOp++) {
+						INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemRead, IARG_INST_PTR, IARG_MEMORYOP_EA, memOp, IARG_END);
 				}
 			}
 		}
 	}
-}
-
-VOID ThreadStart(THREADID threadIndex, CONTEXT *ctxt, INT32 flags, VOID *v) {
-
 }
 
 VOID Routine(RTN rtn, VOID *v) {
@@ -190,15 +148,8 @@ int main(int argc, char *argv[]) {
 		return Usage();
 	}
 
-    bufId = PIN_DefineTraceBuffer(sizeof(struct MEMREF), NUM_BUF_PAGES, BufferFull, 0);
-
-    if(bufId == BUFFER_ID_INVALID) {
-        cerr << "Error: could not allocate initial buffer" << endl;
-        return 1;
-    }
-
 	cout << "Connecting socket in PIN tool" << endl;
-	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
+	dataOut.connect("tcp://127.0.0.1:5557"); // TODO receive as param
 
 // Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);
@@ -207,9 +158,6 @@ int main(int argc, char *argv[]) {
 	TRACE_AddInstrumentFunction(Trace, 0);
 
 	RTN_AddInstrumentFunction(Routine, 0);
-
-// Register function to be called for every thread before it starts running
-	PIN_AddThreadStartFunction(ThreadStart, 0);
 
 // Register function to be called when the application exits
 	PIN_AddFiniFunction(Fini, 0);
