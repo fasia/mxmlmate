@@ -619,6 +619,19 @@ def getTag(tag):
 def getChunksName():
     return 'ChunksCT' + str(IHDRChunk.colorType) + 'BD' + str(IHDRChunk.bitDepth)
 
+def correctElementOrder(chunks):
+    chnkOrder = ['IHDR', 'cHRM', 'gAMA', 'iCCP', 'sRGB', 'sBIT', 'PLTE',
+     'hIST', 'bKGD', 'tRNS', 'pHYs', 'sPLT', 'IDAT', 'tIME', 'iTXt', 'tEXt', 'zTXt', 'IEND']
+    index = 0
+    chnkNames = [ch.chunk_type for ch in chunks]
+    newChunks = []
+    for i in range(len(chnkOrder)):
+        while chnkOrder[i] in chnkNames:
+            ind = chnkNames.index(chnkOrder[i])
+            newChunks.append(chunks.pop(ind))
+            chnkNames.pop(ind)             
+    return newChunks
+
 XML_NAMESPACE = '{http://www.example.org/PNGSchema}'
 IHDRChunk = IHDRChunk()
 def png2xml(pathToPNG, pathToXML):
@@ -634,9 +647,10 @@ def png2xml(pathToPNG, pathToXML):
     
     extractSignature(pngData, root)    
     chunks = extractChunks(pngData)
+    chunks = correctElementOrder(chunks)
     
     global IHDRChunk
-    IHDRChunk.extractFromData(chunks[0].data)    
+    IHDRChunk.extractFromData(chunks[0].data)
     
     chunksElement = ET.SubElement(root, getTag(getChunksName()))  # 'Chunks')
     
@@ -668,8 +682,9 @@ def png2xml(pathToPNG, pathToXML):
 def convertFiles():
     # origWD = os.getcwd()
     # os.chdir(folder)
-    pngs = glob.glob('samples/*.png')
+    # pngs = glob.glob('samplePNGs/*.png')    
+    pngs = glob.glob('images/*.png')
     for pngFile in pngs:
-        xmlName = '.'.join(pngFile.split('.')[:-1]) + '.xml'        
+        xmlName = 'samples/' + '.'.join(pngFile.split('.')[:-1]).split('/')[-1] + '.xml'
         png2xml(pngFile, xmlName)
-convertFiles()
+# convertFiles()

@@ -391,33 +391,35 @@ def generateIDATData():
     # return bytearray([0 for i in range(3 * 7 * 4)])
     
     width = int(math.ceil(HeaderInfo.width * HeaderInfo.bitDepth / 8.))
-            
+    
+    px = 0
     for i in range(HeaderInfo.height):
         if HeaderInfo.colorType == 3:
             ret.append(0)  # filter type
         else:
-            ret.append(random.randint(0, 4))  # filter type            
-        
+            ret.append(random.randint(0, 4))  # filter type
         for j in range(width):
+            rand = px & 0xFF  # random.randint(0, 255)
             if HeaderInfo.colorType == 0:  # greyscale 1 byte per pixel
-                ret.append(random.randint(0, 255))
+                ret.append(rand)
             elif HeaderInfo.colorType == 2:  # Truecolor, 3 byte per pixel
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))               
+                ret.append(rand)
+                ret.append(rand)
+                ret.append(rand)               
             elif HeaderInfo.colorType == 3:  # Index, 1 byte, index into PLTE chunk. PLTE must appear
-                if NumPalette!=0:
-                    ret.append(random.randint(0, NumPalette - 1) & 0xFF)
+                if NumPalette != 0:
+                    ret.append((rand % NumPalette - 1) & 0xFF)
                 else:
-                    ret.append(random.randint(0, 255))
+                    ret.append(rand)
             elif HeaderInfo.colorType == 4:  # Greyscale 1 byte + alpha 1 byte
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
+                ret.append(rand)
+                ret.append(rand)
             elif HeaderInfo.colorType == 6:  # truecolor 3 byte + alpha 1 byte
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
-                ret.append(random.randint(0, 255))
+                ret.append(rand)
+                ret.append(rand)
+                ret.append(rand)
+                ret.append(rand)
+            px = (px + 1) & 0xFF
     return ret
 
 def parseIDATData(elem):
