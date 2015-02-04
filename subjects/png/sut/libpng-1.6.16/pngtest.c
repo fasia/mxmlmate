@@ -1734,11 +1734,23 @@ static char *s_recv (void *socket) {
 
 // TODO add bindpoint params
 int main(int argc, char *argv[]) {
+	if (argc < 2) {
+		fprintf(stderr, "Please provide the port for receiving data!\n");
+		return 1;
+	}
+
 	void *context = zmq_ctx_new ();
 	void *dataIn = zmq_socket (context, ZMQ_PULL);
 	void *controlSocket = zmq_socket(context, ZMQ_REQ);
 
-	zmq_connect(dataIn, "tcp://127.0.0.1:5556");
+	char address[21] = "tcp://127.0.0.1:";
+	int i = 0;
+	for (; i < 4 && argv[1][i]; ++i) {
+		address[16 + i] = argv[1][i];
+	}
+	address[16 + i] = 0;
+	fprintf(stdout,"Connecting to dataInput at %s\n", address);
+	zmq_connect(dataIn, address);
 	zmq_connect(controlSocket, "tcp://127.0.0.1:5555");
 
 	fprintf(stdout,"Sending rdy\n");

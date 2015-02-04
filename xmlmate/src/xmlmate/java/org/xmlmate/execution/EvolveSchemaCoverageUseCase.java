@@ -56,7 +56,7 @@ public class EvolveSchemaCoverageUseCase implements UseCase {
 
         // progress monitor
         ga.addListener(new SchemaCoverageMonitor());
-//        ga.addListener(new EventRecounter());
+        ga.addListener(new EventRecounter());
 
         // start actual search
         ga.generateSolution();

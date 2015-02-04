@@ -22,7 +22,7 @@ public class BinaryBackendUseCase extends EvolveBranchCoverageUseCase {
 	public BinaryBackendUseCase(XMLTestSuiteChromosomeFactory factory, BasicBlockCoverageFitnessFunction fitnessFunction) {
 		super(factory);
 		this.fitnessFunction = fitnessFunction;
-		XMLTestChromosome.setConverter(new PNGConverter()); // FIXME make this a parameter
+//		XMLTestChromosome.setConverter(new PNGConverter()); // FIXME make this a parameter
 	}
 
 	@Override
