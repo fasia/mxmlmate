@@ -1,10 +1,9 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 import xml.etree.ElementTree as ET
-# from lxml import etree as ET
 import io
 import binascii
 import zlib
-import struct
 import os
 import glob
 from hgext.inotify.server import join
