@@ -219,8 +219,12 @@ def parsetRNSData(elem):
         ret.extend(shortToCharBigEndian(txtToInt(tRNSBlue.text, 0xFFFF)))
         
     elif HeaderInfo.colorType == 3:  # tag == 'tRNSColType3':
-        tRNSPaletteIndex = elem.getchildren()[0]
-        ret.extend(chr(txtToInt(tRNSPaletteIndex.text, 0xFF)))
+        tRNSPaletteIndexes = elem.getchildren()
+        index = 0
+        for tRNSPaletteIndex in tRNSPaletteIndexes:
+            if index == NumPalette: break
+            index += 1
+            ret.extend(chr(txtToInt(tRNSPaletteIndex.text, 0xFF)))
     
     return ret
     
