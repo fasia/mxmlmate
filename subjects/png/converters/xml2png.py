@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 import xml.etree.ElementTree as ET
 import io
 import binascii
@@ -6,7 +7,7 @@ import zlib
 import sys
 import random
 import math
-import glob    
+import glob
     
 def hexStringToByteArray(hx):
     res = bytearray()
