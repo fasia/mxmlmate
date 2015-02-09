@@ -15,11 +15,11 @@ def main():
     inputs = []
     converted = []
     while True:
-#         print 'Removing old files', converted
-        map(remove,converted)
 #         print 'Waiting for inputs...'
         inputs[:] = rec().split(':')
 #         print 'Received %d inputs' % len(inputs)
+        map(remove, converted)
+#         print 'Removed old files', converted
         converted[:] = convert(inputs)
 #         print 'Produced %d outputs' % len(converted)
         snd(unicode(':'.join(converted)))
