@@ -37,7 +37,7 @@ public class EventRecounter implements SearchListener {
 
     @Override
     public void searchFinished(GeneticAlgorithm<?> algorithm) {
-        logger.info(String.format("Average generation duration: %s sec.", durations / algorithm.getAge() / 1000.0d));
+        logger.info(String.format("Average generation duration: %s sec.", durations / (algorithm.getAge() + 1) / 1000.0d));
     }
 
     @Override
