@@ -3,15 +3,18 @@
 from xml2png import xml2png
 from sys import argv
 
-def convert(inputs = None):
+def convert(inputFile):
+    o = inputFile.replace('.xml', '.png')
+    xml2png(inputFile, o)
+    return o
+
+def convertAll(inputs = None):
     if inputs is None:
         inputs = []
     outputs = []
     for i in inputs:
-        o = i.replace('.xml', '.png')
-        xml2png(i, o)
-        outputs.append(o)
+        outputs.append(convert(i))
     return outputs
 
 if __name__ == '__main__':
-    convert(argv[1:])
+    convertAll(argv[1:])

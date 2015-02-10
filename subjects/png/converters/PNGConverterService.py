@@ -1,6 +1,7 @@
 import zmq
-from xml2pngmulti import convert
+import msgpack
 from os import remove
+from xml2pngmulti import convert
 
 
 def main():
@@ -8,21 +9,28 @@ def main():
     receiver = context.socket(zmq.PULL)
     receiver.connect("tcp://127.0.0.1:5556")
     sender = context.socket(zmq.PUSH)
-    sender.bind("tcp://127.0.0.1:5560")
-    # cache functions for speed
-    rec = receiver.recv_string
-    snd = sender.send_string
-    inputs = []
-    converted = []
+    sender.connect("tcp://127.0.0.1:5560")
+    unpck = msgpack.Unpacker()
+    pck = msgpack.Packer(autoreset=False)
+    
+    input_file = None
+    converted = None
     while True:
 #         print 'Waiting for inputs...'
-        inputs[:] = rec().split(':')
-#         print 'Received %d inputs' % len(inputs)
-        map(remove, converted)
-#         print 'Removed old files', converted
-        converted[:] = convert(inputs)
-#         print 'Produced %d outputs' % len(converted)
-        snd(unicode(':'.join(converted)))
+        unpck.feed(receiver.recv())
+        num = unpck.next()
+        input_file = unpck.next()
+#         print 'Received input %d >-- %s' % (num, input_file)
+        try:
+            remove(converted)
+        except:
+            print 'Could not remove', converted
+#         print 'Removed old file', converted
+        converted = convert(input_file)
+        pck.pack(num)
+        pck.pack(converted)
+        sender.send(pck.bytes())
+        pck.reset()
 #         print 'Sent converted files'
 
 if __name__ == '__main__':

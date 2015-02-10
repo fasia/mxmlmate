@@ -56,13 +56,16 @@ VOID resetCounters() {
 	accessedAddresses.clear();
 }
 
-VOID SendResults() {
+VOID SendResults(uint32_t id) {
 	std::stringstream buffer;
+//	msgpack::packer pck = msgpack::packer(buffer);
+//	pck.pack_uint32(id);
+	msgpack::pack(buffer, id);
 	msgpack::pack(buffer, accessedAddresses);
 	buffer.seekg(0);
-	std::cout << "sending buffer" << std::endl;
+//	std::cout << "sending buffer" << std::endl;
 	s_send(dataOut, buffer.str());
-	std::cout << "buffer sent" << std::endl;
+//	std::cout << "buffer sent" << std::endl;
 }
 
 /* ===================================================================== */

@@ -212,7 +212,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         for (Iterator<XMLTestChromosome> iterator = tests.iterator(); iterator.hasNext();) {
             iterator.next();
             if (Randomness.nextDouble() < 0.01) {
-            	logger.debug("Removing an xml file");
+            	logger.trace("Removing an xml file");
                 iterator.remove();
                 setChanged(true);
             }
@@ -251,7 +251,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
         // Add new test cases
         for (int count = 1; Randomness.nextDouble() <= StrictMath.pow(Properties.P_TEST_INSERTION, count) && size() < Properties.MAX_SIZE; count++) {
-        	logger.debug("Adding new xml file");
+        	logger.trace("Adding new xml file");
             tests.add(testChromosomeFactory.getChromosome());
             setChanged(true);
         }

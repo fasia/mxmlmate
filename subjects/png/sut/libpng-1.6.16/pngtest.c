@@ -33,16 +33,16 @@
 
 #define _POSIX_SOURCE 1
 
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <zmq.h>
+#include <msgpack.h>
 #include "png.h"
 
 void PIN_SCORE_START() __attribute__((noinline));
-void PIN_SCORE_END() __attribute__((noinline));
+void PIN_SCORE_END(uint32_t id) __attribute__((noinline));
 volatile static unsigned int dummy = 0;
 
 void PIN_SCORE_START() {
@@ -50,7 +50,7 @@ void PIN_SCORE_START() {
 //	std::cout << "PIN_SCORE_START" << std::endl;
 }
 
-void PIN_SCORE_END() {
+void PIN_SCORE_END(uint32_t id) {
 	++dummy;
 //	std::cout << "PIN_SCORE_END" << std::endl;
 }
@@ -1718,16 +1718,17 @@ static int s_send(void *socket, char *string) {
     return size;
 }
 
+#define BUF_SIZE 1024
 //  Receive 0MQ string from socket and convert into C string
 //  Caller must free returned string. Returns NULL if the context
 //  is being terminated.
 static char *s_recv (void *socket) {
-    char buffer [1024]; // TODO increase buffer
-    int size = zmq_recv (socket, buffer, 1023, 0);
+    char buffer [BUF_SIZE];
+    int size = zmq_recv (socket, buffer, BUF_SIZE-1, 0);
     if (size == -1)
         return NULL;
-    if (size > 1023)
-        size = 1023;
+    if (size > BUF_SIZE-1)
+        size = BUF_SIZE-1;
     buffer [size] = 0;
     return strdup(buffer);
 }
@@ -1741,7 +1742,6 @@ int main(int argc, char *argv[]) {
 
 	void *context = zmq_ctx_new ();
 	void *dataIn = zmq_socket (context, ZMQ_PULL);
-	void *controlSocket = zmq_socket(context, ZMQ_REQ);
 
 	char address[21] = "tcp://127.0.0.1:";
 	int i = 0;
@@ -1751,26 +1751,45 @@ int main(int argc, char *argv[]) {
 	address[16 + i] = 0;
 	fprintf(stdout,"Connecting to dataInput at %s\n", address);
 	zmq_connect(dataIn, address);
-	zmq_connect(controlSocket, "tcp://127.0.0.1:5555");
-
-	fprintf(stdout,"Sending rdy\n");
-	s_send(controlSocket, "rdy");
 
 	for (;;) {
 //		fprintf(stdout,"Waiting for tasks...\n");
-		char *message = s_recv(dataIn);
-//		fprintf(stdout,"Received %s\n", message);
-		PIN_SCORE_START();
-		char *token = strtok(message, ":");
-		while (NULL!=token) {
-//			fprintf(stdout,"Processing %s\n", token);
-			test_one_file(token, outname);
-//			fprintf(stdout,"Finished with %s\n", token);
-			token = strtok(NULL, ":");
+		char buffer[BUF_SIZE];
+		int size = zmq_recv(dataIn, buffer, BUF_SIZE-1, 0);
+		if (size == -1)
+			return 1;
+		if (size > BUF_SIZE-1) {
+			fprintf(stderr,"WARNING! Size of a message has exceeded the buffer size of %d!!!\n", BUF_SIZE);
+			size = BUF_SIZE-1;
 		}
-		free(message);
-//		fprintf(stdout,"Done\n");
-		PIN_SCORE_END();
+		buffer[size] = NULL;
+
+		msgpack_unpacked msg;
+		msgpack_unpacked_init(&msg);
+		size_t off = 0;
+		bool res = msgpack_unpack_next(&msg, buffer, size, &off);
+		if (!res) {
+			fprintf(stderr,"res == %d\n", res);
+			fprintf(stderr,"off == %d\n", off);
+			return 1;
+		}
+		msgpack_object obj = msg.data;
+		uint32_t id = (uint32_t) obj.via.u64;
+
+		msgpack_unpacked_init(&msg);
+		res = msgpack_unpack_next(&msg, buffer, size, &off);
+		if (!res) {
+			fprintf(stderr, "res == %d\n", res);
+			fprintf(stderr, "off == %d\n", off);
+			return 1;
+		}
+		obj = msg.data;
+		char* path = obj.via.str.ptr;
+
+		PIN_SCORE_START();
+		test_one_file(path, outname);
+		msgpack_unpacked_destroy(&msg);
+		PIN_SCORE_END(id);
 	}
 
 }
