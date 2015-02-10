@@ -370,7 +370,7 @@ public class Properties {
 
 	/** Constant <code>LOCAL_SEARCH_BUDGET_TYPE</code> */
 	@Parameter(key = "local_search_budget_type", group = "Search Algorithm", description = "Interpretation of local_search_budget")
-	public static LocalSearchBudgetType LOCAL_SEARCH_BUDGET_TYPE = LocalSearchBudgetType.STATEMENTS;
+	public static LocalSearchBudgetType LOCAL_SEARCH_BUDGET_TYPE = LocalSearchBudgetType.TESTS;
 
 	/** Constant <code>LOCAL_SEARCH_PROBES=10</code> */
 	@Parameter(key = "local_search_probes", group = "Search Algorithm", description = "How many mutations to apply to a string to check whether it improves coverage")

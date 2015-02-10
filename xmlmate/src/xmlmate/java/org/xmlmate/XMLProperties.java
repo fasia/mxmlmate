@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.xmlmate.execution.*;
 import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
 import org.xmlmate.genetics.MemoryAccessFitnessFunction;
+import org.xmlmate.genetics.SingletonMemoryAccessFitnessFunction;
 import org.xmlmate.genetics.XMLExistingChromosomeFactory;
 import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestChromosomeFactory;
@@ -325,11 +326,13 @@ public class XMLProperties {
         	assert commands.size() > 0;
         	File workDir = new File(workDirPath);
         	assert workDir.isDirectory();
-        	return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction(workDir, commands));
+        	return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction());
         }
         if (line.hasOption("memCoverage")) {
 			RUN_NAME = "memCoverage " + RUN_NAME;
-			return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction(OUTPUT_PATH, Arrays.asList("dir")));
+			if (Properties.POPULATION == 1) 
+				return new SingletonPopulationBackendUseCase(factory, new SingletonMemoryAccessFitnessFunction());
+			return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
         }
         RUN_NAME = "branchCoverage " + RUN_NAME;
         return new EvolveBranchCoverageUseCase(factory);

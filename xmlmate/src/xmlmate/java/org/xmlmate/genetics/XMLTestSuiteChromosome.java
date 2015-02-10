@@ -1,14 +1,23 @@
 package org.xmlmate.genetics;
 
-import dk.brics.automaton.Transition;
-import org.apache.commons.lang3.time.FastDateFormat;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.xerces.xs.XSAttributeDeclaration;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.evosuite.Properties;
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.ChromosomeFactory;
-import org.evosuite.ga.CrossOverFunction;
 import org.evosuite.ga.SecondaryObjective;
+import org.evosuite.localsearch.LocalSearchBudget;
 import org.evosuite.localsearch.LocalSearchObjective;
 import org.evosuite.testcase.ExecutionResult;
 import org.evosuite.testsuite.AbstractTestSuiteChromosome;
@@ -17,9 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import dk.brics.automaton.Transition;
 
 public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestChromosome> {
 
@@ -46,6 +53,8 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
     @Override
     public boolean localSearch(LocalSearchObjective<? extends Chromosome> objective) {
+    	logger.debug("Local search on suite");
+//    	LocalSearchBudget.getInstance().countLocalSearchOnTest();
         return false;
     }
 
@@ -53,8 +62,14 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         secondaryObjectives.add(objective);
     }
 
-    public static void removeSecondaryObjective(SecondaryObjective objective) {
-        secondaryObjectives.remove(objective);
+	public static void removeSecondaryObjective(SecondaryObjective objective) {
+    	for (Iterator<SecondaryObjective> iterator = secondaryObjectives.iterator(); iterator.hasNext();) {
+			SecondaryObjective secondaryObjective = iterator.next();
+			if (secondaryObjective.getClass().equals(objective.getClass())) {
+				logger.debug("Removed secondary objective {}", objective.getClass().getName());
+				iterator.remove();
+			}
+		}
     }
 
     public double getSchemaRegexCoverage() {
@@ -196,7 +211,8 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         // delete testcases?
         for (Iterator<XMLTestChromosome> iterator = tests.iterator(); iterator.hasNext();) {
             iterator.next();
-            if (Randomness.nextDouble() < 0.05) {
+            if (Randomness.nextDouble() < 0.01) {
+            	logger.debug("Removing an xml file");
                 iterator.remove();
                 setChanged(true);
             }
@@ -235,8 +251,36 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
         // Add new test cases
         for (int count = 1; Randomness.nextDouble() <= StrictMath.pow(Properties.P_TEST_INSERTION, count) && size() < Properties.MAX_SIZE; count++) {
+        	logger.debug("Adding new xml file");
             tests.add(testChromosomeFactory.getChromosome());
             setChanged(true);
         }
     }
+    
+
+	public int getLargestFitnessFile() {
+		double largest = 0d;
+		int file = -1;
+		for (int i = 0; i < tests.size(); i++) {
+			XMLTestChromosome x = tests.get(i);
+			if (x.getFitness() > largest) {
+				largest = x.getFitness();
+				file = i;
+			}			
+		}
+		return file;
+	}
+	
+	public int getSmallestFitnessFile() {
+		double smallest = Double.MAX_VALUE;
+		int file = -1;
+		for (int i = 0; i < tests.size(); i++) {
+			XMLTestChromosome x = tests.get(i);
+			if (x.getFitness() < smallest) {
+				smallest = x.getFitness();
+				file = i;
+			}			
+		}
+		return file;
+	}
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.evosuite.ga.FitnessFunction;
@@ -23,46 +24,23 @@ import com.google.common.collect.Iterables;
 public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSuiteChromosome> {
 	private static final Logger logger = LoggerFactory.getLogger(BasicBlockCoverageFitnessFunction.class);
 	private Context context;
-	private Socket controlSocket;
 	protected Socket dataOut;
 	protected Socket coverageIn;
-	private ProcessBuilder processBuilder;
-	private Process driverProcess;
+	private Scanner in = new Scanner(System.in);
 
-	public BasicBlockCoverageFitnessFunction(File workDir, List<String> driverCall) {
-		// prepare for starting the SUT
-		processBuilder = new ProcessBuilder(driverCall);
-		processBuilder.directory(workDir);
-//		processBuilder.inheritIO();
-		processBuilder.redirectOutput(new File("/dev/null"));
-		processBuilder.redirectError(new File("/dev/null"));
-		logger.debug("Created a process builder for "+StringUtils.join(driverCall,' ')+" in "+workDir.getAbsolutePath());
-
+	public BasicBlockCoverageFitnessFunction() {
 		// bind socket for receiving coverage results
 		context = ZMQ.context(1);
-		controlSocket = context.socket(ZMQ.REP);
 		dataOut = context.socket(ZMQ.PUSH);
 		coverageIn = context.socket(ZMQ.PULL);
 		// XXX make the addresses parameters to the program and pass them on to the PIN tool?
-		controlSocket.bind("tcp://127.0.0.1:5555");
 		dataOut.bind("tcp://127.0.0.1:5556");
 		coverageIn.bind("tcp://127.0.0.1:5557");
 	}
 
-	// XXX generalize to N workers
 	public void startAndReadyWorkers() {
-		logger.debug("starting up worker");
-		try {
-			driverProcess = processBuilder.start(); 
-		} catch (IOException e) {
-			logger.error("Could not start wrapper process!", e);
-			throw new RuntimeException(e);
-		}
-		logger.debug("waiting for rdy");
-		String m1 = controlSocket.recvStr();
-		if (!"rdy".equals(m1))
-			throw new IllegalStateException(MessageFormat.format("Received \"{0}\" instead of ready message!", m1));
-		logger.debug("received rdy");
+		System.out.println("Press Enter when all workers and converters are ready");
+		in.nextLine();
 	}
 
 	@Override
@@ -116,14 +94,10 @@ public class BasicBlockCoverageFitnessFunction extends FitnessFunction<XMLTestSu
 	}
 	
 	public void freeSockets() {
-		controlSocket.close();
+		in.close();
 		dataOut.close();
 		coverageIn.close();
 		context.term();
-	}
-	
-	public void destroyWorkers() {
-		driverProcess.destroy();		
 	}
 
 }

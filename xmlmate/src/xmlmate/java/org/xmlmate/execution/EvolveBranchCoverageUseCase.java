@@ -60,10 +60,7 @@ public class EvolveBranchCoverageUseCase implements UseCase {
     @Override
     public void run() {
     	initialize();
-
-        Properties.LOCAL_SEARCH_PROBABILITY = 0.0d; // disable local search
-        SteadyStateGA<XMLTestSuiteChromosome> ga = new SteadyStateGA<>(factory);
-
+        SteadyStateGA<XMLTestSuiteChromosome> ga = chooseGA(factory);
 
         // fitness function
         FitnessFunction fitnessFunction = chooseFitnessFunction();
@@ -79,8 +76,8 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         ga.addStoppingCondition(stoppingCondition);
 
         //secondary objectives
-        XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeTotalLengthSecondaryObjective());
         XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeSizeSecondaryObjective());
+        XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeTotalLengthSecondaryObjective());
 
         XMLTestChromosome.addSecondaryObjective(new MinimizeSizeSecondaryObjective());
 
@@ -113,6 +110,10 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         // for some reason the process doesn't terminate on its own
         System.exit(0);
     }
+
+	protected SteadyStateGA<XMLTestSuiteChromosome> chooseGA(XMLTestSuiteChromosomeFactory fac) {
+		return new SteadyStateGA<>(fac);
+	}
 
 	protected void freeResources() {
 		// nop
@@ -163,6 +164,10 @@ public class EvolveBranchCoverageUseCase implements UseCase {
             bw.write(String.format(Locale.US, "Coverage: %.4f", solution.getCoverage()));
             bw.newLine();
             bw.write(String.format("Seed: %d", Randomness.getSeed()));
+            bw.newLine();
+            bw.write(String.format("Largest fitness file is %d", solution.getLargestFitnessFile()));
+            bw.newLine();
+            bw.write(String.format("Smallest fitness file is %d", solution.getSmallestFitnessFile()));
             bw.newLine();
         } catch (IOException e) {
             logger.error("Error while writing results!", e);

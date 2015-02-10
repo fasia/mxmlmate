@@ -1,16 +1,11 @@
 package org.xmlmate.execution;
 
-import java.io.File;
-import java.util.List;
-
 import org.evosuite.ga.FitnessFunction;
 import org.evosuite.ga.FitnessReplacementFunction;
 import org.evosuite.ga.SelectionFunction;
 import org.evosuite.ga.SteadyStateGA;
 import org.evosuite.ga.TournamentSelection;
-import org.xmlmate.formats.PNGConverter;
 import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
-import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosomeFactory;
 import org.xmlmate.monitoring.EventRecounter;
@@ -50,7 +45,6 @@ public class BinaryBackendUseCase extends EvolveBranchCoverageUseCase {
 	@Override
 	protected void freeResources() {
 		fitnessFunction.freeSockets();
-		fitnessFunction.destroyWorkers();
 	}
 
 }
