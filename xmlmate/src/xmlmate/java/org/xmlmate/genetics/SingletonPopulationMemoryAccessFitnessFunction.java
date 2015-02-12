@@ -1,8 +1,5 @@
 package org.xmlmate.genetics;
 
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
-public class SingletonMemoryAccessFitnessFunction extends MemoryAccessFitnessFunction {
-	private static final Logger logger = LoggerFactory.getLogger(SingletonMemoryAccessFitnessFunction.class);
+public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccessFitnessFunction {
+	private static final Logger logger = LoggerFactory.getLogger(SingletonPopulationMemoryAccessFitnessFunction.class);
 
 	@Override
 	public double getFitness(XMLTestSuiteChromosome individual) {
@@ -27,7 +24,7 @@ public class SingletonMemoryAccessFitnessFunction extends MemoryAccessFitnessFun
 		for (int i = 0; i < individual.size(); ++i) {
 			XMLTestChromosome x = individual.getTestChromosome(i);
 			if (!x.isChanged()) {
-				int cachedSize = ((MemoryAccessExecutionResult) x.getLastExecutionResult()).getAddresses().size();
+				int cachedSize = ((MemoryAccessExecutionResult) x.getLastExecutionResult()).getAddresses().length;
 				if (cachedSize > max)
 					max = cachedSize;
 			} else {
@@ -42,7 +39,6 @@ public class SingletonMemoryAccessFitnessFunction extends MemoryAccessFitnessFun
 
 					logger.trace("Sending task {}:{}", i, path);
 					dataOut.send(packer.toByteArray());
-					logger.trace("Waiting for coverage");
 					awaited.put(i, outputFile);
 
 				} catch (IOException e) {
@@ -50,7 +46,8 @@ public class SingletonMemoryAccessFitnessFunction extends MemoryAccessFitnessFun
 				}
 			}
 		}
-			
+		
+		logger.trace("Waiting for coverage");
 		for (int i = 0; i < awaited.size(); i++) {
 			try {
 				ByteBuffer buffer = ByteBuffer.wrap(coverageIn.recv());
@@ -58,15 +55,13 @@ public class SingletonMemoryAccessFitnessFunction extends MemoryAccessFitnessFun
 				int num = unpk.readInt();
 				long[] la = unpk.read(long[].class);
 				logger.trace("received {} items", la.length);
-				TLongSet set = new TLongHashSet(la);
-				la = null;
 
 				XMLTestChromosome x = individual.getTestChromosome(num);
-				x.setLastExecutionResult(new MemoryAccessExecutionResult(set));
-				x.setFitness(set.size());
+				x.setLastExecutionResult(new MemoryAccessExecutionResult(la));
+				x.setFitness(la.length);
 				x.setChanged(false);
-				if (set.size() > max)
-					max = set.size();
+				if (la.length > max)
+					max = la.length;
 
 				File outputFile = awaited.get(num);
 				// clean up temporary file
@@ -78,7 +73,7 @@ public class SingletonMemoryAccessFitnessFunction extends MemoryAccessFitnessFun
 				logger.error("Could not read fitness message for chromosome");
 			}	
 		}
-
+		
 		individual.setFitness(max);
 		individual.setChanged(false);
 		return max;

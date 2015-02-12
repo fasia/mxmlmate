@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.xmlmate.execution.*;
 import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
 import org.xmlmate.genetics.MemoryAccessFitnessFunction;
-import org.xmlmate.genetics.SingletonMemoryAccessFitnessFunction;
+import org.xmlmate.genetics.SingletonPopulationMemoryAccessFitnessFunction;
 import org.xmlmate.genetics.XMLExistingChromosomeFactory;
 import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestChromosomeFactory;
@@ -331,7 +331,7 @@ public class XMLProperties {
         if (line.hasOption("memCoverage")) {
 			RUN_NAME = "memCoverage " + RUN_NAME;
 			if (Properties.POPULATION == 1) 
-				return new SingletonPopulationBackendUseCase(factory, new SingletonMemoryAccessFitnessFunction());
+				return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
 			return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
         }
         RUN_NAME = "branchCoverage " + RUN_NAME;

@@ -221,15 +221,15 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         // Mutate existing test cases
         for (int i = 0; i < tests.size(); i++) {
             XMLTestChromosome chrom = tests.get(i);
-            // mutate 25% of existing testcases
-            if (Randomness.nextDouble() < 0.25d) {
+            // mutate 50% of existing testcases
+            if (Randomness.nextDouble() < 0.50d) {
                 Chromosome backup = chrom.clone();
                 chrom.mutate();
                 if (XMLProperties.MAX_XML_SIZE > 0 && chrom.size() > XMLProperties.MAX_XML_SIZE)
                     tests.set(i, (XMLTestChromosome) backup);
                 else
                     setChanged(true);
-            } else if (Randomness.nextDouble() < 0.10d) {
+            } else if (Randomness.nextDouble() < 0.50d) {
                 int j = Randomness.nextInt(tests.size());
                 if (j != i) {
                     XMLTestChromosome parent1 = tests.get(i);

@@ -39,12 +39,10 @@ public class MemoryAccessFitnessFunction extends BasicBlockCoverageFitnessFuncti
 					BufferUnpacker unpk = msg.createBufferUnpacker(buffer);
 					long[] la = unpk.read(long[].class);
 					logger.trace("received {} items", la.length);
-					TLongSet set = new TLongHashSet(la);
-					la = null;
 					
-					addrs.addAll(set);
-					x.setLastExecutionResult(new MemoryAccessExecutionResult(set));
-					x.setFitness(set.size());
+					addrs.addAll(la);
+					x.setLastExecutionResult(new MemoryAccessExecutionResult(la));
+					x.setFitness(la.length);
 					x.setChanged(false);
 					// clean up temporary file
 					if (outputFile.exists() && !outputFile.delete()) {

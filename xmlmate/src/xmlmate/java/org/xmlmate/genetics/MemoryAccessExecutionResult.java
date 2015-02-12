@@ -1,17 +1,15 @@
 package org.xmlmate.genetics;
 
-import gnu.trove.set.TLongSet;
-
 import org.evosuite.testcase.ExecutionResult;
 
 public class MemoryAccessExecutionResult extends ExecutionResult {
-	private final TLongSet addresses;
+	private final long[] addresses;
 
-	public TLongSet getAddresses() {
+	public long[] getAddresses() {
 		return addresses;
 	}
 
-	public MemoryAccessExecutionResult(TLongSet set) {
+	public MemoryAccessExecutionResult(long[] set) {
 		super(null);
 		addresses = set;
 	}

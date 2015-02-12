@@ -1,6 +1,7 @@
 package org.xmlmate.xml;
 
 import nu.xom.*;
+
 import org.apache.xerces.xs.*;
 import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
 import javax.xml.XMLConstants;
+
 import java.util.*;
 
 /**
@@ -82,11 +84,14 @@ public class AwareElement extends Element {
         if (decl == newDecl)
             return;
         // change the element inplace
-        NamespaceManager nsm = NamespaceManager.getInstance();
-        String prefix = nsm.getPrefix(newDecl.getNamespace());
         setLocalName(newDecl.getName());
-        setNamespacePrefix(prefix);
-        setNamespaceURI(newDecl.getNamespace());
+        NamespaceManager nsm = NamespaceManager.getInstance();
+        String newNamespace = newDecl.getNamespace();
+        if (null!=newNamespace && !newNamespace.equals(getNamespaceURI())) {
+        	String prefix = nsm.getPrefix(newNamespace);
+        	setNamespacePrefix(prefix);
+        	setNamespaceURI(newNamespace);	
+        }
         // deregister from old set
         Map<XSElementDeclaration, Set<AwareElement>> eleMap = getEleMap();
         Set<AwareElement> kindred = eleMap.get(decl);
