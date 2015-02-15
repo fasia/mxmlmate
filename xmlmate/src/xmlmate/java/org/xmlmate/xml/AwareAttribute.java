@@ -72,7 +72,7 @@ public class AwareAttribute extends Attribute {
         if (isAny())
             return false; // XXX implement anyAttr mutation
         if (use.getConstraintType() == XSConstants.VC_FIXED)
-            setValue(use.getConstraintValue());
+            setValue(use.getValueConstraintValue().getNormalizedValue());
         else if (Randomness.nextBoolean()) {
             setValue(ValueGenerator.generateValue(decl.getTypeDefinition()));
             return true;
