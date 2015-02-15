@@ -1,9 +1,20 @@
 package org.xmlmate.genetics;
 
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import nu.xom.Node;
 import nu.xom.ParentNode;
-import org.apache.xerces.xs.*;
+
+import org.apache.xerces.xs.XSComplexTypeDefinition;
+import org.apache.xerces.xs.XSElementDeclaration;
+import org.apache.xerces.xs.XSModelGroup;
+import org.apache.xerces.xs.XSParticle;
+import org.apache.xerces.xs.XSTerm;
+import org.apache.xerces.xs.XSTypeDefinition;
 import org.evosuite.Properties;
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.ConstructionFailedException;
@@ -12,10 +23,7 @@ import org.evosuite.utils.Randomness;
 import org.xmlmate.XMLProperties;
 import org.xmlmate.xml.AwareElement;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 public class XMLCrossOverFunction extends CrossOverFunction {
     private static final long serialVersionUID = -3420371603988147237L;
@@ -70,11 +78,9 @@ public class XMLCrossOverFunction extends CrossOverFunction {
      * @param prob swap probability. must be between 0 and 1.
      * @return the number of swaps performed
      */
-    private static int swapSeries(HashSet<AwareElement> elements1, HashSet<AwareElement> partners, double prob) {
+    private static int swapSeries(ArrayList<AwareElement> elements1, ArrayList<AwareElement> partners, double prob) {
         assert 0d < prob && prob < 1d;
         // save local copies to be able to modify
-        elements1 = new HashSet<>(elements1);
-        partners = new HashSet<>(partners);
         int initialSize = partners.size();
         for (AwareElement el : elements1) {
             if (partners.isEmpty())
@@ -104,7 +110,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
     private static boolean swapOrTransplantSeries(HashSet<AwareElement> from, AwareElement recipientParent, double prob, int minFrom, int maxTo) {
         assert 0d < prob && prob < 1d;
         boolean changed = false;
-        HashSet<AwareElement> partners = new HashSet<>();
+        ArrayList<AwareElement> partners = new ArrayList<>(recipientParent.getChildCount());
         for (int i = 0; i < recipientParent.getChildCount(); i++) {
             Node child = recipientParent.getChild(i);
             if (child instanceof AwareElement)
@@ -157,7 +163,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
     private void crossOverSuites(XMLTestSuiteChromosome s1, XMLTestSuiteChromosome s2) {
         logger.debug("Crossing over two test suites!");
 
-        HashSet<XMLTestChromosome> partners = new HashSet<>(s2.getTestChromosomes());
+        ArrayList<XMLTestChromosome> partners = new ArrayList<>(s2.getTestChromosomes());
 
         for (XMLTestChromosome chrom1 : new ArrayList<>(s1.getTestChromosomes())) {
 
@@ -188,7 +194,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
 
     }
 
-    public void crossOverXMLs(XMLTestChromosome x1, XMLTestChromosome x2, HashSet<XSElementDeclaration> visited) {
+    public void crossOverXMLs(XMLTestChromosome x1, XMLTestChromosome x2, Set<XSElementDeclaration> visited) {
         // if (visited.isEmpty()) logger.debug("Crossing over \n" + x1 + "\n" + x2); // commented out because inefficient
         Map<XSElementDeclaration, Set<AwareElement>> eleMap1 = x1.getEleMap();
         Map<XSElementDeclaration, Set<AwareElement>> eleMap2 = x2.getEleMap();
@@ -202,6 +208,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
 
         // choose next element declaration to be considered
         XSElementDeclaration decl = Randomness.choice(agenda);
+        
         // these are no longer needed
         common = null;
         agenda = null;
@@ -214,10 +221,10 @@ public class XMLCrossOverFunction extends CrossOverFunction {
             return;
         }
 
-        HashSet<AwareElement> elements1, elements2;
+        ArrayList<AwareElement> elements1, elements2;
         try {
-            elements1 = (HashSet<AwareElement>) eleMap1.get(decl);
-            elements2 = (HashSet<AwareElement>) eleMap2.get(decl);
+            elements1 = new ArrayList<AwareElement>(eleMap1.get(decl));
+            elements2 = new ArrayList<AwareElement>(eleMap2.get(decl));
         } catch (NullPointerException e) {
             crossOverXMLs(x1, x2, visited);
             return;
