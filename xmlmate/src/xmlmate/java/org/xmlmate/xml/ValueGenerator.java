@@ -1,6 +1,7 @@
 package org.xmlmate.xml;
 
 import dk.brics.automaton.*;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -12,18 +13,19 @@ import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.evosuite.utils.Randomness;
 import org.xmlmate.XMLProperties;
+
 import regex.XSDRegLexer;
 import regex.XSDRegParser;
 import regex.XSDRegParser.RegExpContext;
 
 import javax.xml.XMLConstants;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ValueGenerator {
-    /**
-     * stores used automata. NOT thread safe!
-     */
-    private static final HashMap<XSSimpleTypeDefinition, Automaton> cache = new HashMap<>();
+    /** Stores used automata. */
+    private static final ConcurrentHashMap<XSSimpleTypeDefinition, Automaton> cache = new ConcurrentHashMap<>();
     private static final DatatypesAutomatonProvider automatonProvider = new DatatypesAutomatonProvider()
     {
 //        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
