@@ -20,9 +20,13 @@ package org.evosuite.utils;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.xerces.xs.XSElementDeclaration;
 import org.evosuite.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,20 +44,9 @@ public class Randomness implements Serializable {
 
 	private static long seed = 0;
 
-	private static Random random = null;
-
 	private static Randomness instance = new Randomness();
 
 	private Randomness() {
-		Long seed_parameter = Properties.RANDOM_SEED;
-		if (seed_parameter != null) {
-			seed = seed_parameter;
-			logger.info("Random seed: {}", seed);
-		} else {
-			seed = System.currentTimeMillis();
-			logger.info("No seed given. Using {}.", seed);
-		}
-		random = new MersenneTwister(seed);
 	}
 
 	/**
@@ -78,7 +71,7 @@ public class Randomness implements Serializable {
 	 * @return a boolean.
 	 */
 	public static boolean nextBoolean() {
-		return random.nextBoolean();
+		return  ThreadLocalRandom.current().nextBoolean();
 	}
 
 	/**
@@ -91,11 +84,11 @@ public class Randomness implements Serializable {
 	 * @return a int.
 	 */
 	public static int nextInt(int max) {
-		return random.nextInt(max);
+		return  ThreadLocalRandom.current().nextInt(max);
 	}
 
 	public static double nextGaussian() {
-		return random.nextGaussian();
+		return  ThreadLocalRandom.current().nextGaussian();
 	}
 	
 	/**
@@ -110,7 +103,7 @@ public class Randomness implements Serializable {
 	 * @return a int.
 	 */
 	public static int nextInt(int min, int max) {
-		return random.nextInt(max - min) + min;
+		return  ThreadLocalRandom.current().nextInt(max - min) + min;
 	}
 
 	/**
@@ -121,7 +114,7 @@ public class Randomness implements Serializable {
 	 * @return a int.
 	 */
 	public static int nextInt() {
-		return random.nextInt();
+		return  ThreadLocalRandom.current().nextInt();
 	}
 
 	/**
@@ -144,7 +137,7 @@ public class Randomness implements Serializable {
 	 * @return a short.
 	 */
 	public static short nextShort() {
-		return (short) (random.nextInt(2 * 32767) - 32767);
+		return (short) ( ThreadLocalRandom.current().nextInt(2 * 32767) - 32767);
 	}
 
 	/**
@@ -155,7 +148,7 @@ public class Randomness implements Serializable {
 	 * @return a long.
 	 */
 	public static long nextLong() {
-		return random.nextLong();
+		return  ThreadLocalRandom.current().nextLong();
 	}
 
 	/**
@@ -166,7 +159,7 @@ public class Randomness implements Serializable {
 	 * @return a byte.
 	 */
 	public static byte nextByte() {
-		return (byte) (random.nextInt(256) - 128);
+		return (byte) ( ThreadLocalRandom.current().nextInt(256) - 128);
 	}
 
 	/**
@@ -177,7 +170,7 @@ public class Randomness implements Serializable {
 	 * @return a double.
 	 */
 	public static double nextDouble() {
-		return random.nextDouble();
+		return  ThreadLocalRandom.current().nextDouble();
 	}
 
 	/**
@@ -188,7 +181,7 @@ public class Randomness implements Serializable {
 	 * @return a float.
 	 */
 	public static float nextFloat() {
-		return random.nextFloat();
+		return  ThreadLocalRandom.current().nextFloat();
 	}
 
 	/**
@@ -201,7 +194,7 @@ public class Randomness implements Serializable {
 	 */
 	public static void setSeed(long seed) {
 		Randomness.seed = seed;
-		random.setSeed(seed);
+		 ThreadLocalRandom.current().setSeed(seed);
 	}
 
 	/**
@@ -230,7 +223,7 @@ public class Randomness implements Serializable {
 		if (list.isEmpty())
 			return null;
 
-		int position = random.nextInt(list.size());
+		int position =  ThreadLocalRandom.current().nextInt(list.size());
 		return list.get(position);
 	}
 
@@ -250,10 +243,20 @@ public class Randomness implements Serializable {
 		if (set.isEmpty())
 			return null;
 
-		int position = random.nextInt(set.size());
+		int position =  ThreadLocalRandom.current().nextInt(set.size());
 		return (T) set.toArray()[position];
 	}
 
+	public static <T> T choice(Set<T> set) {
+		if (set.isEmpty())
+			return null;
+		int index = nextInt(set.size());
+        Iterator<T> it = set.iterator();
+        for (int i = 0; i < index; i++)
+			it.next();
+        return it.next();
+	}
+	
 	/**
 	 * <p>
 	 * choice
@@ -269,7 +272,7 @@ public class Randomness implements Serializable {
 		if (elements.length == 0)
 			return null;
 
-		int position = random.nextInt(elements.length);
+		int position =  ThreadLocalRandom.current().nextInt(elements.length);
 		return elements[position];
 	}
 
@@ -282,7 +285,7 @@ public class Randomness implements Serializable {
 	 *            a {@link java.util.List} object.
 	 */
 	public static void shuffle(List<?> list) {
-		Collections.shuffle(list, random);
+		Collections.shuffle(list,  ThreadLocalRandom.current());
 	}
 
 	/**
