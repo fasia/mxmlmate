@@ -13,11 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
+import com.google.common.base.Stopwatch;
+
 public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccessFitnessFunction {
 	private static final Logger logger = LoggerFactory.getLogger(SingletonPopulationMemoryAccessFitnessFunction.class);
+	public static Stopwatch evaluationClock = Stopwatch.createUnstarted();
 
 	@Override
 	public double getFitness(XMLTestSuiteChromosome individual) {
+		evaluationClock.start();
 		int max = 0;
 		Map<Integer, File> awaited = new HashMap<Integer, File>();
 		
@@ -76,6 +80,7 @@ public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccess
 		
 		individual.setFitness(max);
 		individual.setChanged(false);
+		evaluationClock.stop();
 		return max;
 	}
 

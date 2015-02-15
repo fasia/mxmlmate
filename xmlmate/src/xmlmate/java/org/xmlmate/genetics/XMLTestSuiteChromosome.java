@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.xerces.xs.XSAttributeDeclaration;
 import org.apache.xerces.xs.XSElementDeclaration;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 
 import dk.brics.automaton.Transition;
@@ -45,6 +47,8 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     private double regexCoverage = 0.0d;
     private double elemCoverage = 0.0d;
     private double attrCoverage = 0.0d;
+    public static Stopwatch mutationClock = Stopwatch.createUnstarted();
+    public static Stopwatch cloningClock = Stopwatch.createUnstarted();
         
     private static final XMLCrossOverFunction crossoverFunction = new XMLCrossOverFunction();
     private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -109,17 +113,6 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         super(testChromosomeFactory);
         populate();
     }
-
-    /*
-    public XMLTestSuiteChromosome(XMLTestSuiteChromosome other) {
-        super(other);
-        regexCoverage = other.regexCoverage;
-        elemCoverage = other.elemCoverage;
-        attrCoverage = other.attrCoverage;
-        age = other.age;
-        setChanged(other.isChanged());
-    }
-    */
 
     @Override
     public boolean localSearch(LocalSearchObjective<? extends Chromosome> objective) {
@@ -204,6 +197,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
     @Override
     public AbstractTestSuiteChromosome<XMLTestChromosome> clone() {
+    	cloningClock.start();
         XMLTestSuiteChromosome inst = new XMLTestSuiteChromosome();
         inst.testChromosomeFactory = testChromosomeFactory;
         inst.age = age;
@@ -225,6 +219,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 			e.printStackTrace();
 		}
         inst.setChanged(isChanged());
+        cloningClock.stop();
         return inst;
     }
 
@@ -311,7 +306,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
     @Override
     public void mutate() {
-//    	Stopwatch mutationWatch = Stopwatch.createStarted();
+    	mutationClock.start();
         // delete testcases?
         for (Iterator<XMLTestChromosome> iterator = tests.iterator(); iterator.hasNext();) {
             iterator.next();
@@ -358,9 +353,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             setChanged(true);
         }
         
-//        mutationWatch.stop();
-//        mutationTime += mutationWatch.elapsed(TimeUnit.SECONDS);
-//        logger.info("Mutating took {}", mutationWatch);
+        mutationClock.stop();
     }
     
 

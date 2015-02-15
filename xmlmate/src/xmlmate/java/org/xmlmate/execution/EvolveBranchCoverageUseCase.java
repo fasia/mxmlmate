@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 import org.xmlmate.genetics.SingletonPopulationGA;
+import org.xmlmate.genetics.SingletonPopulationMemoryAccessFitnessFunction;
 import org.xmlmate.genetics.XMLCrossOverFunction;
 import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosome;
@@ -121,11 +122,10 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         logger.info("Search finished with fitness {} after {} generations.", solution.getFitness(), gaAge);
         writeSolution((XMLTestSuiteChromosome) solution, gaAge);
 
-        if (Properties.POPULATION == 1) {
-        	logger.debug("Cumulative time spent cloning:    {} s.", SingletonPopulationGA.cloningTime  /1000000d);
-        	logger.debug("Cumulative time spent mutating:   {} s.", SingletonPopulationGA.mutationTime /1000000d);
-        	logger.debug("Cumulative time spent evaluating: {} s.", SingletonPopulationGA.evalTime     /1000000d);
-        }
+    	logger.debug("Cumulative time spent cloning:    {}.", XMLTestSuiteChromosome.cloningClock);
+    	logger.debug("Cumulative time spent mutating:   {}.", XMLTestSuiteChromosome.mutationClock);
+    	if (Properties.POPULATION == 1)
+			logger.debug("Cumulative time spent evaluating: {}.", SingletonPopulationMemoryAccessFitnessFunction.evaluationClock);
         
         // for some reason the process doesn't terminate on its own
         System.exit(0);
