@@ -39,16 +39,12 @@ public class AwareElement extends Element {
         this.decl = decl;
     }
 
-    private AwareElement(AwareElement other) {
-        super(other);
-        decl = other.decl;
-        isAny = other.isAny;
-        // seems to be a kind of a workaround
-        removeChildren();
-        for (int i = 0; i < other.getChildCount(); i++) {
-            Node child = other.getChild(i);
-            appendChild(child.copy()); // and this is why I overrode copy() as well ;)
-        }
+    
+    @Override
+    protected Element shallowCopy() {
+    	AwareElement e = new AwareElement(getQualifiedName(), getNamespaceURI(), decl);
+    	e.isAny = isAny;
+    	return e;
     }
 
     public static AwareElement anyElem(String uri) {
@@ -395,11 +391,6 @@ public class AwareElement extends Element {
         Elements children = getChildElements();
         for (int i = 0; i < children.size(); i++)
             ((AwareElement) children.get(i)).deregister(eleMap);
-    }
-
-    @Override
-    public Node copy() {
-        return new AwareElement(this);
     }
 
     @Override
