@@ -16,7 +16,7 @@ import java.util.*;
  * This class represents an XML element that is aware of its declaration in the schema.
  */
 public class AwareElement extends Element {
-    private static final Logger logger = LoggerFactory.getLogger("AwareElement");
+    private static final Logger logger = LoggerFactory.getLogger(AwareElement.class);
     /**
      * probability to mutate an element rather than ascending further up the tree
      */
@@ -472,5 +472,34 @@ public class AwareElement extends Element {
             p = p.getParent();
         }
         return depth;
+    }
+
+    public boolean smallNumericMutation() {
+        XSTypeDefinition td = decl.getTypeDefinition();
+        XSSimpleTypeDefinition stype;
+        if (td.getTypeCategory() == XSTypeDefinition.SIMPLE_TYPE) {
+            stype = (XSSimpleTypeDefinition) td;
+        } else {
+            XSComplexTypeDefinition ctype = (XSComplexTypeDefinition) td;
+            if (ctype.getContentType() == XSComplexTypeDefinition.CONTENTTYPE_SIMPLE) {
+                stype = ctype.getSimpleType();
+            } else return false;
+        }
+        assert null != stype;
+        if (!stype.getNumeric()) return false;
+
+        int value;
+        try {
+            value = Integer.parseInt(getValue());
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        int offset = Randomness.nextInt(1, 11); // [1 - 10]
+        if (Randomness.nextBoolean())
+            offset = -offset;
+        removeChildren();
+        appendChild(Integer.toString(value+offset));
+        logger.trace("Local search offset {} by {}", getLocalName(), offset);
+        return true;
     }
 }

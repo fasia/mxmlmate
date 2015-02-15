@@ -14,6 +14,8 @@ import org.evosuite.localsearch.LocalSearchObjective;
 import org.evosuite.testcase.*;
 import org.evosuite.testsuite.TestSuiteFitnessFunction;
 import org.evosuite.utils.Randomness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 import org.xmlmate.execution.XMLTestRunner;
 import org.xmlmate.formats.FormatConverter;
@@ -36,6 +38,7 @@ import java.util.concurrent.TimeoutException;
 
 public class XMLTestChromosome extends ExecutableChromosome {
     private static final long serialVersionUID = 436444840380164621L;
+    private static final Logger logger = LoggerFactory.getLogger(XMLTestChromosome.class);
     private static final ExecutorService executor = Executors.newSingleThreadExecutor(TestCaseExecutor.getInstance());
     private static final List<SecondaryObjective> secondaryObjectives = new ArrayList<>();
     private static FormatConverter converter;
@@ -189,9 +192,12 @@ public class XMLTestChromosome extends ExecutableChromosome {
 
     @Override
     public boolean localSearch(LocalSearchObjective<? extends Chromosome> objective) {
-    	logger.debug("Local search on test");
-    	LocalSearchBudget.getInstance().countLocalSearchOnTest();
-        return false;
+    	logger.trace("Local search on test");
+        if (doc.smallNumericMutation()) {
+            setChanged(true);
+            LocalSearchBudget.getInstance().countLocalSearchOnTest();
+        }
+        return isChanged();
     }
 
     @Override

@@ -117,6 +117,7 @@ public class XMLProperties {
         options.addOption("elite", true, "Size of elite. must be in [0,population). Default is " + Properties.ELITE);
         options.addOption("out", true, "Relative path to temporary folder for program output. Default is " + OUTPUT_PATH);
         options.addOption("depth", true, "Maximum recursion depth for optional xml elements. Default is " + OPTIONAL_DEPTH);
+        options.addOption("l", "local-search", true, "Number of generations between local searches. Default is " + Properties.LOCAL_SEARCH_RATE);
         options.addOption("seed", true, "Seed for the randomness. If not given, one will be auto-generated.");
         return options;
     }
@@ -216,6 +217,7 @@ public class XMLProperties {
         //check seed
         if (line.hasOption("seed")) {
             Properties.RANDOM_SEED = Long.parseLong(line.getOptionValue("seed"));
+            logger.warn("Current implementation of XMLMate does not support deterministic seed setting!");
             Randomness.getInstance();
         } else {
             Randomness.getInstance();
@@ -298,6 +300,8 @@ public class XMLProperties {
         Properties.ELITE = getIntOrDefault(line, "Elite", Properties.ELITE, 0);
         // max files
         Properties.MAX_SIZE = getIntOrDefault(line, "Maxfiles", Properties.MAX_SIZE);
+        // local search rate
+        Properties.LOCAL_SEARCH_RATE = getIntOrDefault(line, "Local-search", Properties.LOCAL_SEARCH_RATE);
         // per file timeout
         Properties.TIMEOUT = getIntOrDefault(line, "Test-timeout", Properties.TIMEOUT);
         // global timeout
@@ -367,7 +371,7 @@ public class XMLProperties {
         long start = System.currentTimeMillis();
         SchemaTraverser traverser = new SchemaTraverser();
         Element root = AwareInstantiator.generate(QName.valueOf(ROOT_ELEM)).getRootElement();
-        traverser.traverse(((AwareElement) root).getDecl(), new SchemaAllVisitor(), new SchemaRegexVisitor());
+        traverser.traverse(((AwareElement) root).getDecl(), new SchemaAllVisitor(), new SchemaRegexVisitor()/*, new TypeNameLister()*/);
         logger.info("Done in {} sec.", (System.currentTimeMillis() - start) / 1000d);
     }
 

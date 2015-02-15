@@ -107,20 +107,31 @@ public class AwareDocument extends Document {
         return transitions;
     }
 
-    public boolean mutate() {
-        // Element root = getRootElement();
-        // return ((AwareElement) root).mutate();
+    private AwareElement chooseRandom() {
         XSElementDeclaration key = Randomness.choice(eleMap.keySet());
         assert null != key;
         Set<AwareElement> set = eleMap.get(key);
         assert null != set;
         set.remove(null);
         if (set.isEmpty()) {
-            eleMap.remove(key);
-            return mutate();
+            eleMap.remove(key); // lazy cleaning
+            return chooseRandom();
         }
-        AwareElement e = Randomness.choice(set);
-        return e.mutate();
+        return Randomness.choice(set);
+    }
+
+    public boolean mutate() {
+        return chooseRandom().mutate();
+    }
+
+    public boolean smallNumericMutation() {
+        boolean changed = false;
+        while (true) {
+            if (Randomness.nextDouble() > 0.65d) break;
+            AwareElement element = chooseRandom(); // XXX might want to optimize the choice for this use case
+            changed |= element.smallNumericMutation();
+        }
+        return changed;
     }
 
     @Override

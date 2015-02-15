@@ -23,6 +23,7 @@ import org.apache.xerces.xs.XSElementDeclaration;
 import org.evosuite.Properties;
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.ChromosomeFactory;
+import org.evosuite.ga.FitnessFunction;
 import org.evosuite.ga.SecondaryObjective;
 import org.evosuite.localsearch.LocalSearchObjective;
 import org.evosuite.testcase.ExecutionResult;
@@ -47,7 +48,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         
     private static final XMLCrossOverFunction crossoverFunction = new XMLCrossOverFunction();
     private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    private class Mutation implements Callable<List<XMLTestChromosome>> {
+    private static class Mutation implements Callable<List<XMLTestChromosome>> {
     	private final XMLTestChromosome original;
 		public Mutation(XMLTestChromosome original) {
 			this.original = original;
@@ -64,7 +65,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     	
     }
     
-    private class Crossover implements Callable<List<XMLTestChromosome>> {
+    private static class Crossover implements Callable<List<XMLTestChromosome>> {
     	
     	private final XMLTestChromosome parent1;
     	private final XMLTestChromosome parent2;
@@ -86,7 +87,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     	
     }
     
-    private class Clone implements Callable<XMLTestChromosome> {
+    private static class Clone implements Callable<XMLTestChromosome> {
     	private final XMLTestChromosome original;
     	public Clone(XMLTestChromosome original) {
     		this.original = original;
@@ -122,9 +123,21 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
     @Override
     public boolean localSearch(LocalSearchObjective<? extends Chromosome> objective) {
-    	logger.debug("Local search on suite");
-//    	LocalSearchBudget.getInstance().countLocalSearchOnTest();
-        return false;
+    	logger.trace("Local search on suite");
+        double oldFitness = getFitness();
+        boolean changed = false;
+        for (XMLTestChromosome x : tests) {
+            changed |= x.localSearch(objective);
+        }
+        if (!changed)
+            return false;
+
+        @SuppressWarnings("unchecked")
+        FitnessFunction<XMLTestSuiteChromosome> fitnessFunction = (FitnessFunction<XMLTestSuiteChromosome>) objective.getFitnessFunction();
+
+        // note that this also updates the current fitness
+        double delta = fitnessFunction.getFitness(this) - oldFitness;
+        return fitnessFunction.isMaximizationFunction() ? delta > 0 : delta < 0;
     }
 
     public static void addSecondaryObjective(SecondaryObjective objective) {
