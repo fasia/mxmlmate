@@ -1,5 +1,16 @@
 package org.xmlmate.execution;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+
 import net.sf.corn.cps.CPScanner;
 import net.sf.corn.cps.ClassFilter;
 import net.sf.corn.cps.CombinedFilter;
@@ -7,7 +18,14 @@ import net.sf.corn.cps.CombinedFilter;
 import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
 import org.evosuite.coverage.exception.ExceptionCoverageSuiteFitness;
-import org.evosuite.ga.*;
+import org.evosuite.ga.Chromosome;
+import org.evosuite.ga.CrossOverFunction;
+import org.evosuite.ga.FitnessFunction;
+import org.evosuite.ga.MaxSizeBloatControl;
+import org.evosuite.ga.MinimizeSizeSecondaryObjective;
+import org.evosuite.ga.SelectionFunction;
+import org.evosuite.ga.SteadyStateGA;
+import org.evosuite.ga.TournamentSelection;
 import org.evosuite.ga.stoppingconditions.MaxTimeStoppingCondition;
 import org.evosuite.ga.stoppingconditions.StoppingCondition;
 import org.evosuite.ga.stoppingconditions.ZeroFitnessStoppingCondition;
@@ -17,6 +35,7 @@ import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
+import org.xmlmate.genetics.SingletonPopulationGA;
 import org.xmlmate.genetics.XMLCrossOverFunction;
 import org.xmlmate.genetics.XMLTestChromosome;
 import org.xmlmate.genetics.XMLTestSuiteChromosome;
@@ -24,11 +43,6 @@ import org.xmlmate.genetics.XMLTestSuiteChromosomeFactory;
 import org.xmlmate.monitoring.BothCoveragesMonitor;
 import org.xmlmate.monitoring.EventRecounter;
 import org.xmlmate.util.ClassFilterAdapter;
-
-import java.io.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 
 public class EvolveBranchCoverageUseCase implements UseCase {
     private static final Logger logger = LoggerFactory.getLogger(EvolveBranchCoverageUseCase.class);
@@ -107,6 +121,12 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         logger.info("Search finished with fitness {} after {} generations.", solution.getFitness(), gaAge);
         writeSolution((XMLTestSuiteChromosome) solution, gaAge);
 
+        if (Properties.POPULATION == 1) {
+        	logger.debug("Cumulative time spent cloning:    {} s.", SingletonPopulationGA.cloningTime  /1000000d);
+        	logger.debug("Cumulative time spent mutating:   {} s.", SingletonPopulationGA.mutationTime /1000000d);
+        	logger.debug("Cumulative time spent evaluating: {} s.", SingletonPopulationGA.evalTime     /1000000d);
+        }
+        
         // for some reason the process doesn't terminate on its own
         System.exit(0);
     }
