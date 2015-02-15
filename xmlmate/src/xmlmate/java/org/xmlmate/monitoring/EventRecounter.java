@@ -1,6 +1,6 @@
 package org.xmlmate.monitoring;
 
-import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.GeneticAlgorithm;
@@ -9,19 +9,22 @@ import org.evosuite.testsuite.AbstractTestSuiteChromosome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
+
 public class EventRecounter implements SearchListener {
     private static final Logger logger = LoggerFactory.getLogger(EventRecounter.class);
-    private long last;
-    private long durations = 0;
+    private Stopwatch globalClock;
+    private Stopwatch generationClock;
 
     @Override
     public void searchStarted(GeneticAlgorithm<?> algorithm) {
-        last = System.currentTimeMillis();
+        globalClock = Stopwatch.createStarted();
+        generationClock = Stopwatch.createStarted();
     }
 
     @Override
     public void iteration(GeneticAlgorithm<?> algorithm) {
-        long now = System.currentTimeMillis();
+        generationClock.stop();
         int length = 0;
         int size = 0;
         for (Chromosome chromosome : algorithm.getPopulation()) {
@@ -29,15 +32,16 @@ public class EventRecounter implements SearchListener {
             size += chromosome.size();
         }
         Chromosome bestIndividual = algorithm.getBestIndividual();
-        long duration = now - last;
-        durations += duration;
-        logger.info("Generation {} had size {}, length {}, and took {} sec. Best fitness {} from gen {}", algorithm.getAge(), size, length, duration / 1000d, bestIndividual.getFitness(), bestIndividual.getAge());
-        last = now;
+        
+        logger.info("Generation {} had size {}, length {}, and took {}. Best fitness {} from gen {}", algorithm.getAge(), size, length, generationClock, bestIndividual.getFitness(), bestIndividual.getAge());
+        generationClock.reset();
+        generationClock.start();
     }
 
     @Override
     public void searchFinished(GeneticAlgorithm<?> algorithm) {
-        logger.info(String.format("Average generation duration: %s sec.", durations / (algorithm.getAge() + 1) / 1000.0d));
+    	globalClock.stop();
+        logger.info(String.format("Average generation duration: %s sec.", globalClock.elapsed(TimeUnit.SECONDS) / (double)(algorithm.getAge() + 1)));
     }
 
     @Override
