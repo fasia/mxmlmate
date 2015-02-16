@@ -17,7 +17,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.xerces.xs.XSAttributeDeclaration;
 import org.apache.xerces.xs.XSElementDeclaration;
@@ -36,6 +35,7 @@ import org.xmlmate.XMLProperties;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import dk.brics.automaton.Transition;
 
@@ -48,12 +48,15 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     private double elemCoverage = 0.0d;
     private double attrCoverage = 0.0d;
     public static Stopwatch mutationClock = Stopwatch.createUnstarted();
-    public static Stopwatch cloningClock = Stopwatch.createUnstarted();
         
     private static final XMLCrossOverFunction crossoverFunction = new XMLCrossOverFunction();
-    private static ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private static ExecutorService mutatorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Mutator %d").build());
+	private static ExecutorService xoverService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Xover %d").build());
+	
     private static class Mutation implements Callable<List<XMLTestChromosome>> {
+    	
     	private final XMLTestChromosome original;
+    	
 		public Mutation(XMLTestChromosome original) {
 			this.original = original;
 		}
@@ -70,6 +73,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     }
     
     private static class Crossover implements Callable<List<XMLTestChromosome>> {
+		private final static ExecutorService cloneService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Cloner %d") .build());
     	
     	private final XMLTestChromosome parent1;
     	private final XMLTestChromosome parent2;
@@ -81,8 +85,10 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
 		@Override
 		public List<XMLTestChromosome> call() throws Exception {
-			XMLTestChromosome offspring1 = new XMLTestChromosome(parent1);
-			XMLTestChromosome offspring2 = new XMLTestChromosome(parent2);
+			Future<XMLTestChromosome> futureOffspring1 = cloneService.submit(new Clone(parent1));
+			Future<XMLTestChromosome> futureOffspring2 = cloneService.submit(new Clone(parent2));
+			XMLTestChromosome offspring1 = futureOffspring1.get();
+			XMLTestChromosome offspring2 = futureOffspring2.get();
 			crossoverFunction.crossOverXMLs(offspring1, offspring2, new HashSet<XSElementDeclaration>());
 			return ImmutableList.of(
 					offspring1.size() <= XMLProperties.MAX_XML_SIZE ? offspring1: parent1, 
@@ -197,7 +203,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
     @Override
     public AbstractTestSuiteChromosome<XMLTestChromosome> clone() {
-    	cloningClock.start();
+    	assert !isChanged() : "Cannot shallowly clone changed suites!";
         XMLTestSuiteChromosome inst = new XMLTestSuiteChromosome();
         inst.testChromosomeFactory = testChromosomeFactory;
         inst.age = age;
@@ -206,21 +212,27 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         inst.regexCoverage = regexCoverage;
         inst.elemCoverage = elemCoverage;
         inst.attrCoverage = attrCoverage;
-        List<Callable<XMLTestChromosome>> tasks = new ArrayList<>(tests.size());
+        inst.tests = new ArrayList<>(tests); // shallowly copy the xml trees
+        inst.setChanged(isChanged());
+        return inst;
+    }
+    
+    XMLTestSuiteChromosome deepClone() {
+    	XMLTestSuiteChromosome clone = (XMLTestSuiteChromosome) clone();
+    	clone.tests.clear();
+    	List<Callable<XMLTestChromosome>> tasks = new ArrayList<>(tests.size());
         for (XMLTestChromosome xmlTestChromosome : tests) {
 			tasks.add(new Clone(xmlTestChromosome));
 		}
 		try {
-			List<Future<XMLTestChromosome>> taskResults = executor.invokeAll(tasks);
+			List<Future<XMLTestChromosome>> taskResults = mutatorService.invokeAll(tasks);
 			for (Future<XMLTestChromosome> futureResult : taskResults)
-				inst.addTest(futureResult.get());
+				clone.addTest(futureResult.get());
 		} catch (InterruptedException | ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        inst.setChanged(isChanged());
-        cloningClock.stop();
-        return inst;
+		return clone;
     }
 
     @Override
@@ -321,21 +333,24 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         
 		Randomness.shuffle(tests);
 		
-		List<Callable<List<XMLTestChromosome>>> tasks = new LinkedList<>();
+		List<Future<List<XMLTestChromosome>>> taskResults = new LinkedList<>();
 		List<XMLTestChromosome> newTests = new ArrayList<>(oldSize);
 		for (int i = 0; i < oldSize;) {
 			XMLTestChromosome p1 = tests.get(i);
-			if (Randomness.nextDouble() <= 0.50d && i + 1 < oldSize) { // 50% crossover
+			if (Randomness.nextDouble() <= 0.20d && i + 1 < oldSize) { // 20% crossover
 				XMLTestChromosome p2 = tests.get(i + 1);
-				tasks.add(new Crossover(p1, p2));
+				taskResults.add(xoverService.submit(new Crossover(p1, p2)));
 				i += 2;
-			} else { // 50% mutation
-				tasks.add(new Mutation(p1));
+			} else if (Randomness.nextDouble() <= 0.30d) { // 24% mutation
+				taskResults.add(mutatorService.submit(new Mutation(p1)));
 				i += 1;
-			} 
+			} else {
+				newTests.add(p1);
+				i += 1;
+			}
 		}
+		
 		try {
-			List<Future<List<XMLTestChromosome>>> taskResults = executor.invokeAll(tasks);
 			for (Future<List<XMLTestChromosome>> futureTest : taskResults)
 				for (XMLTestChromosome x : futureTest.get())
 					newTests.add(x);

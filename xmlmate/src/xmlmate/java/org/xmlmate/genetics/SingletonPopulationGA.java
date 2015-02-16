@@ -64,7 +64,7 @@ public class SingletonPopulationGA extends SteadyStateGA<XMLTestSuiteChromosome>
 				break;
 			}
 
-			XMLTestSuiteChromosome clone = (XMLTestSuiteChromosome) individual.clone();
+			XMLTestSuiteChromosome clone = ((XMLTestSuiteChromosome) individual).deepClone();
 			if(clone.localSearch(localObjective)) {
 				improvement = true;
 				population.set(i, clone);

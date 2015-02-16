@@ -122,7 +122,6 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         logger.info("Search finished with fitness {} after {} generations.", solution.getFitness(), gaAge);
         writeSolution((XMLTestSuiteChromosome) solution, gaAge);
 
-    	logger.debug("Cumulative time spent cloning:    {}.", XMLTestSuiteChromosome.cloningClock);
     	logger.debug("Cumulative time spent mutating:   {}.", XMLTestSuiteChromosome.mutationClock);
     	if (Properties.POPULATION == 1)
 			logger.debug("Cumulative time spent evaluating: {}.", SingletonPopulationMemoryAccessFitnessFunction.evaluationClock);
