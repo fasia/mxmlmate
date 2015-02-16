@@ -1,0 +1,25 @@
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+%Motivation 
+The e{\bfseries X}tensible {\bfseries M}arkup {\bfseries L}anguage (XML) is 
+a universal data interchange format for a wide variety of applications. 
+One of the challenges that comprise automated testing of such applications is the generation of meaningful inputs that 
+can advance deep into the program flow; 
+%Problem
+however, this is a hard task for most format-agnostic test generation tools. 
+Because XML files are complexly structured, simple guessing techniques are insufficient for producing valid and realistic inputs. 
+One can leverage XML schemas, which describe the structure of XML files, for generating valid inputs, and 
+using a guided search technique can further increase their effectiveness. 
+Also, unit-level testing tools are usually unaware of certain preconditions that hold when 
+the tested application is run normally, thus they produce unrealistic tests that expose false positives as they 
+violate those preconditions. System-level testing, however, does not have this problem because system tests follow the 
+natural execution order of the tested application. 
+%Methodology
+This thesis presents an approach for performing automated search-based system testing of 
+applications that process XML inputs that are governed by XML schemas. 
+I have implemented a prototype, applied it to three java applications, and compared its performance with 
+that of a state of the art search-based unit testing tool. 
+%Results
+By utilizing search-based system-level testing in conjunction with the structural information from 
+XML schemas my approach was able to generate meaningful and realistic tests, which have uncovered real defects in the 
+tested applications.  

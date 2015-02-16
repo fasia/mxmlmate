@@ -1,0 +1,80 @@
+\documentclass[a4paper]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{mdwlist}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{textcomp}
+\usepackage{float}
+
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+
+\usepackage[nameinlink]{cleveref}
+
+\begin{document}
+\input{./title.tex}
+\newpage
+\input{./oath.tex}
+\newpage
+% \section*{Acknowledgements}
+% This thesis has benefited from the support of several people, whom I would like to thank sincerely. 
+% I would especially like to thank 
+% \begin{description*}
+% 	\item[]
+% \end{description*}
+% \newpage
+\input{./abstract.tex}
+\newpage
+\tableofcontents
+\newpage
+\section{Introduction}
+\section{Related Work}
+\section{Approach}
+\subsection{Technology Stack}
+\subsubsection{Xom}
+\subsubsection{Xerces}
+\subsubsection{PIN}
+\subsubsection{ZeroMQ}
+\subsubsection{Msgpack}
+\subsection{Components}
+% make pretty communication graph
+% xmlmate
+% driver
+% pintool
+% broker
+% converter
+\subsection{Challenges}
+\subsubsection{Communication Protocol}
+\subsubsection{Format Converters}
+\subsubsection{Parallelization}
+\subsubsection{Local Search}
+\subsection{Fitness Functions}
+% here all fitness functions are introduced and described
+\subsubsection{Basic Block Coverage}
+\subsubsection{Memory Access}
+\subsubsection{Division by Zero}
+\subsubsection{Integer Overflow}
+\subsubsection{Buffer Overflow}
+\subsection{Formats}
+\subsubsection{PNG}
+\subsubsection{Pcap}
+\subsubsection{Flac}
+\section{Evaluation}
+\subsection{Results}
+\subsection{Threats to Validity}
+\section{Conclusion}
+\section{Future Work}
+% complete parallel rewrite
+% more fitness functions
+% more subjects
+% more formats
+
+\newpage
+\section*{References}
+\renewcommand\refname{}
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{plain}
+\bibliography{sources}
+\end{document}
