@@ -1712,28 +1712,7 @@ static PNG_CONST char *inname = "pngtest.png";
 static PNG_CONST char *outname = "pngout.png";
 #endif
 
-//  Convert C string to 0MQ string and send to socket
-static int s_send(void *socket, char *string) {
-    int size = zmq_send (socket, string, strlen (string), 0);
-    return size;
-}
-
 #define BUF_SIZE 1024
-//  Receive 0MQ string from socket and convert into C string
-//  Caller must free returned string. Returns NULL if the context
-//  is being terminated.
-static char *s_recv (void *socket) {
-    char buffer [BUF_SIZE];
-    int size = zmq_recv (socket, buffer, BUF_SIZE-1, 0);
-    if (size == -1)
-        return NULL;
-    if (size > BUF_SIZE-1)
-        size = BUF_SIZE-1;
-    buffer [size] = 0;
-    return strdup(buffer);
-}
-
-// TODO add bindpoint params
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
 		fprintf(stderr, "Please provide the port for receiving data!\n");
@@ -1752,9 +1731,10 @@ int main(int argc, char *argv[]) {
 	fprintf(stdout,"Connecting to dataInput at %s\n", address);
 	zmq_connect(dataIn, address);
 
+	char buffer[BUF_SIZE];
+	msgpack_unpacked msg;
 	for (;;) {
 //		fprintf(stdout,"Waiting for tasks...\n");
-		char buffer[BUF_SIZE];
 		int size = zmq_recv(dataIn, buffer, BUF_SIZE-1, 0);
 		if (size == -1)
 			return 1;
@@ -1762,9 +1742,8 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr,"WARNING! Size of a message has exceeded the buffer size of %d!!!\n", BUF_SIZE);
 			size = BUF_SIZE-1;
 		}
-		buffer[size] = NULL;
+		buffer[size] = (char)0;
 
-		msgpack_unpacked msg;
 		msgpack_unpacked_init(&msg);
 		size_t off = 0;
 		bool res = msgpack_unpack_next(&msg, buffer, size, &off);
@@ -1776,7 +1755,7 @@ int main(int argc, char *argv[]) {
 		msgpack_object obj = msg.data;
 		uint32_t id = (uint32_t) obj.via.u64;
 
-		msgpack_unpacked_init(&msg);
+		msgpack_unpacked_destroy(&msg);
 		res = msgpack_unpack_next(&msg, buffer, size, &off);
 		if (!res) {
 			fprintf(stderr, "res == %d\n", res);
@@ -1784,7 +1763,7 @@ int main(int argc, char *argv[]) {
 			return 1;
 		}
 		obj = msg.data;
-		char* path = obj.via.str.ptr;
+		const char* path = obj.via.str.ptr;
 
 		PIN_SCORE_START();
 		test_one_file(path, outname);
