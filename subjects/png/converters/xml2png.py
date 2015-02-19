@@ -23,8 +23,11 @@ def txtToInt(txt, mod=0xFFFFFFFF):
     ord0 = ord('0')
     for i in txt:
         num = num * 10
+        rd = ord(i) - ord0
+        if rd < 0 or rd > 9:continue
         num = num + ord(i) - ord0
     # num = abs(num)    
+    # if num & 0x80000000: num = 0  # no signed numbers
     return num & mod
 
 def shortToCharLittleEndian(num):    
@@ -557,6 +560,7 @@ def xml2png(pathToXML, pathToPNG):
 if __name__ == '__main__':
     xml2png(sys.argv[1], sys.argv[2])
     # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
+# xml2png('/home/gmaisuradze/Desktop/problems/problemfile1.xml', '/home/gmaisuradze/Desktop/problems/problemfile1.png')
 
 # def convertFiles():
 #     # origWD = os.getcwd()
