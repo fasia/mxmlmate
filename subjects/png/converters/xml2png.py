@@ -22,9 +22,9 @@ def txtToInt(txt, mod=0xFFFFFFFF):
     num = 0 
     ord0 = ord('0')
     for i in txt:
-        num = num * 10
         rd = ord(i) - ord0
         if rd < 0 or rd > 9:continue
+        num = num * 10
         num = num + ord(i) - ord0
     # num = abs(num)    
     # if num & 0x80000000: num = 0  # no signed numbers
@@ -560,7 +560,7 @@ def xml2png(pathToXML, pathToPNG):
 if __name__ == '__main__':
     xml2png(sys.argv[1], sys.argv[2])
     # xml2png('/home/gmaisuradze/Desktop/EclipseWorkspace/xmlmate/xmlmate/filename.xml', 'filename.png')  # sys.argv[2]
-# xml2png('/home/gmaisuradze/Desktop/problems/problemfile1.xml', '/home/gmaisuradze/Desktop/problems/problemfile1.png')
+# xml2png('/home/gmaisuradze/Desktop/problems/problemfile2.xml', '/home/gmaisuradze/Desktop/problems/problemfile2.png')
 
 # def convertFiles():
 #     # origWD = os.getcwd()
