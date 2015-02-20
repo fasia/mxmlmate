@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xmlmate.org/pcap"
+        xmlns:tns="http://www.xmlmate.org/pcap" elementFormDefault="qualified">
+
+    <complexType name="GlobalHeaderType">
+        <sequence>
+            <element name="magic_number" type="hexBinary" fixed="a1b2c3d4"/>
+            <element name="version_major" type="positiveInteger" fixed="2"/>
+            <element name="version_minor" type="positiveInteger" fixed="4"/>
+            <element name="thiszone" type="int" fixed="0"/>
+            <element name="sigfigs" type="nonNegativeInteger" fixed="0"/>
+            <element name="snaplen" type="positiveInteger"/>
+            <element name="network" type="positiveInteger" fixed="1"/>
+            <!-- TODO add more values for network as enumeration -->
+        </sequence>
+    </complexType>
+
+    <complexType name="PacketHeaderType">
+        <sequence>
+            <element name="ts_sec" type="positiveInteger"/>
+            <element name="ts_usec" type="positiveInteger"/>
+            <element name="incl_len" type="positiveInteger"/>
+            <!--this will be set when converting-->
+            <!--<element name="orig_len" type="positiveInteger"/>-->
+        </sequence>
+    </complexType>
+
+    <complexType name="PCAPType">
+        <sequence>
+            <element name="header" type="tns:GlobalHeaderType"/>
+            <element name="packet" type="tns:PacketHeaderType" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <element name="pcap" type="tns:PCAPType"/>
+
+</schema>
