@@ -1,5 +1,6 @@
 #include <zmq.h>
 #include <msgpack.h>
+#include <pcap.h>
 
 void PIN_SCORE_START() __attribute__((noinline));
 void PIN_SCORE_END(uint32_t id) __attribute__((noinline));
@@ -71,8 +72,18 @@ int main(int argc, char *argv[]) {
 		obj = msg.data;
 		const char* path = obj.via.str.ptr;
 
+//		fprintf(stdout, "Processing %s\n", path);
+
 		PIN_SCORE_START();
-		// TODO implement calling system under test here
+		struct pcap_pkthdr header;
+		char errbuf[PCAP_ERRBUF_SIZE];
+		pcap_t *handle = pcap_open_offline(path, errbuf);
+		if (NULL != handle) {
+			while (pcap_next(handle, &header))
+				;
+			pcap_close(handle);
+		}
+//			else fprintf(stderr, "Skipping %s\n", path);
 		msgpack_unpacked_destroy(&msg);
 		PIN_SCORE_END(id);
 	}

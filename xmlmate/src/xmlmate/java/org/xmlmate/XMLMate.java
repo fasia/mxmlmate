@@ -11,5 +11,7 @@ public class XMLMate {
         XMLProperties.initialize();
         // run use case
         useCase.run();
+        // terminate all auxiliary executors and daemon threads
+        System.exit(0);
     }
 }

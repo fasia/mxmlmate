@@ -2,24 +2,32 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xmlmate.org/pcap"
         xmlns:tns="http://www.xmlmate.org/pcap" elementFormDefault="qualified">
 
+
+    <simpleType name="positiveInt">
+        <restriction base="unsignedInt">
+            <minExclusive value="0"/>
+        </restriction>
+    </simpleType>
+
     <complexType name="GlobalHeaderType">
         <sequence>
-            <element name="magic_number" type="hexBinary" fixed="a1b2c3d4"/>
-            <element name="version_major" type="positiveInteger" fixed="2"/>
-            <element name="version_minor" type="positiveInteger" fixed="4"/>
+        	<!-- Will be set by the converter -->
+        	<!-- <element name="magic_number" type="hexBinary" fixed="a1b2c3d4"/> -->
+            <element name="version_major" type="tns:positiveInt" fixed="2"/>
+            <element name="version_minor" type="tns:positiveInt" fixed="4"/>
             <element name="thiszone" type="int" fixed="0"/>
-            <element name="sigfigs" type="nonNegativeInteger" fixed="0"/>
-            <element name="snaplen" type="positiveInteger"/>
-            <element name="network" type="positiveInteger" fixed="1"/>
+            <element name="sigfigs" type="unsignedInt" fixed="0"/>
+            <element name="snaplen" type="tns:positiveInt"/>
+            <element name="network" type="tns:positiveInt" fixed="1"/>
             <!-- TODO add more values for network as enumeration -->
         </sequence>
     </complexType>
 
     <complexType name="PacketHeaderType">
         <sequence>
-            <element name="ts_sec" type="positiveInteger"/>
-            <element name="ts_usec" type="positiveInteger"/>
-            <element name="incl_len" type="positiveInteger"/>
+            <element name="ts_sec" type="tns:positiveInt"/>
+            <element name="ts_usec" type="tns:positiveInt"/>
+            <element name="incl_len" type="tns:positiveInt"/>
             <!--this will be set when converting-->
             <!--<element name="orig_len" type="positiveInteger"/>-->
         </sequence>
