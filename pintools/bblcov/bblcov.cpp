@@ -1,10 +1,12 @@
 #include <pin.H>
+#include "zmq.hpp"
+#include "zhelpers.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <set>
-#include "zmq.hpp"
+#include <msgpack.hpp>
 
 typedef std::set<ADDRINT> Blocks_T;
 
@@ -19,7 +21,7 @@ static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
 static Blocks_T executedBlocks;
 zmq::context_t context(1);         // Prepare zmq context
-zmq::socket_t socket(context, ZMQ_PUSH); // Prepare zmq socket
+zmq::socket_t dataOut(context, ZMQ_PUSH); // Prepare zmq socket
 
 
 std::ostream * out = &cerr;
@@ -59,19 +61,16 @@ VOID OutputResults() {
 	*out << "===============================================" << endl;
 }
 
-VOID SendResults() {
-//	*out << "Sending results: " << executedBlocks.size() << endl;
-	std::stringstream out;
-	out << executedBlocks.size();
-	std::string s = out.str();
-
-	zmq::message_t reply2(s.length());
-	memcpy((void *) reply2.data(), s.c_str(), s.length());
-	socket.send(reply2);
+VOID SendResults(uint32_t id) {
+	std::stringstream buffer;
+	msgpack::pack(buffer, id);
+	msgpack::pack(buffer, executedBlocks);
+	buffer.seekg(0);
+	s_send(dataOut, buffer.str());
 }
 
 VOID DisposeZMQ() {
-	socket.close();
+	dataOut.close();
 	context.close();
 }
 
@@ -183,7 +182,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	cout << "Connecting socket in PIN tool" << endl;
-	socket.connect("tcp://127.0.0.1:5557"); // TODO receive as param
+	dataOut.connect("tcp://127.0.0.1:5557"); // TODO receive as param
 
 	// Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);

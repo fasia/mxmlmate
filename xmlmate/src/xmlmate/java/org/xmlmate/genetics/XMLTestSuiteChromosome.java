@@ -125,6 +125,20 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     	logger.trace("Local search on suite");
         double oldFitness = getFitness();
         boolean changed = false;
+        
+        // store clones of tests in case of an unfavorable mutation outcome
+        ArrayList<XMLTestChromosome> savedClones = new ArrayList<>(tests.size());
+        List<Future<XMLTestChromosome>> taskResults = new ArrayList<Future<XMLTestChromosome>>(tests.size());
+	for (XMLTestChromosome xmlTestChromosome : tests)
+	    taskResults.add(mutatorService.submit(new Clone(xmlTestChromosome)));
+	try {
+	    for (Future<XMLTestChromosome> futureResult : taskResults)
+		savedClones.add(futureResult.get());
+	} catch (InterruptedException | ExecutionException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+        
         for (XMLTestChromosome x : tests) {
             changed |= x.localSearch(objective);
         }
@@ -136,7 +150,12 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 
         // note that this also updates the current fitness
         double delta = fitnessFunction.getFitness(this) - oldFitness;
-        return fitnessFunction.isMaximizationFunction() ? delta > 0 : delta < 0;
+        boolean better = fitnessFunction.isMaximizationFunction() ? delta > 0 : delta < 0;
+        if (!better) { // restore if no improvement
+            setFitness(oldFitness);
+	    tests = savedClones;
+	}
+        return better;
     }
 
     public static void addSecondaryObjective(SecondaryObjective objective) {
@@ -215,24 +234,6 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         inst.tests = new ArrayList<>(tests); // shallowly copy the xml trees
         inst.setChanged(isChanged());
         return inst;
-    }
-    
-    XMLTestSuiteChromosome deepClone() {
-    	XMLTestSuiteChromosome clone = (XMLTestSuiteChromosome) clone();
-    	clone.tests.clear();
-    	List<Callable<XMLTestChromosome>> tasks = new ArrayList<>(tests.size());
-        for (XMLTestChromosome xmlTestChromosome : tests) {
-			tasks.add(new Clone(xmlTestChromosome));
-		}
-		try {
-			List<Future<XMLTestChromosome>> taskResults = mutatorService.invokeAll(tasks);
-			for (Future<XMLTestChromosome> futureResult : taskResults)
-				clone.addTest(futureResult.get());
-		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return clone;
     }
 
     @Override

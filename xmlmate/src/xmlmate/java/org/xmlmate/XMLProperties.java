@@ -1,10 +1,27 @@
 package org.xmlmate;
 
-import dk.brics.automaton.Automaton;
-import dk.brics.automaton.Transition;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.namespace.QName;
+
 import nu.xom.Element;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.impl.xs.XMLSchemaLoader;
@@ -17,7 +34,14 @@ import org.evosuite.ga.ChromosomeFactory;
 import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlmate.execution.*;
+import org.xmlmate.execution.BinaryBackendUseCase;
+import org.xmlmate.execution.EvolveBranchCoverageUseCase;
+import org.xmlmate.execution.EvolveHybridCoverageUseCase;
+import org.xmlmate.execution.EvolveSchemaCoverageUseCase;
+import org.xmlmate.execution.GenerateSingleFileUseCase;
+import org.xmlmate.execution.MeasureSchemaCoverageUseCase;
+import org.xmlmate.execution.SingletonPopulationBackendUseCase;
+import org.xmlmate.execution.UseCase;
 import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
 import org.xmlmate.genetics.MemoryAccessFitnessFunction;
 import org.xmlmate.genetics.SingletonPopulationMemoryAccessFitnessFunction;
@@ -32,13 +56,8 @@ import org.xmlmate.xml.metrics.SchemaAllVisitor;
 import org.xmlmate.xml.metrics.SchemaRegexVisitor;
 import org.xmlmate.xml.metrics.SchemaTraverser;
 
-import javax.xml.namespace.QName;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.Transition;
 
 @SuppressWarnings("PublicField")
 public class XMLProperties {
@@ -102,10 +121,7 @@ public class XMLProperties {
         options.addOption("measure", true, "Measure the schema coverage of all suites in the given directory.");
         options.addOption("schemaCoverage", false, "Use the schema coverage as sole fitness function.");
         options.addOption("hybridCoverage", false, "Use the hybrid coverage as fitness function maximizing both branch and schema coverages.");
-        int maxTargetBinaryArgs = 5;
-        Option bblCoverage = new Option("bblCoverage",true,"Use PIN instrumentation framework and measure basic block coverage. Followed by working directory, path to PIN, path to PINtool, and path to target binary and any arguments. (max "+maxTargetBinaryArgs+")");
-        bblCoverage.setArgs(4 + maxTargetBinaryArgs);
-        options.addOption(bblCoverage);
+        options.addOption("bblCoverage", false, "Use with PIN to maximize basic block coverage.");
         options.addOption("memCoverage", false, "Use with PIN to maximize memory accesses.");
         options.addOption("r", "root", true, "Root element of the xml tree.");
         options.addOption("a", "samples", true, "Path to samples (file or folder). If given, root must also be given.");
@@ -144,37 +160,32 @@ public class XMLProperties {
     }
 
     private static boolean hasRequiredParams(CommandLine line) {
-        if (!line.hasOption("schema")) {
-            logger.error("No path to schema provided!");
-            return false;
-        }
-        if (line.hasOption("bblCoverage")) {
-        	if (line.hasOption("prefix"))
-        		logger.warn("prefix matching option not yet implemented for bblCoverage use case!"); // TODO implement this option
-        	if (line.hasOption("ignore-packages"))
-        		logger.warn("ignore-packages matching option not yet implemented for bblCoverage use case!"); // TODO implement this option
-			if (line.hasOption("class")) {
-				logger.error("You may not use the -class option with -bblCoverage!");
-				return false;
-			}
-			if (line.getOptionValues("bblCoverage").length < 2) {
-				logger.error("Not enough values provided with the -bblCoverage option!");
-				return false;
-			}
-			return true;
-		}
-        if (line.hasOption("memCoverage")) {
-        	// TODO add more warnings and sanity checks
-        	if (line.hasOption("class")) {
-        		logger.error("You may not use the -class options with the -memCoverage option!");
-        		return false;
-        	}
-        	return true;
-        }
-        boolean hasRoot = line.hasOption("root");
-        if (line.hasOption("class") && line.hasOption("prefix"))
-            return !line.hasOption("samples") || hasRoot;
-        return hasRoot && (line.hasOption("single") || line.hasOption("measure") || line.hasOption("schemaCoverage"));
+	if (!line.hasOption("schema")) {
+	    logger.error("No path to schema provided!");
+	    return false;
+	}
+	if (line.hasOption("bblCoverage")) {
+	    if (line.hasOption("prefix"))
+		logger.warn("prefix matching option not supported for bblCoverage use case!");
+	    if (line.hasOption("ignore-packages"))
+		logger.warn("ignore-packages matching option not supported for bblCoverage use case!");
+	    if (line.hasOption("class")) {
+		logger.error("You may not use the -class option with -bblCoverage!");
+		return false;
+	    }
+	    return true;
+	}
+	if (line.hasOption("memCoverage")) {
+	    if (line.hasOption("class")) {
+		logger.error("You may not use the -class options with the -memCoverage option!");
+		return false;
+	    }
+	    return true;
+	}
+	boolean hasRoot = line.hasOption("root");
+	if (line.hasOption("class") && line.hasOption("prefix"))
+	    return !line.hasOption("samples") || hasRoot;
+	return hasRoot && (line.hasOption("single") || line.hasOption("measure") || line.hasOption("schemaCoverage"));
     }
 
     private static void printHelpAndQuit(Options options) {
@@ -322,22 +333,16 @@ public class XMLProperties {
             RUN_NAME = "hybridCoverage " + RUN_NAME;
             return new EvolveHybridCoverageUseCase(factory);
         }
-        if (line.hasOption("bblCoverage")) {
-        	RUN_NAME = "bblCoverage " + RUN_NAME;
-        	String[] paths = line.getOptionValues("bblCoverage");
-        	List<String> commands = new LinkedList<>(Arrays.asList(paths));
-        	String workDirPath = commands.remove(0);
-        	assert commands.size() > 0;
-        	File workDir = new File(workDirPath);
-        	assert workDir.isDirectory();
-        	return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction());
-        }
-        if (line.hasOption("memCoverage")) {
-			RUN_NAME = "memCoverage " + RUN_NAME;
-			if (Properties.POPULATION == 1) 
-				return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
-			return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
-        }
+	if (line.hasOption("bblCoverage")) {
+	    RUN_NAME = "bblCoverage " + RUN_NAME;
+	    return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction());
+	}
+	if (line.hasOption("memCoverage")) {
+	    RUN_NAME = "memCoverage " + RUN_NAME;
+	    if (Properties.POPULATION == 1)
+		return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
+	    return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
+	}
         RUN_NAME = "branchCoverage " + RUN_NAME;
         return new EvolveBranchCoverageUseCase(factory);
     }

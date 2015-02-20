@@ -14,7 +14,7 @@ public class MaximizeCumulativeFitnessSecondaryObjective extends SecondaryObject
 	private int getCumulativeFitness(XMLTestSuiteChromosome individual) {
 		TLongSet addrs = new TLongHashSet();
 		for (XMLTestChromosome x : individual.getTestChromosomes())
-				addrs.addAll(((MemoryAccessExecutionResult) x.getLastExecutionResult()).getAddresses());
+				addrs.addAll(((AddressStoringExecutionResult) x.getLastExecutionResult()).getAddresses());
 		return addrs.size();
 	}
 	

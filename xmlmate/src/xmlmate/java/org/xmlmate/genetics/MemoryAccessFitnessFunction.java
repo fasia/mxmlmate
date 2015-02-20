@@ -1,68 +1,69 @@
 package org.xmlmate.genetics;
 
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
+import java.util.Map;
 
-import org.evosuite.utils.Randomness;
 import org.msgpack.MessagePack;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlmate.XMLProperties;
 
-public class MemoryAccessFitnessFunction extends BasicBlockCoverageFitnessFunction {
-	private static final Logger logger = LoggerFactory.getLogger(MemoryAccessFitnessFunction.class);
-	protected final MessagePack msg = new MessagePack();
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 
-	
-	@Override
-	public double getFitness(XMLTestSuiteChromosome individual) {
-		TLongSet addrs = new TLongHashSet();
-		for (XMLTestChromosome x : individual.getTestChromosomes()) {
-			if (!x.isChanged())
-				addrs.addAll(((MemoryAccessExecutionResult) x.getLastExecutionResult()).getAddresses());
-			else {
-				File f = new File(XMLProperties.OUTPUT_PATH, String.format( "%d-%d%s", System.currentTimeMillis(), Randomness.nextShort(), XMLProperties.FILE_EXTENSION));
-				try {
-					File outputFile = x.writeToFile(f);
-					String path = outputFile.getAbsolutePath();
-					logger.trace("Sending file {}", path);
-					dataOut.send(path);
-					logger.trace("Waiting for coverage");
-					
-					ByteBuffer buffer = ByteBuffer.wrap(coverageIn.recv());
-					BufferUnpacker unpk = msg.createBufferUnpacker(buffer);
-					long[] la = unpk.read(long[].class);
-					logger.trace("received {} items", la.length);
-					
-					addrs.addAll(la);
-					x.setLastExecutionResult(new MemoryAccessExecutionResult(la));
-					x.setFitness(la.length);
-					x.setChanged(false);
-					// clean up temporary file
-					if (outputFile.exists() && !outputFile.delete()) {
-						logger.warn("Could not delete temporary file after evaluating {}", path);
-						outputFile.deleteOnExit();
-					}
-				} catch (IOException e) {
-					logger.error("Could not write chromosome out to file " + f.getAbsolutePath());
-					if (f.exists() && !f.delete()) {
-						logger.warn("Could not delete temporary file " + f.getAbsolutePath());
-						f.deleteOnExit();
-					}
-				}
-			}
-		}
-		
-		double fitness = addrs.size();
-		individual.setFitness(fitness);
-		individual.setChanged(false);
-		return fitness;
+public class MemoryAccessFitnessFunction extends BinaryBackendFitnessFunction {
+    private static final long serialVersionUID = -6682118782013137115L;
+    private static final Logger logger = LoggerFactory.getLogger(MemoryAccessFitnessFunction.class);
+    protected final MessagePack msgUnpack = new MessagePack();
+
+    @Override
+    public double getFitness(XMLTestSuiteChromosome individual) {
+	evaluationClock.start();
+	TLongSet addrs = new TLongHashSet();
+	for (XMLTestChromosome x : individual.getTestChromosomes()) {
+	    if (!x.isChanged())
+		addrs.addAll(((AddressStoringExecutionResult) x.getLastExecutionResult()).getAddresses());
 	}
+	Map<Integer, File> awaited = sendChangedChromosomes(individual.getTestChromosomes());
+
+	logger.trace("Waiting for coverage of {} files", awaited.size());
+
+	for (int i = 0; i < awaited.size(); i++) {
+	    try {
+		ByteBuffer buffer = receiveResult();
+		BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
+		int num = unpk.readInt();
+		long[] la = unpk.read(long[].class);
+		logger.trace("received {} items", la.length);
+
+		XMLTestChromosome x = individual.getTestChromosome(num);
+		x.setLastExecutionResult(new AddressStoringExecutionResult(la));
+		x.setFitness(la.length);
+		x.setChanged(false);
+
+		addrs.addAll(la);
+		File outputFile = awaited.get(num);
+		// clean up temporary file
+		if (outputFile.exists() && !outputFile.delete()) {
+		    logger.warn("Could not delete temporary file after evaluating {}", outputFile.getAbsolutePath());
+		    outputFile.deleteOnExit();
+		}
+	    } catch (IOException e) {
+		logger.error("Could not read fitness message for chromosome");
+	    }
+	}
+	
+	individual.setFitness(addrs.size());
+	individual.setChanged(false);
+	evaluationClock.stop();
+	return addrs.size();
+    }
+
+    @Override
+    public boolean isMaximizationFunction() {
+	return true;
+    }
 
 }
