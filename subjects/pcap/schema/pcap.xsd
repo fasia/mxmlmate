@@ -15,11 +15,10 @@
         	<!-- <element name="magic_number" type="hexBinary" fixed="a1b2c3d4"/> -->
             <element name="version_major" type="tns:positiveInt" fixed="2"/>
             <element name="version_minor" type="tns:positiveInt" fixed="4"/>
-            <element name="thiszone" type="int" fixed="0"/>
-            <element name="sigfigs" type="unsignedInt" fixed="0"/>
+            <element name="thiszone" type="int"/>
+            <element name="sigfigs" type="unsignedInt"/>
             <element name="snaplen" type="tns:positiveInt"/>
-            <element name="network" type="tns:positiveInt" fixed="1"/>
-            <!-- TODO add more values for network as enumeration -->
+            <element name="network" type="tns:positiveInt"/>
         </sequence>
     </complexType>
 

@@ -3,7 +3,7 @@
 import sys
 import io
 from xml.etree.ElementTree import parse
-from random import randint
+from os import urandom
 import struct
 
 
@@ -16,8 +16,8 @@ def xml2pcap(input_file, output_file):
         f.write(struct.pack('=IhhiIII', *([0xa1b2c3d4] + [int(t.text) for t in header])))
         for c in root[1:]:
             incl_len = min(int(c[2].text), snaplen)
-            f.write(struct.pack('=IIII%dB' % incl_len, int(c[0].text), int(c[1].text), incl_len, incl_len,
-                                *[randint(0, 255) for _ in range(incl_len)]))
+            f.write(struct.pack('=IIII', int(c[0].text), int(c[1].text), incl_len, incl_len))
+            f.write(bytearray(urandom(incl_len)))
 
 
 if __name__ == '__main__':

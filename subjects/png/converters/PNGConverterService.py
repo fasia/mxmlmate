@@ -27,9 +27,10 @@ def main():
         # print 'Removed old file', converted
         try:
             result = convert(input_file)
-        except:
-            result = 'None'
-            print 'Could not convert', input_file
+        except Exception, e:
+            # record anyway to remove the empty file next time
+            result = input_file.replace('.xml', '.pcap')  
+            print 'Could not convert', input_file, 'because of', e
         converted[num] = result
         pck.pack(num)
         pck.pack(result)

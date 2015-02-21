@@ -79,8 +79,19 @@ int main(int argc, char *argv[]) {
 		char errbuf[PCAP_ERRBUF_SIZE];
 		pcap_t *handle = pcap_open_offline(path, errbuf);
 		if (NULL != handle) {
-			while (pcap_next(handle, &header))
-				;
+			int dlt = pcap_datalink(handle);
+			const char *dlt_name = pcap_datalink_val_to_name(dlt);
+			if (NULL != dlt_name)
+				pcap_datalink_val_to_description(dlt);
+
+			const u_char* packet = NULL;
+			while ((packet = pcap_next(handle, &header))) {
+				void* buf = malloc(header.caplen);
+				if (NULL != buf) {
+					memcpy(buf, packet, header.caplen);
+					free(buf);
+				}
+			}
 			pcap_close(handle);
 		}
 //			else fprintf(stderr, "Skipping %s\n", path);
