@@ -34,6 +34,7 @@ public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccess
 	    try {
 		ByteBuffer buffer = receiveResult();
 		BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
+		unpk.setArraySizeLimit(10000000);
 		int num = unpk.readInt();
 		long[] la = unpk.read(long[].class);
 		logger.trace("received {} items", la.length);
@@ -53,7 +54,7 @@ public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccess
 		    outputFile.deleteOnExit();
 		}
 	    } catch (IOException e) {
-		logger.error("Could not read fitness message for chromosome");
+		logger.error("Could not read fitness message for chromosome",e);
 	    }
 	}
 
