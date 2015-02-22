@@ -1,0 +1,84 @@
+%### 
+\subsection{Technology Stack}
+%### 
+\label{sec:tech}
+Over the time of its development \xmlmate has amassed quite an impressive technology stack, 
+which has grown to include not only a number of \xml processing libraries, but also communication, instrumentation, and serialization frameworks. 
+In the following sections I would like to give a brief overview of the technologies used.
+%###  
+\subsubsection{Xom}
+%### 
+\xom\cite{xom} is a \java library for handling \xml documents at the core of \xmlmate. 
+It offers in-memory representation of \xml tree structures as well as support for Namespaces in \xml, {\small XPath 1.0}, {\small XSLT 1.0}, 
+{\small XInclude}, {\small xml:id}, {\small xml:base}, Canonical \xml, and Exclusive Canonical \xml.
+I decided for it in favor of {\small SAX}, {\small StAX}, {\small DOM4j} and {\small jDOM} because of its simplicity and efficiency.
+It is also the only \xml API that ensures correctness very strictly - \xom only allows to create namespace well-formed XML documents, 
+which coincides with one of the underlying principles of \xmlmate{} - generating valid and well-formed data.
+Furthermore, \xom is open to extenstion, which allows for easy enhancements and adaptations to make it suitable 
+for building the basis of genetic representations of \xml trees (further described in \cref{sec:repr}).
+\improvement[inline]{Add some xml specification and example}
+%### 
+\subsubsection{Xerces2}
+%### 
+\xerces\cite{xerces} is a \java library for parsing, validating and manipulating XML documents, which most importantly to \xmlmate, has support for W3C XML Schema 1.1 (Working Drafts, December 2009). 
+At the heart of \xmlmate lies a representation of an \xsd, which is used as a blueprint for generating new \xml instances and modifying existing ones. 
+This representation is implemented with \xerces, as at the time of conception it was really the only available \xsd implementation for \java. 
+\xerces mainly provides access to the definitions of a schema as well as a mechanism for validating \xml instances.
+Unfortunately, it only exposes its functionality via \java interfaces, which makes enhancements and adaptations rather hard, but not impossible, as you will see in \cref{sec:repr}.
+\improvement[inline]{Add some xsd specs and example}
+%### 
+\subsubsection{PIN}
+%### 
+{\small Intel} \pin\cite{pin} is a dynamic binary instrumentation framework for the IA-32 and x86-64 instruction-set architectures 
+that enables the creation of dynamic program analysis tools, which performs the instrumentation at run time on  
+compiled binary files. Thus, it requires no recompiling of source code and can support instrumenting programs that dynamically generate code.
+\pin allows a tool to insert arbitrary code (written in C or C++) in arbitrary places in the executable, for which it 
+provides an API that abstracts away the underlying instruction-set idiosyncrasies and allows context information 
+such as register contents to be passed to the injected code as parameters. It also automatically saves and restores 
+the registers that are overwritten by the injected code so the application continues to work.
+
+Generally, the instrumentation with \pin consists of two components: a mechanism that decides where and what code to insert, 
+and the code to be executed at insertion points. These two components, called \emph{instrumentation} and \emph{analysis} 
+code are hosted in a single executable called a \emph{Pintool}, which functions like a plugin to the \pin framework.
+A pintool can register callbacks on different levels of granularity, varying from single instructions to procedures
+to entire binary images, in order to receive context-dependent information and access to values of particular interest.
+\unsure[inline]{maybe add small example}
+%### 
+\subsubsection{ZeroMQ}
+%### 
+{\small ZeroMQ}\cite{zmq} (or \zmq as it as actually called) is an extremely efficient messaging library, 
+which is very well suited for use in concurrent or distributed applications. \zmq regards messages as 
+completely transparent blobs of data which are to be transported across predefined communication channels 
+between sockets. Rather than unnecessarily defining its own transfer protocol, \zmq works on top of already exiting 
+ones like \texttt{inproc}, \texttt{IPC}, \texttt{TCP}, \texttt{TIPC} and multicast such as \texttt{pgm} or \texttt{epgm}.
+Out of the box \zmq provides its users with several communication patterns that can be either used directly or combined 
+into more complex patterns, which remain easy to manage and use. Some basic patterns are \texttt{Request/Response}, 
+\texttt{Publish/Subscribe}, or \texttt{Push/Pull} among others.
+There are implementations of \zmq in many programming languages, of which the ones for \java, {\small Python}, {\small C}, 
+and {\small C++} are actually used in \xmlmate.
+\unsure{Add something more - maybe the fact that it uses the same code over all protocols}
+\unsure{mention RabbitMQ and Nanomsg}
+%### 
+\subsubsection{MessagePack}
+%### 
+Because a messaging library only solves the problem of getting \emph{arbitrary data} between peers, it 
+alone does not suffice for creating a fully fledged communication protocol - this is where serialization/deserialization libraries 
+usually come in. \msgpack\cite{msgpack} is one such serialization format that is highly efficient as it based on 
+binary representation of data. It is implemented as a library in at least 20 programming languages. 
+Once again, \xmlmate uses the ones for \java, {\small Python}, {\small C}, and {\small C++}.
+While \msgpack is very efficient in what it does, it has some disadvantages such as 
+\begin{itemize}
+  \item Integer values are limited to be in $[-2^{63}, 2^{64}-1]$.
+  \item The maximum length of an array or string is limited to $2^{32}-1$.
+  \item It is the user's responsibility to ensure correct endianness across all endpoints.
+\end{itemize}
+
+There is another relatively young binary serialization format \emph{CBOR}\footnote{\url{http://tools.ietf.org/html/rfc7049}} 
+that does not have many of {\small MessagePack's} disadvantages, while being comparatively as efficient.
+There are implementations in {\small C}, {\small Python} and \java; however, at the time of {\small XMLMate's}
+conception I did not know of their existence. This might be a subject of some future enhancement.
+\info{Mention in Future Work}
+% C (https://github.com/upwhere/ccbor), 
+% Python (https://code.google.com/p/cbor/) 
+% and Java (https://github.com/c-rack/cbor-java)
+\unsure{Mention Protobuf, Cap'n Proto, SBE, and FlatBuffers}

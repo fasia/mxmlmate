@@ -1,0 +1,47 @@
+%### 
+\subsection{Components}
+%### 
+\label{sec:components}
+The extension of \xmlmate to binary subjects benefits from frameworks described in \cref{sec:tech} as they 
+help solve the majority of the arising subtasks rather easily. Let me first give you a superficial description
+of the new extended \xmlmate work process. 
+\begin{enumerate}
+  \item \xmlmate performs its genetic operations on a population of chromosomes which results in a set of 
+  \xml files, whose fitness (according to the currently employed fitness function) needs to be determined.
+  The paths to these files are then sent out via a \zmq \texttt{PUSH} socket either directly to the 
+  \emph{test drivers}, in case the program being tested supports reading inputs in \xml format, or alternatively 
+  to an arbitrary number of \emph{converters}, that, as the name suggests, convert the \xml files into a format 
+  suitable for the system under test. This distinction is completely transparent to \xmlmate and thus allows for 
+  adding an arbitrary amount of transformation steps between itself and the test drivers.
+  \item A converter (most of which are implemented in {\small Python}) receives a task message via a 
+  \zmq \texttt{PULL} socket, which it completes by converting the file found at the location specified in the message. 
+  It then sends out another message with the location of the converted file via its \texttt{PUSH} socket further 
+  down the processing pipeline to the \emph{broker}.
+  There can be an unlimited number of converters active at the same time, but there is only one broker.
+  \item The broker is responsible for collecting conversion results from converters and fairly distributing them 
+  to the test drivers. The broker could be very efficiently implemented in {\small Python} as the fair 
+  queueing forwarding functionality is available out of the box with \zmq.
+  \info{It would be cool to have actual load balancing brokers between \xmlmate and converters and between 
+  converters and test drivers, but it's somewhat tricky, so it remains a cool future work item}
+  \item A test driver receives a message either directly from \xmlmate in case of an \xml based file format, 
+  or otherwise from the broker, unpacks the file path, and feeds it to the system under test, which is being 
+  monitored by a \emph{pintool} that implements the ``client side" of the aforementioned currently 
+  employed fitness function. The test driver's responsibilities also include signaling the beginning and end 
+  of the \texttt{sut} processing to the pintool by calling special marker methods \texttt{PIN\_SCORE\_START} and
+  \texttt{PIN\_SCORE\_END}, which the pintool replaces with its own internal fitness data related processing methods. 
+  The driver is implemented in {\small C} and, as with the converter, there can be arbitrarily many active at the same time.
+  \item As previously mentioned, the pintool monitors the execution of the program under test and records
+  data relevant to the computation of the fitness score according to the fitness function it is part of.
+  E.g. for a fitness function that counts the number of basic blocks executed in the program, the pintool 
+  would keep a set of basic blocks that it has observed being executed. The pintool replaces the call to 
+  \texttt{PIN\_SCORE\_START} in the driver with a method that resets its fitness related data stores (in the 
+  above example it would empty the set of basic blocks). It also replaces the call to \texttt{PIN\_SCORE\_END} 
+  with a method that sends out the stored data out to \xmlmate via \zmq. The pintools are implemented in {\small C++} 
+  and there is always exactly one pintool per test driver.
+  \item The fitness function in \xmlmate receives the message from the pintool, interprets it according to 
+  its specification (e.g. again, if the fitness function is supposed to count the number of executed basic blocks, 
+  it would expect to receive a set of basic block addresses) and finally assigns the computed fitness score to 
+  the genetic representation of the \xml file sent out in step 1.
+%   \item liveness guard
+\end{enumerate}
+\improvement[inline]{Add illustration}

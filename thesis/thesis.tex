@@ -7,58 +7,56 @@
 \usepackage{array}
 \usepackage{textcomp}
 \usepackage{float}
+\usepackage{xspace}
 
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
-
 \usepackage[nameinlink]{cleveref}
+
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+
+%
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+%
+
+% Abbreviations
+\newcommand{\java}{{\small Java}\xspace}
+\newcommand{\python}{{\small Python}\xspace}
+\newcommand{\cpp}{{\small C++}\xspace}
+\newcommand{\xmlmate}{\textsc{XMLmate}\xspace}
+\newcommand{\evosuite}{\textsc{EvoSuite}\xspace}
+\newcommand{\xml}{{\small XML}\xspace}
+\newcommand{\xsd}{{\small XML Schema Definition}\xspace}
+\newcommand{\xom}{{\small XOM}\xspace}
+\newcommand{\pin}{{\small Pin}\xspace}
+\newcommand{\zmq}{{\small ØMQ}\xspace}
+\newcommand{\msgpack}{{\small MessagePack}\xspace}
+\newcommand{\xerces}{{\small Xerces2}\xspace}
 
 \begin{document}
 \input{./title.tex}
 \newpage
 \input{./oath.tex}
 \newpage
-% \section*{Acknowledgements}
-% This thesis has benefited from the support of several people, whom I would like to thank sincerely. 
-% I would especially like to thank 
-% \begin{description*}
-% 	\item[]
-% \end{description*}
-% \newpage
+\input{./acknowledgements.tex}
+\newpage
 \input{./abstract.tex}
 \newpage
 \tableofcontents
 \newpage
 \section{Introduction}
 \section{Related Work}
+% Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
+% oXygen
 \section{Approach}
-\subsection{Technology Stack}
-\subsubsection{Xom}
-\subsubsection{Xerces}
-\subsubsection{PIN}
-\subsubsection{ZeroMQ}
-\subsubsection{Msgpack}
-\subsection{Components}
-% xmlmate
-% broker
-% converter
-% driver
-% pintool
-% liveness guard
-\subsection{Challenges}
-\subsubsection{Communication Protocol}
-% make pretty communication graph
-% optimizations in caching results (e.g. Trove)
-% staring synchronization
-\subsubsection{Format Converters}
-\subsubsection{Parallelization}
-% profiling tools
-% search for bottleneck
-% unexpected places: 
-% 	datatype optimizations
-% 	random generator
-% copy-on-maybe-write cloning optimization
-\subsubsection{Local Search}
+\input{./technology.tex}
+\input{./components.tex}
+\input{./challenges.tex}
 \subsection{Fitness Functions}
 % here all fitness functions are introduced and described
 \subsubsection{Basic Block Coverage}
@@ -81,11 +79,12 @@
 % more fitness functions
 % more subjects
 % more formats
-
 \newpage
 \section*{References}
 \renewcommand\refname{}
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{plain}
 \bibliography{sources}
+\newpage
+\listoftodos[Notes]
 \end{document}
