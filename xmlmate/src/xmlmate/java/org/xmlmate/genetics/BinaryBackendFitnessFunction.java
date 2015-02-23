@@ -77,7 +77,7 @@ public abstract class BinaryBackendFitnessFunction extends FitnessFunction<XMLTe
     }
 
     protected final Map<Integer, File> sendChangedChromosomes(List<XMLTestChromosome> chromosomes) {
-	Map<Integer, File> awaited = new HashMap<Integer, File>();
+	Map<Integer, File> awaited = new HashMap<>();
 
 	for (int i = 0; i < chromosomes.size(); i++) {
 	    XMLTestChromosome x = chromosomes.get(i);

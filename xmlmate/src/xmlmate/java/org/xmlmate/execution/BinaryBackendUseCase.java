@@ -26,10 +26,11 @@ public class BinaryBackendUseCase extends EvolveBranchCoverageUseCase {
 
     @Override
     protected void setupGAAdditions(SteadyStateGA<XMLTestSuiteChromosome> ga) {
-	// selection function
+	// selection functions
 	SelectionFunction<XMLTestSuiteChromosome> selectionFunction = new TournamentSelection<>();
 	selectionFunction.setMaximize(fitnessFunction.isMaximizationFunction());
 	ga.setSelectionFunction(selectionFunction);
+    XMLTestSuiteChromosome.selectionFunction.setMaximize(fitnessFunction.isMaximizationFunction());
 	// replacement function
 	ga.setReplacementFunction(new FitnessReplacementFunction(fitnessFunction.isMaximizationFunction()));
 	// monitoring

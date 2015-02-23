@@ -21,10 +21,7 @@ import java.util.concurrent.Future;
 import org.apache.xerces.xs.XSAttributeDeclaration;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.evosuite.Properties;
-import org.evosuite.ga.Chromosome;
-import org.evosuite.ga.ChromosomeFactory;
-import org.evosuite.ga.FitnessFunction;
-import org.evosuite.ga.SecondaryObjective;
+import org.evosuite.ga.*;
 import org.evosuite.localsearch.LocalSearchObjective;
 import org.evosuite.testcase.ExecutionResult;
 import org.evosuite.testsuite.AbstractTestSuiteChromosome;
@@ -44,23 +41,24 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 	private static final long serialVersionUID = -6950670819692732483L;
     private static final Logger logger = LoggerFactory.getLogger(XMLTestSuiteChromosome.class);
     private static final List<SecondaryObjective> secondaryObjectives = new ArrayList<>(2);
+    public static final SelectionFunction<XMLTestChromosome> selectionFunction = new TournamentSelection<>();
     private double regexCoverage = 0.0d;
     private double elemCoverage = 0.0d;
     private double attrCoverage = 0.0d;
     public static Stopwatch mutationClock = Stopwatch.createUnstarted();
-        
+
     private static final XMLCrossOverFunction crossoverFunction = new XMLCrossOverFunction();
 	private static ExecutorService mutatorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Mutator %d").build());
 	private static ExecutorService xoverService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Xover %d").build());
-	
+
     private static class Mutation implements Callable<List<XMLTestChromosome>> {
-    	
+
     	private final XMLTestChromosome original;
-    	
+
 		public Mutation(XMLTestChromosome original) {
 			this.original = original;
 		}
-    	
+
 		@Override
 		public List<XMLTestChromosome> call() throws Exception {
 			XMLTestChromosome clone = new XMLTestChromosome(original);
@@ -69,12 +67,12 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 				return Collections.singletonList(clone);
 			return Collections.singletonList(original);
 		}
-    	
+
     }
-    
+
     private static class Crossover implements Callable<List<XMLTestChromosome>> {
 		private final static ExecutorService cloneService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Cloner %d") .build());
-    	
+
     	private final XMLTestChromosome parent1;
     	private final XMLTestChromosome parent2;
 
@@ -91,30 +89,30 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 			XMLTestChromosome offspring2 = futureOffspring2.get();
 			crossoverFunction.crossOverXMLs(offspring1, offspring2, new HashSet<XSElementDeclaration>());
 			return ImmutableList.of(
-					offspring1.size() <= XMLProperties.MAX_XML_SIZE ? offspring1: parent1, 
+					offspring1.size() <= XMLProperties.MAX_XML_SIZE ? offspring1: parent1,
 					offspring2.size() <= XMLProperties.MAX_XML_SIZE ? offspring2: parent2);
 		}
-    	
+
     }
-    
+
     private static class Clone implements Callable<XMLTestChromosome> {
     	private final XMLTestChromosome original;
     	public Clone(XMLTestChromosome original) {
     		this.original = original;
 		}
-    	
+
 		@Override
 		public XMLTestChromosome call() throws Exception {
 			return new XMLTestChromosome(original);
 		}
-    	
+
     }
-    
+
     // private constructor used for parallel cloning
     private XMLTestSuiteChromosome() {
-		
+
 	}
-    
+
     public XMLTestSuiteChromosome(ChromosomeFactory<XMLTestChromosome> testChromosomeFactory) {
         super(testChromosomeFactory);
         populate();
@@ -125,7 +123,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     	logger.trace("Local search on suite");
         double oldFitness = getFitness();
         boolean changed = false;
-        
+
         // store clones of tests in case of an unfavorable mutation outcome
         ArrayList<XMLTestChromosome> savedClones = new ArrayList<>(tests.size());
         List<Future<XMLTestChromosome>> taskResults = new ArrayList<Future<XMLTestChromosome>>(tests.size());
@@ -138,7 +136,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
-        
+
         for (XMLTestChromosome x : tests) {
             changed |= x.localSearch(objective);
         }
@@ -320,7 +318,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     @Override
     public void mutate() {
     	mutationClock.start();
-        // delete testcases?
+        // delete test cases?
         for (Iterator<XMLTestChromosome> iterator = tests.iterator(); iterator.hasNext();) {
             iterator.next();
             if (Randomness.nextDouble() < 0.01) {
@@ -329,28 +327,33 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
                 setChanged(true);
             }
         }
-        
+
         int oldSize = tests.size();
-        
-		Randomness.shuffle(tests);
-		
-		List<Future<List<XMLTestChromosome>>> taskResults = new LinkedList<>();
+
+        List<Future<List<XMLTestChromosome>>> taskResults = new LinkedList<>();
+        Set<Integer> chosen = new HashSet<>();
+        for (int i = 0; i < oldSize; ) {
+            i += 1;
+            if (Randomness.nextDouble() < 0.2d) { // 20% crossover
+                int index1 = selectionFunction.getIndex(tests);
+                int index2 = selectionFunction.getIndex(tests);
+                chosen.add(index1);
+                chosen.add(index2);
+                taskResults.add(xoverService.submit(new Crossover(tests.get(index1), tests.get(index2))));
+                i += 1;
+            }
+            if (Randomness.nextDouble() < 0.3d) { // 30% mutation
+                int index = selectionFunction.getIndex(tests);
+                chosen.add(index);
+                taskResults.add(mutatorService.submit(new Mutation(tests.get(index))));
+            }
+        }
+
 		List<XMLTestChromosome> newTests = new ArrayList<>(oldSize);
-		for (int i = 0; i < oldSize;) {
-			XMLTestChromosome p1 = tests.get(i);
-			if (Randomness.nextDouble() <= 0.20d && i + 1 < oldSize) { // 20% crossover
-				XMLTestChromosome p2 = tests.get(i + 1);
-				taskResults.add(xoverService.submit(new Crossover(p1, p2)));
-				i += 2;
-			} else if (Randomness.nextDouble() <= 0.30d) { // 24% mutation
-				taskResults.add(mutatorService.submit(new Mutation(p1)));
-				i += 1;
-			} else {
-				newTests.add(p1);
-				i += 1;
-			}
-		}
-		
+        for (int i1 = 0; i1 < tests.size(); i1++)
+            if (!chosen.contains(i1))
+                newTests.add(tests.get(i1));
+
 		try {
 			for (Future<List<XMLTestChromosome>> futureTest : taskResults)
 				for (XMLTestChromosome x : futureTest.get())
@@ -361,17 +364,17 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 		}
 		tests = newTests;
 		setChanged(true);
-		
+
         // Add new test cases
         for (int count = 1; Randomness.nextDouble() <= StrictMath.pow(Properties.P_TEST_INSERTION, count) && size() < Properties.MAX_SIZE; count++) {
         	logger.trace("Adding new xml file");
             tests.add(testChromosomeFactory.getChromosome());
             setChanged(true);
         }
-        
+
         mutationClock.stop();
     }
-    
+
 
 	public int getLargestFitnessFile() {
 		double largest = 0d;
@@ -381,11 +384,11 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 			if (x.getFitness() > largest) {
 				largest = x.getFitness();
 				file = i;
-			}			
+			}
 		}
 		return file;
 	}
-	
+
 	public int getSmallestFitnessFile() {
 		double smallest = Double.MAX_VALUE;
 		int file = -1;
@@ -394,7 +397,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 			if (x.getFitness() < smallest) {
 				smallest = x.getFitness();
 				file = i;
-			}			
+			}
 		}
 		return file;
 	}
