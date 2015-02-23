@@ -13,13 +13,13 @@ of the new extended \xmlmate work process.
   to an arbitrary number of \emph{converters}, that, as the name suggests, convert the \xml files into a format 
   suitable for the system under test. This distinction is completely transparent to \xmlmate and thus allows for 
   adding an arbitrary amount of transformation steps between itself and the test drivers.
-  \item A converter (most of which are implemented in {\small Python}) receives a task message via a 
+  \item A converter (most of which are implemented in \python) receives a task message via a 
   \zmq \texttt{PULL} socket, which it completes by converting the file found at the location specified in the message. 
   It then sends out another message with the location of the converted file via its \texttt{PUSH} socket further 
   down the processing pipeline to the \emph{broker}.
   There can be an unlimited number of converters active at the same time, but there is only one broker.
   \item The broker is responsible for collecting conversion results from converters and fairly distributing them 
-  to the test drivers. The broker could be very efficiently implemented in {\small Python} as the fair 
+  to the test drivers. The broker could be very efficiently implemented in \python as the fair 
   queueing forwarding functionality is available out of the box with \zmq.
   \info{It would be cool to have actual load balancing brokers between \xmlmate and converters and between 
   converters and test drivers, but it's somewhat tricky, so it remains a cool future work item}
@@ -36,7 +36,7 @@ of the new extended \xmlmate work process.
   would keep a set of basic blocks that it has observed being executed. The pintool replaces the call to 
   \texttt{PIN\_SCORE\_START} in the driver with a method that resets its fitness related data stores (in the 
   above example it would empty the set of basic blocks). It also replaces the call to \texttt{PIN\_SCORE\_END} 
-  with a method that sends out the stored data out to \xmlmate via \zmq. The pintools are implemented in {\small C++} 
+  with a method that sends out the stored data out to \xmlmate via \zmq. The pintools are implemented in \cpp 
   and there is always exactly one pintool per test driver.
   \item The fitness function in \xmlmate receives the message from the pintool, interprets it according to 
   its specification (e.g. again, if the fitness function is supposed to count the number of executed basic blocks, 

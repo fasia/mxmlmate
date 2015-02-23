@@ -68,22 +68,120 @@ a response is awaited for each of those sent out tasks. Responses are collected 
 in via a \texttt{PULL} socket on another well known port (default 5557) and deserialized with \msgpack 
 into the identifying number and whatever data format is expected by the current fitness function. 
 (E.g. a fitness function that counts the number of executed basic blocks expects an array of addresses.)
-As far as the \java part of \xmlmate is concerned this is all it ever sees of the entire process.
-% optimizations in caching results (e.g. Trove)
-% staring synchronization
+As far as the \java part of \xmlmate is concerned this is all it ever sees of the entire process, and so it 
+must rely on the pintool monitoring the application under test to collect and send back fitness results.
+
+
+A format converter receives a \zmq message via \texttt{PULL} on port 5556, unpacks it with \msgpack, 
+stores the identifying number, converts the file, packs the stored number followed by the path to 
+the converted file with \msgpack into another \zmq message and sends it out via \texttt{PUSH} on port 5560.
+
+
+The broker is very simple: it pulls in messages on port 5560 and pushes them out again unaltered on port 5570.
+
+
+A test driver listens on port 5570 (or 5556 if there are no converters) for incoming \zmq messages and unpacks
+them with \msgpack into the identifying number and a path. It then calls \texttt{PIN\_SCORE\_START()} to 
+signal the start of the execution of the system under test to the monitoring pintool, whereafter it passes the 
+received file path to the sut for execution. When the sut finishes and control returns to the test driver, 
+it calls \texttt{PIN\_SCORE\_END(number)} with the number stored from the message earlier.
+
+
+When a test driver calls \texttt{PIN\_SCORE\_START()}, the call gets replaced with a call to a method in the 
+pintool that clears its internal information buffers, thereby resetting all currently gathered fitness related 
+information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets replaced with 
+one that packs and sends out a message containing the identifying number and any fitness information via \zmq 
+\texttt{PUSH} on port 5557.
+
+Please note that all ports mentioned above are customizable and even the message carrier can be changed from tcp 
+to any other protocol supported by \zmq, of which there are plenty.
+\improvement{Mention \zmq binding and connecting and static and dynamic system components}
+\unsure{mention starting synchronization}
+
 \change[inline]{make pretty communication graph}
 %###
 \subsubsection{Format Converters}
 %###
+One of the main tasks of this work is to show that \xmlmate is versatile enough to not be limited to 
+only \xml and \xml-derived formats. In order to facilitate this versatility the concept of a format 
+converter has been introduced. The main goal of a converter for a specific format is to convert an 
+\xml file corresponding to a schema specification into another format as specified by the purpose 
+of this converter. For an example consider a converter from \xml to the packet capture format \pcap. 
+This converter expects \xml files in the format corresponding to the \pcap{} \xsd and produces a 
+valid \pcap file. \info{make a section reference}
+
+
+\xmlmate also has support for starting out its evolution process from a given set of inputs. If the   
+inputs are not available in the \xml format, they must first be converted so as to be genetically 
+representable. For this use case there are reverse converters, which convert files into their 
+\xml equivalent, again, according to the corresponding \xsd. For the above example a reverse converter 
+could transform any valid \pcap file into its \xml representation governed by the \pcap{} \xsd.
 %###
 \subsubsection{Parallelization}
 %###
-% profiling tools
-% search for bottleneck
-% unexpected places: 
-% 	datatype optimizations
-% 	random generator
-% copy-on-maybe-write cloning optimization
+After running the first tests on the initial \xmlmate design, which did not include any parallelization, 
+it quickly became clear that both format conversion and running the program under test with \pin 
+are two performance bottlenecks significantly slowing down the entire process. Considering that the 
+tests were run on a multicore machine, and only one CPU was ever doing any work, the decision was 
+made to make both the conversion and evaluation steps parallel by allowing arbitrarily many 
+converter and test driver instances (along with their corresponding pintools) to participate in the process. 
+This was somewhat easily accomplished due to the very well thought out design of the messaging library \zmq, 
+as there were only minor issues to consider - like adding the static broker component to 
+manage the dynamic number of converters and test drivers.
+
+However, after adding the aforementioned parallelization, a new bottleneck presented itself - this time 
+somewhere inside the \java part of \xmlmate. Using a \java profiling tool I was able to trace the cause 
+to the mutation and crossover routines, which seems logical in retrospect because both manipulate the 
+in-memory representations of \xml tree structures. That alone, however, is not sufficient to cause a 
+major bottleneck. \evosuite's genetic algorithm always makes backups of entire test suites as well as 
+single tests before applying any genetic operation to them in order to be able to recover from an 
+unfavorable outcome (e.g. decreased fitness) and roll back all changes. So each time an in-memory \xml 
+tree was going to be mutated, it was deeply copied, each time two \xml trees were going to be crossed 
+over, they were both deeply copied, each time an entire test suite was going to be mutated, it was 
+deeply copied - each of its tests one after another, and each time two test suites were about to 
+undergo crossover, both of them were deeply copied. That was what caused this particular bottleneck. 
+To remedy this situation I applied the following two improvements:
+
+The first one was adding three distinct task executors dividing the responsibilities of deeply copying, mutating and 
+crossing over \xml trees. This way all three classes of tasks were enabled to run simultaneously 
+no longer needing to queue up linearly one strictly after another. The mutation task executor is 
+responsible for taking a single individual \xml tree, copying it and mutating the copy; the 
+crossover task executor takes two \xml trees, delegates their copying to the copying task executor 
+for a speed up, and then performs the actual crossover on the returned copies.
+
+The second improvement was making the process of copying the test suites shallow instead of deep. 
+This is a safe change since the individual tests are still copied before any changes are applied 
+to them - the result is a kind of \emph{copy-on-maybe-write} policy as only those tests are copied 
+that are going to experience potential change. \info{reference this in local search}
+
+After that there were still other bottlenecks - some more surprising than others. For example 
+it was rather sudden to see calls to the \texttt{Random} class being listed among the most time consuming 
+by the profiler. In \java 7 the \texttt{Random} class is thread-safe, which has lead to a lot of 
+contention when multiple threads suddenly started asking the singleton instance of \evosuite's randomness 
+provider for random values for mutation and crossover. The fix was rather easy: \java 7 also provides 
+a \texttt{ThreadLocalRandom} class intended for exactly this kind of situation; this easy fix came 
+at a price, however - it is no longer possible to provide a single seed value to the whole generation 
+process.
+
+Another minor performance optimization included adding a polymorphic method for selecting a random 
+element from a given \texttt{Set}. The previously available methods treated a \texttt{Set} like a 
+\java \texttt{Collection} and performed the selection by first copying the entire set into a 
+\texttt{RandomAccess}-able \texttt{List}. This is clearly wasteful of resources in case the set in question is large.
+In this case it actually faster to generate a random number between zero and the number of elements in 
+the set and then actuate the set's iterator that number of times finally claiming the element acquired 
+last as the required random choice.
+
+One further possible major optimization could be to allow partial fitness score evaluation while a suite 
+mutation is still in progress. When an \xml file has left the mutation or crossover executor it could be 
+immediately sent out to worker processes for fitness evaluation. Preliminary tests showed promising 
+results; however, this optimization is very intrusive of \evosuite's concept of a single threaded 
+genetic algorithm possibly leading to grave incompatibilities with other mechanisms deep within other parts 
+of \evosuite, therefore it was deemed as a neat future work item, which should probably be combined with a 
+proper restructuring of the genetic framework.
 %###
 \subsubsection{Local Search}
 %###
+As previously mentioned, one of the core principles of \xmlmate was to always create schema-valid inputs; 
+however, this no longer complies with current requirements in the use case of security testing. 
+Fortunately, it is possible to use another artifact of \evosuite's to provide specification deviations: 
+the local search. 

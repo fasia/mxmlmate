@@ -34,6 +34,7 @@
 \newcommand{\xsd}{{\small XML Schema Definition}\xspace}
 \newcommand{\xom}{{\small XOM}\xspace}
 \newcommand{\pin}{{\small Pin}\xspace}
+\newcommand{\pcap}{{\small pcap}\xspace}
 \newcommand{\zmq}{{\small ØMQ}\xspace}
 \newcommand{\msgpack}{{\small MessagePack}\xspace}
 \newcommand{\xerces}{{\small Xerces2}\xspace}
@@ -54,9 +55,18 @@
 % Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
 % oXygen
 \section{Approach}
+% goals:
+%  add formats
+%  pluggable fitness functions
+%  support for binary backends
 \input{./technology.tex}
 \input{./components.tex}
 \input{./challenges.tex}
+\subsection{Formats}
+\subsubsection{XML}
+\subsubsection{PNG}
+\subsubsection{Pcap}
+\subsubsection{Flac}
 \subsection{Fitness Functions}
 % here all fitness functions are introduced and described
 \subsubsection{Basic Block Coverage}
@@ -66,11 +76,12 @@
 \subsubsection{Division by Zero}
 \subsubsection{Integer Overflow}
 \subsubsection{Buffer Overflow}
-\subsection{Formats}
-\subsubsection{PNG}
-\subsubsection{Pcap}
-\subsubsection{Flac}
 \section{Evaluation}
+\subsection{Subjects}
+\subsubsection{libxml2}
+\subsubsection{libpng}
+\subsubsection{libpcap}
+\subsubsection{libflac}
 \subsection{Results}
 \subsection{Threats to Validity}
 \section{Conclusion}
@@ -79,6 +90,7 @@
 % more fitness functions
 % more subjects
 % more formats
+% both java and binary coverages combined
 \newpage
 \section*{References}
 \renewcommand\refname{}
