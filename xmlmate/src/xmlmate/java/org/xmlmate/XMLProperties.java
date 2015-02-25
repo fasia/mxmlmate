@@ -42,13 +42,7 @@ import org.xmlmate.execution.GenerateSingleFileUseCase;
 import org.xmlmate.execution.MeasureSchemaCoverageUseCase;
 import org.xmlmate.execution.SingletonPopulationBackendUseCase;
 import org.xmlmate.execution.UseCase;
-import org.xmlmate.genetics.BasicBlockCoverageFitnessFunction;
-import org.xmlmate.genetics.MemoryAccessFitnessFunction;
-import org.xmlmate.genetics.SingletonPopulationMemoryAccessFitnessFunction;
-import org.xmlmate.genetics.XMLExistingChromosomeFactory;
-import org.xmlmate.genetics.XMLTestChromosome;
-import org.xmlmate.genetics.XMLTestChromosomeFactory;
-import org.xmlmate.genetics.XMLTestSuiteChromosomeFactory;
+import org.xmlmate.genetics.*;
 import org.xmlmate.util.InstrumentationManager;
 import org.xmlmate.xml.AwareElement;
 import org.xmlmate.xml.AwareInstantiator;
@@ -123,6 +117,7 @@ public class XMLProperties {
         options.addOption("hybridCoverage", false, "Use the hybrid coverage as fitness function maximizing both branch and schema coverages.");
         options.addOption("bblCoverage", false, "Use with PIN to maximize basic block coverage.");
         options.addOption("memCoverage", false, "Use with PIN to maximize memory accesses.");
+        options.addOption("div0Fitness", false, "Use with PIN to aim for div by zero.");
         options.addOption("r", "root", true, "Root element of the xml tree.");
         options.addOption("a", "samples", true, "Path to samples (file or folder). If given, root must also be given.");
         options.addOption("t", "timeout", true, "Termination time in sec. Default is " + GLOBAL_TIMEOUT);
@@ -182,6 +177,18 @@ public class XMLProperties {
 	    }
 	    return true;
 	}
+    if (line.hasOption("div0Fitness")) {
+        if (line.hasOption("class")) {
+            logger.error("You may not use the -class options with the -div0Fitness option!");
+            return false;
+        }
+        if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population"))!=1) {
+            logger.error("div0Fitness can only be used with a population of 1!");
+            return false;
+        }
+        return true;
+    }
+
 	boolean hasRoot = line.hasOption("root");
 	if (line.hasOption("class") && line.hasOption("prefix"))
 	    return !line.hasOption("samples") || hasRoot;
@@ -340,11 +347,16 @@ public class XMLProperties {
 	if (line.hasOption("memCoverage")) {
 	    RUN_NAME = "memCoverage " + RUN_NAME;
 	    if (Properties.POPULATION == 1)
-		return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
+    		return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
 	    return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
 	}
-        RUN_NAME = "branchCoverage " + RUN_NAME;
-        return new EvolveBranchCoverageUseCase(factory);
+    if (line.hasOption("div0Fitness")) {
+        RUN_NAME = "div0Fitness " + RUN_NAME;
+        assert Properties.POPULATION == 1;
+        return new SingletonPopulationBackendUseCase(factory, new DivByZeroFitnessFunction());
+    }
+    RUN_NAME = "branchCoverage " + RUN_NAME;
+    return new EvolveBranchCoverageUseCase(factory);
     }
 
     private static void parseModel() {
