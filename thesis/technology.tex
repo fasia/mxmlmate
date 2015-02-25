@@ -30,7 +30,7 @@ Unfortunately, it only exposes its functionality via \java interfaces, which mak
 \subsubsection{PIN}
 %### 
 {\small Intel} \pin\cite{pin} is a dynamic binary instrumentation framework for the IA-32 and x86-64 instruction-set architectures 
-that enables the creation of dynamic program analysis tools, which performs the instrumentation at run time on  
+that enables the creation of program analysis tools, which perform the instrumentation at run time on  
 compiled binary files. Thus, it requires no recompiling of source code and can support instrumenting programs that dynamically generate code.
 \pin allows a tool to insert arbitrary code (written in {\small C} or \cpp) in arbitrary places in the executable, for which it 
 provides an API that abstracts away the underlying instruction-set idiosyncrasies and allows context information 
@@ -40,7 +40,7 @@ the registers that are overwritten by the injected code so the application conti
 Generally, the instrumentation with \pin consists of two components: a mechanism that decides where and what code to insert, 
 and the code to be executed at insertion points. These two components, called \emph{instrumentation} and \emph{analysis} 
 code are hosted in a single executable called a \emph{Pintool}, which functions like a plugin to the \pin framework.
-A pintool can register callbacks on different levels of granularity, varying from single instructions to procedures
+A pintool can register callbacks on different levels of granularity, varying from single instructions over procedures
 to entire binary images, in order to receive context-dependent information and access to values of particular interest.
 \unsure[inline]{maybe add small example}
 %### 
