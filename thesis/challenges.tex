@@ -122,7 +122,7 @@ could transform any valid \pcap file into its \xml representation governed by th
 After running the first tests on the initial \xmlmate design, which did not include any parallelization, 
 it quickly became clear that both format conversion and running the program under test with \pin 
 are two performance bottlenecks significantly slowing down the entire process. Considering that the 
-tests were run on a multicore machine, and only one CPU was ever doing any work, the decision was 
+tests were run on a multi-core machine, and only one CPU was ever doing any work, the decision was 
 made to make both the conversion and evaluation steps parallel by allowing arbitrarily many 
 converter and test driver instances (along with their corresponding pintools) to participate in the process. 
 This was somewhat easily accomplished due to the very well thought out design of the messaging library \zmq, 
@@ -152,7 +152,7 @@ for a speed up, and then performs the actual crossover on the returned copies.
 The second improvement was making the process of copying the test suites shallow instead of deep. 
 This is a safe change since the individual tests are still copied before any changes are applied 
 to them - the result is a kind of \emph{copy-on-maybe-write} policy as only those tests are copied 
-that are going to experience potential change. \info{reference this in local search}
+that are going to experience potential change.
 
 After that there were still other bottlenecks - some more surprising than others. For example 
 it was rather sudden to see calls to the \texttt{Random} class being listed among the most time consuming 
@@ -177,7 +177,7 @@ immediately sent out to worker processes for fitness evaluation. Preliminary tes
 results; however, this optimization is very intrusive of \evosuite's concept of a single threaded 
 genetic algorithm possibly leading to grave incompatibilities with other mechanisms deep within other parts 
 of \evosuite, therefore it was deemed as a neat future work item, which should probably be combined with a 
-proper restructuring of the genetic framework.
+proper restructuring of the genetic framework. \unsure{maybe mention parallel processing of test suites}
 %###
 \subsubsection{Local Search}
 %###
@@ -186,13 +186,20 @@ however, this no longer complies with current requirements in the use case of se
 inputs that most often cause the targeted program to fail usually deviate from the specification in 
 one way or another. The case where the syntactic validity of the \xml representation is violated is 
 both unfavorable to format conversion and out of scope of this work.
-Fortunately, it is possible to use another artifact of \evosuite's to provide deviations from the 
+
+Fortunately, it is possible to use another artifact of \evosuite's design to provide deviations from the 
 specification in values (as opposed to structure): the local search. 
 The local search is a mechanism which allows to perform small mutations in limited contexts in between 
 the regular genetic operations to find individuals that are ``closely related'' to existing ones
-yet have better fitness. One implementation of this is interval bounded numeric offset mutation - 
-Several numeric values in the individual are changed by an offset chosen at random from a predefined 
+yet have better fitness. One implementation of this is interval bounded numeric offset mutation whereby
+several numeric values in the individual are changed by an offset chosen at random from a predefined 
 interval. E.g. integer values are changed by random values from $[-10,10]$ and floating point numbers 
 are offset by values from $[-0.5,0.5]$.
 Performing such changes sometimes leads to the values leaving their value spaces specified in the schema, 
 which allows to accommodate for the new use case of security testing.
+
+Quite ironically, \evosuite's genetic algorithm framework for some reason does not create a backup 
+copy of individuals before initiating local search, which manifested itself in abruptly diminishing 
+fitness values; this was, of course, fixed by issuing a backup copy inside the local search procedure, 
+additionally taking full advantage of the newly implemented parallelized deep copying mechanism.
+\unsure{mention incompatibility with sec:fit:schema, and make it another small and nifty future work item}

@@ -1,0 +1,151 @@
+%### 
+\subsection{Fitness Functions}
+%### 
+One requirement of this work was to provide \xmlmate with the concept of pluggable fitness functions and 
+give several examples that demonstrate the versatility of the approach. Luckily, \evosuite already provides 
+a \texttt{FitnessFunction<T extends Chromosome>} generic interface, which can be made use of on multiple 
+levels of abstraction. To provide the pluggability on the level of  entire test suites there are implementers of
+\texttt{FitnessFunction<XMLTestSuiteChromosome>} and on the level of single test inputs ones of 
+\texttt{FitnessFunction<XMLTestChromosome>}. 
+Secondary evolution objectives have a very similar type topography; secondary objectives are sometimes useful 
+as ``tie breakers'' when a decision between two chromosomes has to be made when both have equal fitness values,
+but posses subtle differences that e.g. might lead to slightly more or less favorable crossover behavior in 
+the future. The next sections describe some of the new fitness function implementations available with the 
+extended and improved \xmlmate.
+%### 
+\subsubsection{Schema Coverage}
+%###
+\label{sec:fit:schema}
+The very first extension from pure \java branch coverage and exception oriented fitness functions employed 
+previously in \xmlmate is the \texttt{Schema Coverage} fitness function. Its goal is to maximize the number 
+of schema rules used in the generated inputs. The reasoning behind this is that inputs which exhibit most of 
+the features described in the specification should also trigger more functionality in the program under test. 
+More concretely the schema coverage fitness value is computed as a weighted average of the three values:
+\begin{description}
+  \item[element coverage] describes how many element declarations were instantiated in the generated inputs, 
+  including substitution group members. A substitution group consists of jointly declared elements, which 
+  can take each other's place in the \xml. Additionally, the element coverage can reflect how many branches 
+  of choice particles as well as how many of the optional elements are present in the produced files.
+  \item[attribute coverage] is, similarly, a measure of how many attribute declarations were utilized, so its 
+  value depends on both the optionality of the declarations and the number of generated elements (or more 
+  precisely the number of elements carrying the corresponding attribute declarations).
+  \item[transition coverage] probably sounds a little out of place, so let me first explain how the concrete 
+  values for elements and attributes are generated. One of the most implementation-wise challenging features 
+  of the \xsd{} {\small Language} is the \texttt{pattern} facet that describes valid values of an element or 
+  attribute by means of a regular expression (that has a different grammar than that of \java, \python or 
+  {\small Perl} regular expression languages, which, as an aside, presented another whole technical challenge). 
+  In order to be able to provide values conforming to those regular expressions an automaton based representation 
+  has been put in place for the types of the elements and attributes. In fact, it worked so well, that there 
+  was longer any need in representing any type in a way other than by means of a deterministic finite
+  automaton. This means that all types, including \texttt{string}, \texttt{int}, \texttt{short}, \texttt{hexBinary},
+  have a corresponding automaton, which is cached in memory for performance reasons. Furthermore, with this representation 
+  it is very easy to apply additional facets like restrictions on length or number of fractional digits just by 
+  performing automaton based operations like union and intersection. 
+  Coming back to the topic of schema coverage, the transitions in these automata are the subject of its 
+  transition coverage component which describes how many of the transitions of all the automata are being 
+  used in the generated \xml files. This measure is indicative of the overall proportion of covered value space 
+  over all type definitions regarded together.
+\end{description}
+    
+Contrary to the initial expectations, \improvement{mention in the Evaluation section} the results do not 
+necessarily show a strong correlation between high schema coverage and some kinds of code coverage like 
+branch or basic block coverage. This can be explained by the fact that it is not the abundance of different 
+input values, but rather some specific values themselves, that are responsible for penetrating deeper into a 
+program's logic and thus increasing the code coverage.
+
+However, the schema coverage is a good evolution guide for the purpose of creating a diverse starting population
+which can then be further evolved with different purposes - be it code coverage of particular program regions, or
+other kinds of fitness criteria like closeness to integer overflows and the like.
+
+Furthermore, there is no need in powering up any of the infrastructure involved with usual ways of measuring 
+fitness - no system under test, no brokers or converters are needed to compute the schema coverage fitness. 
+There is also no need for \texttt{IO} operations, as all \xml tree evaluations are processed in-memory.
+
+%### 
+\subsubsection{Basic Block Coverage}
+%###
+A more or less direct transfer of \evosuite's \texttt{Instruction Count} fitness function is the 
+\texttt{Basic Block Coverage} fitness function, which aims to maximize the number of basic blocks 
+executed in the program under test. This fitness function makes heavy use of the {\small Intel} \pin
+instrumentation framework - in particular its definition of a basic block: a single entrance, 
+single exit sequence of instructions in the program under test. However, because \pin is discovering the 
+program dynamically as it is executed, its view of basic blocks can be somewhat unconventional. As an 
+example consider the code on the left in \cref{lst:bblcode}, which, when compiled for the IA-32 
+architecture, will yield instructions approximate to the ones on the right. Classically speaking, 
+each \mintinline{nasm}{addl} instruction is its own basic block; however, over the course of program 
+execution, when the different switch cases are entered, \pin will generate basic blocks, which
+contain four instructions as the \texttt{.L7} case is entered, three basic blocks as the \texttt{.L6}
+case is entered, and so forth. Furthermore, \pin breaks basic blocks on some other instructions like 
+\texttt{cpuid}, \texttt{popf}, and \texttt{REP} prefixed instructions. This leads to a slight divergence 
+from the expected values, but for the purposes of representing code coverage this has no negative 
+consequences. As a matter of fact, this phenomenon is actually somewhat reminiscent of the LCSAJ
+\footnote{\url{https://en.wikipedia.org/wiki/Linear_code_sequence_and_jump}} metric, which only 
+increases its value as a fitness score component.
+\begin{listing}[h]
+\centering
+\begin{minipage}[b]{0.49\textwidth}
+	\centering
+	\begin{ccode*}{linenos=false,frame=bottomline}
+	switch(i) {
+        case 4: total++;
+        case 3: total++;
+        case 2: total++;
+        case 1: total++;
+        case 0:
+        default: break;
+    	}
+\end{ccode*}
+	Example C Code
+ \end{minipage}
+%
+ \begin{minipage}[b]{0.49\textwidth}
+  \centering
+  \begin{minted}[frame=bottomline]{nasm}
+.L7:
+        addl    $1, -4(%ebp)
+.L6:
+        addl    $1, -4(%ebp)
+.L5:
+        addl    $1, -4(%ebp)
+.L4:
+        addl    $1, -4(%ebp)
+\end{minted}
+  IA-32 Instructions
+ \end{minipage}
+ \caption{Example for Basic Block Idiosyncrasies in \pin}
+ \label{lst:bblcode}
+\end{listing}
+
+The \texttt{Basic Block Coverage} fitness function is the first, but not the only to use the new binary 
+backend feature set. Therefore it profits from an abstract fitness function prototype designed specifically 
+to work with binary test subjects, which abstracts away and manages the responsibilities of communicating 
+with the backend system, be it potential format converters, or the targeted program controlled by test 
+drivers and monitored by pintools.
+Like all subclasses of this \texttt{BinaryBackendFitnessFunction} the \texttt{Basic Block Coverage} 
+fitness function consists of two components: a \java class and a pintool written in \cpp.
+
+The pintool's task is to instrument the targeted binary in such a way, that whenever it executes a 
+basic block, which belongs to the image of interest (e.g. \texttt{libpng} - a parameter given at the start),
+its address is recorded in a set data structure. When the test driver, which is responsible for running 
+the program under test, signals the completion of the processing of the currently evaluated inputs, 
+the pintool sends the set as a packet to the \java class in \xmlmate.
+
+It is the purpose of the \java class to interpret the data received from the pintool.
+%### 
+\subsubsection{Memory Access}
+%###
+% profits from abstract binary backend architecture 
+% secondary objective
+% singleton population optimization
+%### 
+\subsubsection{Division by Zero}
+%###
+% different secondary objective
+ 
+%### 
+\subsubsection{Integer Overflow}
+%### 
+
+%### 
+\subsubsection{Buffer Overflow}
+%###

@@ -10,11 +10,18 @@
 \usepackage{xspace}
 
 \usepackage[hidelinks]{hyperref}
-\usepackage{caption}
+\usepackage[compatibility=false]{caption}
+
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+\usepackage{minted}
+\usemintedstyle{autumn}
+% \usemintedstyle{bw} % use for black and white
+\newminted{java}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
+\newminted{c}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
+
 \usepackage[nameinlink]{cleveref}
 
 \usepackage{xargs}                      % Use more than one optional parameter in a new commands
-\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
 
 %
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
@@ -51,46 +58,28 @@
 \tableofcontents
 \newpage
 \section{Introduction}
+% 
 \section{Related Work}
 % Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
 % oXygen
 \section{Approach}
 % goals:
 %  add formats
-%  pluggable fitness functions
 %  support for binary backends
+%  pluggable fitness functions
+%  case study: security testing libpng
 \input{./technology.tex}
 \input{./components.tex}
 \input{./challenges.tex}
-\subsection{Formats}
-\subsubsection{XML}
-\subsubsection{PNG}
-\subsubsection{Pcap}
-\subsubsection{Flac}
-\subsection{Fitness Functions}
-% here all fitness functions are introduced and described
-\subsubsection{Basic Block Coverage}
-\subsubsection{Schema Coverage}
-\subsubsection{Memory Access}
-% secondary objective
-\subsubsection{Division by Zero}
-\subsubsection{Integer Overflow}
-\subsubsection{Buffer Overflow}
-\section{Evaluation}
-\subsection{Subjects}
-\subsubsection{libxml2}
-\subsubsection{libpng}
-\subsubsection{libpcap}
-\subsubsection{libflac}
-\subsection{Results}
-\subsection{Threats to Validity}
+\input{./formats.tex} 
+\input{./fitness.tex} 
 \section{Conclusion}
 \section{Future Work}
 % complete parallel rewrite
 % more fitness functions
 % more subjects
 % more formats
-% both java and binary coverages combined
+% both java and binary coverages combined (JNI)
 \newpage
 \section*{References}
 \renewcommand\refname{}
@@ -98,5 +87,5 @@
 \bibliographystyle{plain}
 \bibliography{sources}
 \newpage
-\listoftodos[Notes]
+\listoftodos[Notes] % TODO remove ;)
 \end{document}
