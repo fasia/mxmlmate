@@ -1,11 +1,21 @@
 %### 
-\subsection{Formats}
+\subsection{Formats and Subjects}
 %###
- 
+\xmlmate now supports producing inputs in almost any format, provided there is an \xsd and a converter
+available. Let me describe some formats that were experimented with along with their schemas, converters, and
+subject programs in the next sections.
 %### 
 \subsubsection{XML}
 %###
-
+Before I proceed with describing other exciting formats, I want to emphasize that by being extended to an all
+new multi-component distributed system \xmlmate has by no means lost its ability to interact with subject
+programs that actually process inputs in the \xml format. As a matter of fact, \xml as such is not exactly a
+full-fledged format in and of itself, it is rather a meta format, which many other formats are subsumed by. One
+such example is the ubiquitous \texttt{html} format, which, coincidentally, I have chosen as the basis format
+for testing \texttt{libxml} - a library for processing generic \xml documents written in \texttt{C}, which is
+\unsure{add examples, e.g. python's lxml}
+widely used as the foundation of an entire multitude of parser implementations. 
+\texttt{html} has a very complex specification, which exhibits almost all of \xml's feature set.
 %### 
 \subsubsection{PNG}
 %###

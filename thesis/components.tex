@@ -18,11 +18,11 @@ of the new extended \xmlmate work process.
   It then sends out another message with the location of the converted file via its \texttt{PUSH} socket further 
   down the processing pipeline to the \emph{broker}.
   There can be an unlimited number of converters active at the same time, but there is only one broker.
-  \item The broker is responsible for collecting conversion results from converters and fairly distributing them 
-  to the test drivers. The broker could be very efficiently implemented in \python as the fair 
-  queueing forwarding functionality is available out of the box with \zmq.
-  \info{It would be cool to have actual load balancing brokers between \xmlmate and converters and between 
-  converters and test drivers, but it's somewhat tricky, so it remains a cool future work item}
+  \item The broker is responsible for collecting conversion results from converters and fairly distributing
+  them to the test drivers. The broker has been managed to be very efficiently implemented in \python as the
+  general purpose fair-queue forwarding device it is based on is available out of the box with \zmq.
+  Currently, the main reason for the broker's necessity is a technicality of \zmq's, but the
+  end of \cref{sec:proto} offers some insights into the current situation and possible future enhancements.
   \item A test driver receives a message either directly from \xmlmate in case of an \xml based file format, 
   or otherwise from the broker, unpacks the file path, and feeds it to the system under test, which is being 
   monitored by a \emph{pintool} that implements the ``client side" of the aforementioned currently 
@@ -42,6 +42,8 @@ of the new extended \xmlmate work process.
   its specification (e.g. again, if the fitness function is supposed to count the number of executed basic blocks, 
   it would expect to receive a set of basic block addresses) and finally assigns the computed fitness score to 
   the genetic representation of the \xml file sent out in step 1.
-%   \item liveness guard
+  \item liveness guard \improvement[inline]{add description of liveness guards when done}
 \end{enumerate}
-\improvement[inline]{Add illustration}
+\improvement[inline]{Add illustration of system components}
+
+\unsure[inline]{Maybe describe mockups used in the development process}

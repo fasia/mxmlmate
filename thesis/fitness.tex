@@ -46,6 +46,8 @@ More concretely the schema coverage fitness value is computed as a weighted aver
   used in the generated \xml files. This measure is indicative of the overall proportion of covered value space 
   over all type definitions regarded together.
 \end{description}
+
+\improvement{Describe how exactly the fitness value is calculated (with a formula)}
     
 Contrary to the initial expectations, \improvement{mention in the Evaluation section} the results do not 
 necessarily show a strong correlation between high schema coverage and some kinds of code coverage like 
@@ -71,16 +73,16 @@ instrumentation framework - in particular its definition of a basic block: a sin
 single exit sequence of instructions in the program under test. However, because \pin is discovering the 
 program dynamically as it is executed, its view of basic blocks can be somewhat unconventional. As an 
 example consider the code on the left in \cref{lst:bblcode}, which, when compiled for the IA-32 
-architecture, will yield instructions approximate to the ones on the right. Classically speaking, 
-each \mintinline{nasm}{addl} instruction is its own basic block; however, over the course of program 
-execution, when the different switch cases are entered, \pin will generate basic blocks, which
+architecture, will yield instructions approximate to the ones on the 
+right\footnote{From \url{https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/\#GRAN}}.
+Classically speaking, each \mintinline{nasm}{addl} instruction is its own basic block; however, over the course
+of program execution, when the different switch cases are entered, \pin will generate basic blocks, which
 contain four instructions as the \texttt{.L7} case is entered, three basic blocks as the \texttt{.L6}
 case is entered, and so forth. Furthermore, \pin breaks basic blocks on some other instructions like 
 \texttt{cpuid}, \texttt{popf}, and \texttt{REP} prefixed instructions. This leads to a slight divergence 
 from the expected values, but for the purposes of representing code coverage this has no negative 
 consequences. As a matter of fact, this phenomenon is actually somewhat reminiscent of the LCSAJ
-\footnote{\url{https://en.wikipedia.org/wiki/Linear_code_sequence_and_jump}} metric, which only 
-increases its value as a fitness score component.
+metric\cite{Hennell:1976:PA}, which only increases its value as a fitness score component.
 \begin{listing}[h]
 \centering
 \begin{minipage}[b]{0.49\textwidth}
@@ -131,12 +133,75 @@ the program under test, signals the completion of the processing of the currentl
 the pintool sends the set as a packet to the \java class in \xmlmate.
 
 It is the purpose of the \java class to interpret the data received from the pintool.
+In the case of the \texttt{Basic Block Coverage} fitness function, the data received represents the
+set of starting addresses of the basic blocks that were found to be executed in the program under test. 
+For each \xml in a test suite an individual set must be maintained in order to be able to profit 
+from result caching: when a test suite is modified during the evolution step, not necessarily all
+of its tests must have been changed and thus not all tests must be passed to a test driver for reevaluation, 
+their previous result can be reused because it is still up-to-date. Virtue of the fact that the pintool 
+already builds a set out of the addresses of the executed blocks on its side, the result for a single 
+\xml can be stored as an array (\texttt{long[]}) without having to wrap a \texttt{Set} container around it.
+
+However, when it comes to calculating the number of unique basic blocks covered by an 
+entire test suite, each time a new set must be created which consists of the union of 
+the individual arrays belonging to all \xml files in the suite. At this point the very efficient
+\texttt{TLongHashSet} implementation from the \emph{GNU Trove} collections mentioned in \cref{sec:trove} 
+is very useful - especially so because it stores the \java primitive values directly instead of \emph{boxing}
+them in wrapper objects like the standard \java collections do. This way Trove saves space and is faster.
+
+The actual fitness value of a test suite according to the \texttt{Basic Block Coverage} fitness function 
+is the number of unique basic blocks executed by all \xml files in the suite. Due to the dynamic nature 
+of instrumentation with \pin it is impossible to know the total number of basic blocks in the program 
+under test. One consequence of this is that this fitness function must be a maximization function - meaning
+that higher fitness values are considered better, which is somewhat atypical for \evosuite. Even though it has
+some degree of support for maximization functions, multiple code defects surfaced during the development that
+mostly had to do with hard-coded assumptions about the fitness function always being a minimization function.
 %### 
 \subsubsection{Memory Access}
 %###
-% profits from abstract binary backend architecture 
-% secondary objective
-% singleton population optimization
+All previously mentioned fitness functions are aimed at increasing a coverage of one sort or another; however,
+in the context of using \xmlmate to try and find vulnerabilities in the system under test, this is not
+necessarily the most promising approach. In order to be able to find vulnerabilities having to do with
+operations such as reading from and writing to memory, such as null pointer dereferences or buffer underflows
+or overflows, the first na\"\i{}ve approach is to aim for a maximum number of memory reads and writes at a
+maximum of addresses. This is the idea behind the \texttt{Memory Access} fitness function, which like its
+cousin \texttt{Basic Block Coverage} fitness function, is a maximization function, with which it also shares
+the \texttt{BinaryBackendFitnessFunction} as an ancestor. Once again, this fitness function consists of a
+pintool and its complementary \java class. 
+
+The pintool stores memory addresses that were accessed by the program under test in a set, which it sends to
+the \java class upon test completion.
+The \java class is very similar to that of its cousin fitness function, in fact they share the entirety of
+their code.
+
+However, upon consideration of the current use case, the distinction between test suites and tests as
+prescribed by \evosuite no longer seems appropriate - what we actually want instead is to evolve a population
+of single \xml files in order to find one individual file that triggers faulty behavior. To satisfy this newly
+appeared need, the concept of a \emph{singleton population} was introduced.
+
+Using a singleton population is a compromise between \evosuite's need for the presence of test suites to
+evolve, and our need for only one set of files to be evolved. When the singleton population is used, the
+population size of the genetic algorithm is limited to only one suite and the genetic algorithm itself is
+modified accordingly, amongst other things by disabling elitism on the test suite level. Elitism is a
+mechanism which ensures that the best individual (the best test suite in \evosuite's case) survives into the
+next generation unaltered, so that fitness may never decrease from one generation to the next. Note,
+that using elitism does not prevent the best individual from reproducing - its copies may do so freely, and
+usually this is what leads to an improvement in fitness. 
+
+With the singleton population in place, there is only one test suite to evolve, which means that the fitness
+must now be calculated differently. The fitness of this single suite can no longer reflect the cumulative
+result over all the tests, but must rather correspond to the fittest one of them, which, at the end of the
+evolution, will be considered the result of the search, or the pinnacle of evolution, if you will.
+
+This routine can be somewhat improved by adding a secondary evolution objective, which considers a
+mutation of the test suite as an improvement even if it has the same number of memory accesses in the best
+test, yet cumulatively its tests cause more unique memory addresses to be accessed. 
+
+As a technical aside, I want to mention that there were considerations to model the use case of evolving a
+set of files as a population of singleton test suites each containing a single file instead of the currently
+employed population consisting of one suite. This, however, would have been unfavorable to the parallelization
+efforts as per \cref{sec:par} because \evosuite does not allow parallel evaluation of test suites without some
+major intrusion in its code base.
 %### 
 \subsubsection{Division by Zero}
 %###

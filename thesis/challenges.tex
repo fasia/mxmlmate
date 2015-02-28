@@ -46,6 +46,7 @@ internally and thus very lightweight.
 %### 
 \subsubsection{Communication Protocol}
 %###
+\label{sec:proto}
 Since \xmlmate now comprises several processes, a communication protocol must be put in place to 
 interconnect the individual components. The communication channels themselves are built on top of
 the \zmq messaging library with \msgpack as the serialization/deserialization engine. The current
@@ -92,12 +93,24 @@ pintool that clears its internal information buffers, thereby resetting all curr
 information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets replaced with 
 one that packs and sends out a message containing the identifying number and any fitness information via \zmq 
 \texttt{PUSH} on port 5557.
+Please note that all ports mentioned above are customizable and even the message carrier can be changed from
+tcp to any other protocol supported by \zmq, of which there are plenty. 
 
-Please note that all ports mentioned above are customizable and even the message carrier can be changed from tcp 
-to any other protocol supported by \zmq, of which there are plenty.
-\improvement{Mention \zmq binding and connecting and static and dynamic system components}
+Also, at first, the role of the broker component might seem unclear, or the broker itself might make the
+impression of being largely unnecessary, as it seems logical that converters could be directly connected to
+the test drivers without it. However, as mentioned in \cref{sec:zmq}, \zmq has two concepts of linking its
+sockets: connecting for dynamic components, whose number is unknown a priori, and binding for static ones.
+Also, sockets sitting on opposite ends of a transport channel must use different linking modes.
+One of the design goals for the new \xmlmate extension was that it should be able to work with a variable
+number of converter and driver processes as a measure of adequate resource allocation adapting for different
+workloads (e.g. output file formats). To make the converters and drivers pluggable, they must be
+\emph{connecting}, and since the other side must \emph{bind}, they cannot be directly linked to each other. 
+The solution is to add a permanent component which binds the other ends of their respective connections and
+forwards the messages. So yes, for now the existence of the broker is due to a technicality, but in the future
+it may be enhanced with actual load balancing functionality, which could have a huge positive impact on the
+overall performance.
+
 \unsure{mention starting synchronization}
-
 \change[inline]{make pretty communication graph}
 %###
 \subsubsection{Format Converters}
@@ -119,6 +132,7 @@ could transform any valid \pcap file into its \xml representation governed by th
 %###
 \subsubsection{Parallelization}
 %###
+\label{sec:par}
 After running the first tests on the initial \xmlmate design, which did not include any parallelization, 
 it quickly became clear that both format conversion and running the program under test with \pin 
 are two performance bottlenecks significantly slowing down the entire process. Considering that the 
@@ -155,8 +169,8 @@ to them - the result is a kind of \emph{copy-on-maybe-write} policy as only thos
 that are going to experience potential change.
 
 After that there were still other bottlenecks - some more surprising than others. For example 
-it was rather sudden to see calls to the \texttt{Random} class being listed among the most time consuming 
-by the profiler. In \java 7 the \texttt{Random} class is thread-safe, which has lead to a lot of 
+it was rather unexpected to see calls to methods of the \texttt{Random} class being listed among the most time
+consuming by the profiler. In \java 7 the \texttt{Random} class is thread-safe, which has lead to a lot of 
 contention when multiple threads suddenly started asking the singleton instance of \evosuite's randomness 
 provider for random values for mutation and crossover. The fix was rather easy: \java 7 also provides 
 a \texttt{ThreadLocalRandom} class intended for exactly this kind of situation; this easy fix came 
@@ -164,20 +178,25 @@ at a price, however - it is no longer possible to provide a single seed value to
 process.
 
 Another minor performance optimization included adding a polymorphic method for selecting a random 
-element from a given \texttt{Set}. The previously available methods treated a \texttt{Set} like a 
-\java \texttt{Collection} and performed the selection by first copying the entire set into a 
-\texttt{RandomAccess}-able \texttt{List}. This is clearly wasteful of resources in case the set in question is large.
-In this case it actually faster to generate a random number between zero and the number of elements in 
-the set and then actuate the set's iterator that number of times finally claiming the element acquired 
-last as the required random choice.
+element from a given \texttt{Set}. The previously available methods treat a \texttt{Set} like a 
+generic \texttt{Collection} and perform the selection by first copying the entire set into a 
+\texttt{RandomAccess}-able \texttt{List}, choosing an element at a random index, and then discarding the list.
+This is clearly wasteful of resources in case the set in question is large. In this case it is actually faster
+to generate a random number between zero and the number of elements in the set and then actuate the set's
+iterator that number of times finally claiming the element acquired last as the required random choice.
 
 One further possible major optimization could be to allow partial fitness score evaluation while a suite 
 mutation is still in progress. When an \xml file has left the mutation or crossover executor it could be 
-immediately sent out to worker processes for fitness evaluation. Preliminary tests showed promising 
+immediately sent out to a worker process for fitness evaluation. Preliminary tests showed promising 
 results; however, this optimization is very intrusive of \evosuite's concept of a single threaded 
 genetic algorithm possibly leading to grave incompatibilities with other mechanisms deep within other parts 
 of \evosuite, therefore it was deemed as a neat future work item, which should probably be combined with a 
-proper restructuring of the genetic framework. \unsure{maybe mention parallel processing of test suites}
+proper restructuring of the genetic framework.
+
+Another optimization, which sadly also belongs to the list of currently incompatible changes, would require to
+rewrite the genetic algorithm in order to enable it to process the individual test suites in parallel -
+not only mutation and crossover, but evaluation as well, leaving generation alternations to be the only
+thresholds to otherwise completely parallel execution.
 %###
 \subsubsection{Local Search}
 %###
@@ -202,4 +221,10 @@ Quite ironically, \evosuite's genetic algorithm framework for some reason does n
 copy of individuals before initiating local search, which manifested itself in abruptly diminishing 
 fitness values; this was, of course, fixed by issuing a backup copy inside the local search procedure, 
 additionally taking full advantage of the newly implemented parallelized deep copying mechanism.
-\unsure{mention incompatibility with sec:fit:schema, and make it another small and nifty future work item}
+
+Please note that due to its specification ignoring nature, the local search is currently incompatible with the
+schema coverage fitness function described in \cref{sec:fit:schema} as the algorithm responsible for computing
+how many of the schema's definitions are used in an \xml instance gets confused by unexpected invalid values.
+This seems to be a rather small issue and will probably be fixed at a later point in time; however, as of now
+there has been no reason to run schema coverage based evolutions with local search enabled, which, at least for
+the time being, makes this a non-issue.

@@ -42,10 +42,12 @@ and the code to be executed at insertion points. These two components, called \e
 code are hosted in a single executable called a \emph{Pintool}, which functions like a plugin to the \pin framework.
 A pintool can register callbacks on different levels of granularity, varying from single instructions over procedures
 to entire binary images, in order to receive context-dependent information and access to values of particular interest.
+\improvement{Mention gcov and valgrind}
 \unsure[inline]{maybe add small example}
 %### 
 \subsubsection{ZeroMQ}
-%### 
+%###
+\label{sec:zmq}
 {\small ZeroMQ}\cite{zmq} (or \zmq as it as actually called) is an extremely efficient messaging library, 
 which is very well suited for use in concurrent or distributed applications. \zmq regards messages as 
 completely transparent blobs of data which are to be transported across predefined communication channels 
@@ -55,9 +57,35 @@ Out of the box \zmq provides its users with several communication patterns that 
 into more complex patterns, which remain easy to manage and use. Some basic patterns are \texttt{Request/Response}, 
 \texttt{Publish/Subscribe}, or \texttt{Push/Pull} among others.
 There are implementations of \zmq in many programming languages, of which the ones for \java, \python, {\small C}, 
-and \cpp are actually used in \xmlmate.
-\unsure{Add something more - maybe the fact that it uses the same code over all protocols}
-\unsure{mention RabbitMQ and Nanomsg}
+and \cpp are actually used in \xmlmate. 
+
+It is very easy to get started with \zmq in all programming languages - the basic concept is the
+same everywhere: the program that uses \zmq must first set up a so called \emph{context}, which then becomes
+host to \emph{sockets}, which, in turn, are either bound or connected to \emph{endpoints} of some transport
+channel. A socket can have arbitrarily many ingoing and outgoing connections and \zmq automatically reconnects
+it to any peers in case the underlying connection gets interrupted. Furthermore, a socket can be either bound
+or connected to its endpoint with \emph{binding} being preferred when the component behind the socket is a
+static component of the overall system; only one socket can be bound per endpoint. Conversely, a socket is
+\emph{connected} when the component behind it is more dynamic in nature and may leave and rejoin the system
+arbitrarily, or when the number of instances of this component is not known a priori. Sockets joined at
+different ends of a connection must use different methods, in practice, this means that on one end of the line
+there is a single bound socket, and on the other there is a variable number of connected sockets, which may
+come and go during runtime.
+
+There are different types of sockets: \texttt{PUB}, \texttt{SUB}, \texttt{REQ}, \texttt{REP}, \texttt{PUSH}, 
+\texttt{PULL}, as well as some other, more exotic types. The different types of sockets can be plugged together
+like their names suggest, for example \xmlmate combines a multitude of \texttt{PUSH} and \texttt{PULL} sockets
+to create a processing pipeline for its \xml files and their fitness scores.
+
+Beside \zmq there are other messaging solutions, some of which were considered for use in \xmlmate. One such
+library is {\small RabbitMQ}\cite{rabbitmq} - it implements the AMQP protocol and as such requires a central
+message broker. This means an additional process in need of customization and deployment would be needed, and
+writing client side code is also somewhat more difficult; this is why {\small RabbitMQ} was decided against.
+
+Then there is {\small nanomsg}\cite{nanomsg}, which was written by one of the authors of \zmq. 
+It is similarly brokerless, more lightweight and efficient than \zmq, and has an even easier to use API, which
+for example does not burden its users with the concept of a context; however, it is still in beta and lacks
+the gigantic community support like that of \zmq, which ultimately lead me to not choosing it either.
 %### 
 \subsubsection{MessagePack}
 %### 
@@ -82,4 +110,22 @@ conception I did not know of their existence. This might be a subject of some fu
 % Python (https://code.google.com/p/cbor/) 
 % and Java (https://github.com/c-rack/cbor-java)
 \unsure{Mention Protobuf, Cap'n Proto, SBE, and FlatBuffers}
-% optimizations in caching results (e.g. Trove)
+%### 
+\subsubsection{GNU Trove}
+%### 
+\label{sec:trove}
+The GNU Trove \java library provides performant and memory efficient alternative implementations of the
+standard \java collections API, and, in addition, offers collections supporting primitive types. 
+
+A disadvantage of \java's standard collections, which can often quickly become a performance bottleneck in
+applications that handle lots of primitive values, is their lack of direct support for those. In
+order to store primitive values in the standard collections, it is necessary to envelop each and every single
+value in its own wrapper object - a process known as \emph{boxing}, which incurs costs both in memory use and
+computing time. This practice is so common that since version $1.5$ \java offers autoboxing functionality,
+whereby programmers can put primitive values where their wrapper counterparts are expected and vice versa, and
+the \java compiler would perform the necessary boxing and unboxing automatically, thus hiding the additional
+cost from inexperienced programmers. In most cases, these additional costs can be calmly neglected, but
+sometimes they cannot. In order to exclude the possibility of this becoming a problem and suddenly sneaking
+up, the decision was made to go with Trove collections from the beginning. These collections have since found
+their special use with the many details of the various evaluation result types, e.g. storing big amounts of
+memory addresses.
