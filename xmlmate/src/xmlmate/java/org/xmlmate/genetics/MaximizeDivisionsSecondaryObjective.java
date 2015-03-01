@@ -1,22 +1,20 @@
 package org.xmlmate.genetics;
 
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.SecondaryObjective;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MaximizeCumulativeFitnessSecondaryObjective extends SecondaryObjective {
-    private static final long serialVersionUID = -416847013277281037L;
-    private static final Logger logger = LoggerFactory.getLogger(MaximizeCumulativeFitnessSecondaryObjective.class);
+public class MaximizeDivisionsSecondaryObjective extends SecondaryObjective {
+    private static final long serialVersionUID = -5561799183151420412L;
+    private static final Logger logger = LoggerFactory.getLogger(MaximizeDivisionsSecondaryObjective.class);
 
-    private int getCumulativeFitness(XMLTestSuiteChromosome individual) {
-	TLongSet addrs = new TLongHashSet();
+
+    private long getCumulativeFitness(XMLTestSuiteChromosome individual) {
+	long sum = 0l;
 	for (XMLTestChromosome x : individual.getTestChromosomes())
-	    addrs.addAll(((AddressStoringExecutionResult) x.getLastExecutionResult()).getAddresses());
-	return addrs.size();
+	    sum += ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances().size();
+	return sum;
     }
 
     @Override
@@ -24,9 +22,9 @@ public class MaximizeCumulativeFitnessSecondaryObjective extends SecondaryObject
 	if (chromosome1 instanceof XMLTestSuiteChromosome && chromosome2 instanceof XMLTestSuiteChromosome) {
 	    XMLTestSuiteChromosome x1 = (XMLTestSuiteChromosome) chromosome1;
 	    XMLTestSuiteChromosome x2 = (XMLTestSuiteChromosome) chromosome2;
-	    return getCumulativeFitness(x2) - getCumulativeFitness(x1); // keep 1st if negative
+	    return (int)(getCumulativeFitness(x2) - getCumulativeFitness(x1));
 	}
-	logger.warn("Tried to use MaximizeCumulativeFitnessSecondaryObjective for non XML Suite chromosomes");
+	logger.warn("Tried to use MinimizeCumulativeZeroDistanceSecondaryObjective for non XML Suite chromosomes");
 	return 0;
     }
 

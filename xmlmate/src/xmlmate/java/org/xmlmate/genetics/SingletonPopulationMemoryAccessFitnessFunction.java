@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+import org.evosuite.Properties;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,11 @@ public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccess
     private static final long serialVersionUID = -5379138832761549718L;
     private static final Logger logger = LoggerFactory.getLogger(SingletonPopulationMemoryAccessFitnessFunction.class);
 
+    public SingletonPopulationMemoryAccessFitnessFunction() {
+	assert Properties.POPULATION == 1 : "The SingletonPopulationMemoryAccessFitnessFunction can only be used with a singleton population!";
+	XMLTestSuiteChromosome.addSecondaryObjective(new MaximizeCumulativeFitnessSecondaryObjective());
+    }
+    
     @Override
     public double getFitness(XMLTestSuiteChromosome individual) {
 	evaluationClock.start();

@@ -1,19 +1,20 @@
 package org.xmlmate.genetics;
 
-import com.google.common.primitives.Longs;
 import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.hash.TLongLongHashMap;
 import gnu.trove.procedure.TLongLongProcedure;
-import org.evosuite.Properties;
-import org.msgpack.MessagePack;
-import org.msgpack.unpacker.BufferUnpacker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import gnu.trove.procedure.TLongProcedure;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
+
+import org.evosuite.Properties;
+import org.msgpack.MessagePack;
+import org.msgpack.unpacker.BufferUnpacker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
     private static final long serialVersionUID = 2226177116546744577L;
@@ -22,6 +23,8 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
 
     public DivByZeroFitnessFunction() {
         assert Properties.POPULATION == 1 : "The DivByZeroFitnessFunction can only be used with a singleton population!";
+        XMLTestSuiteChromosome.addSecondaryObjective(new MaximizeDivisionsSecondaryObjective());
+        XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeCumulativeZeroDistanceSecondaryObjective());
     }
 
     @Override
@@ -78,7 +81,9 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
             }
         }
 
-        long fitness = Longs.min(mins.values());
+        GetMinValue minEntry = new GetMinValue();
+        mins.forEachValue(minEntry);
+        long fitness = minEntry.min;
         individual.setFitness(fitness);
         individual.setChanged(false);
         evaluationClock.stop();
@@ -90,6 +95,16 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
         return false;
     }
 
+    private static class GetMinValue implements TLongProcedure {
+	long min = Long.MAX_VALUE;
+	@Override
+	public boolean execute(long arg0) {
+	    if (arg0 < min)
+		min = arg0;
+	    return true;
+	}
+    }
+    
     private static class UpdateMinimum implements TLongLongProcedure {
         private final TLongLongMap mins;
 

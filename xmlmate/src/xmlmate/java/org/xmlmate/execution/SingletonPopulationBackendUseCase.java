@@ -22,7 +22,6 @@ public class SingletonPopulationBackendUseCase extends BinaryBackendUseCase {
 	super.setupGAAdditions(ga);
 	XMLTestSuiteChromosome.removeSecondaryObjective(new MinimizeSizeSecondaryObjective());
 	XMLTestSuiteChromosome.removeSecondaryObjective(new MinimizeTotalLengthSecondaryObjective());
-	XMLTestSuiteChromosome.addSecondaryObjective(new MaximizeCumulativeFitnessSecondaryObjective());
     }
 
     @Override

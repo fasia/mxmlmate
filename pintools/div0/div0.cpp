@@ -79,7 +79,8 @@ VOID DisposeZMQ() {
 /* ===================================================================== */
 
 VOID recordIns(ADDRINT ip, ADDRINT divisor) {
-	//divInstructions[ip].push_back((INT64)divisor);
+	// cout << ip << " / " << divisor << endl;
+	divInstructions[ip].push_back((INT64)divisor);
 }
 
 VOID resetCounters() {
@@ -119,29 +120,50 @@ VOID Routine(RTN rtn, VOID *v) {
 	}
 }
 
+VOID debugPrint(INS ins) {
+	cout << INS_Mnemonic(ins) << " @ " << INS_Address(ins) << endl;
+	unsigned int i;
+	for (i = 0; i < INS_OperandCount(ins); ++i) {
+		cout << "op" << i;
+		if (INS_OperandIsReg(ins,i))
+				cout << " r";
+		if (INS_OperandIsImplicit(ins,i))
+			cout << " i";
+		if (INS_OperandIsImmediate(ins,i))
+			cout << " I";
+		if (INS_OperandIsMemory(ins,i))
+			cout << " m";
+		if (INS_OperandIsFixedMemop(ins,i))
+			cout << " M";
+		cout << endl;
+	}
+}
+
 VOID Instruction(INS ins, VOID *v) {
+	if (INS_Address(ins) < imgLow || INS_Address(ins) > imgHigh)
+		return;
+
     switch (INS_Opcode(ins)) {
     case XED_ICLASS_DIV:
     case XED_ICLASS_IDIV:
-    case XED_ICLASS_FDIV: {
+    {
     	// divisor is 0th argument
     	// initialize container list on first contact
-    	// divInstructions.insert(std::make_pair(INS_Address(ins), new std::list<INT64>()));
     	divInstructions[INS_Address(ins)] = *(new std::list<INT64>);
-    	INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns,IARG_INST_PTR, IARG_REG_VALUE, 0, IARG_END);
+    	INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 0), IARG_END);
     	break;
     }
+    // temporarily unsupported
     case XED_ICLASS_DIVPD:
     case XED_ICLASS_DIVPS:
     case XED_ICLASS_DIVSD:
     case XED_ICLASS_DIVSS:
     	// divisor is 1st argument
     	// initialize container list on first contact
-    	// divInstructions.insert(std::make_pair(INS_Address(ins), new std::list<INT64>()));
-		divInstructions[INS_Address(ins)] = *(new std::list<INT64>);
-    	INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns,IARG_INST_PTR, (ADDRINT)*((INT64*)IARG_MEMORYREAD_EA), IARG_END);
-    	break;
+		//divInstructions[INS_Address(ins)] = *(new std::list<INT64>);
+    	//INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns,IARG_INST_PTR, (ADDRINT)*((INT64*)IARG_MEMORYREAD_EA), IARG_END);
 	// unsupported
+    case XED_ICLASS_FDIV:
     case XED_ICLASS_FIDIV:
     case XED_ICLASS_FDIVP:
     case XED_ICLASS_FDIVR:
@@ -151,8 +173,8 @@ VOID Instruction(INS ins, VOID *v) {
     case XED_ICLASS_VDIVPS:
     case XED_ICLASS_VDIVSD:
     case XED_ICLASS_VDIVSS:
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
