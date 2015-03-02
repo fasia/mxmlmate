@@ -333,14 +333,14 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 	List<Future<List<XMLTestChromosome>>> taskResults = new LinkedList<>();
 	int chosen = 0;
 	for (int i = 0; i < oldSize; ++i) {
-	    if (Randomness.nextDouble() < 0.2d) { // 20% crossover
+	    if ((Randomness.nextDouble() < 0.2d) && (chosen <= oldSize-2)) { // 20% crossover
 		int index1 = selectionFunction.getIndex(tests);
 		int index2 = selectionFunction.getIndex(tests);
 		chosen += 2;
 		taskResults.add(xoverService.submit(new Crossover(tests.get(index1), tests.get(index2))));
 		i += 1;
 	    }
-	    if (Randomness.nextDouble() < 0.30d) { // 30% mutation
+	    if ((Randomness.nextDouble() < 0.30d) && (chosen < oldSize)) { // 30% mutation
 		int index = selectionFunction.getIndex(tests);
 		chosen += 1;
 		taskResults.add(mutatorService.submit(new Mutation(tests.get(index))));
@@ -353,14 +353,13 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
 	
 	// fill up unchanged
 	newTests.addAll(selectionFunction.select(tests, oldSize-chosen));
-
+    	
 	try {
 	    for (Future<List<XMLTestChromosome>> futureTest : taskResults)
 		for (XMLTestChromosome x : futureTest.get())
 		    newTests.add(x);
 	} catch (InterruptedException | ExecutionException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    logger.error("Exception while evaluating a test", e);
 	}
 	tests = newTests;
 	setChanged(true);

@@ -29,7 +29,7 @@ def main():
             result = convert(input_file)
         except Exception, e:
             # record anyway to remove the empty file next time
-            result = input_file.replace('.xml', '.pcap')  
+            result = input_file.replace('.xml', '.png')  
             print 'Could not convert', input_file, 'because of', e
         converted[num] = result
         pck.pack(num)

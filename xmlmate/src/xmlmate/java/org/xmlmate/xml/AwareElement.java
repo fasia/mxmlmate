@@ -488,6 +488,8 @@ public class AwareElement extends Element {
         assert null != stype;
         if (!stype.getNumeric()) return false;
 
+        // TODO implement occasional range inversion
+        
         int value;
         try {
             value = Integer.parseInt(getValue());
