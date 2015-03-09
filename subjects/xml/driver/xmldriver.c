@@ -4,85 +4,87 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-void PIN_SCORE_START() __attribute__((noinline));
-void PIN_SCORE_END(uint32_t id) __attribute__((noinline));
+void PIN_SCORE_START(void *ptr) __attribute__((noinline));
+void *PIN_SCORE_END(uint32_t id, void *socket) __attribute__((noinline));
 volatile static unsigned int dummy = 0;
 
-void PIN_SCORE_START() {
+void PIN_SCORE_START(void *ptr) {
 	++dummy;
 //	std::cout << "PIN_SCORE_START" << std::endl;
 }
 
-void PIN_SCORE_END(uint32_t id) {
+void *PIN_SCORE_END(uint32_t id, void *socket) {
 	++dummy;
+	return NULL;
 //	std::cout << "PIN_SCORE_END" << std::endl;
 }
 
 /* EXPECTED ARGUMENTS:
- * tcp port number for incoming zmq connections
+ * <endpoint> <identity>
  */
-#define BUF_SIZE 1024
 int main(int argc, char *argv[]) {
-	if (argc < 2) {
-		fprintf(stderr, "Please provide the port for receiving data!\n");
+	if (argc < 3) {
+		fprintf(stderr, "Usage: testdriver <endpoint> <identity>\n");
 		return 1;
 	}
-
 	void *context = zmq_ctx_new();
-	void *dataIn = zmq_socket(context, ZMQ_PULL);
+	void *socket = zmq_socket(context, ZMQ_DEALER);
+	char *address = argv[1];
+	char *identity = argv[2];
+	fprintf(stdout, "Connecting worker %s to socket at %s\n", identity, address);
+	zmq_setsockopt(socket, ZMQ_IDENTITY, identity, strlen(identity));
+	zmq_connect(socket, address);
+	zmq_send_const(socket, "RDY", 3, 0);
 
-	char address[21] = "tcp://127.0.0.1:";
-	int i = 0;
-	for (; i < 4 && argv[1][i]; ++i) {
-		address[16 + i] = argv[1][i];
-	}
-	address[16 + i] = 0;
-	fprintf(stdout, "Connecting to dataInput at %s\n", address);
-	zmq_connect(dataIn, address);
+	void *outbuffer = NULL;
+	msgpack_unpacked unpacked;
 
-	char buffer[BUF_SIZE];
-	msgpack_unpacked msg;
 	for (;;) {
-//		fprintf(stdout,"Waiting for tasks...\n");
-		int size = zmq_recv(dataIn, buffer, BUF_SIZE - 1, 0);
-		if (size == -1)
+		zmq_msg_t msg;
+		zmq_msg_init(&msg);
+		zmq_msg_recv(&msg, socket, 0);
+		size_t size = zmq_msg_size(&msg);
+		char *inbuffer = (char *) malloc(size + 1);
+		if (NULL == inbuffer) {
+			fprintf(stderr, "Out of Memory!\n");
 			return 1;
-		if (size > BUF_SIZE - 1) {
-			fprintf(stderr, "WARNING! Size of a message has exceeded the buffer size of %d!!!\n", BUF_SIZE);
-			size = BUF_SIZE - 1;
 		}
-		buffer[size] = (char) 0;
+		memcpy(inbuffer, zmq_msg_data(&msg), size);
+		zmq_msg_close(&msg);
+		inbuffer[size] = 0;
 
-		msgpack_unpacked_init(&msg);
+		msgpack_unpacked_init(&unpacked);
 		size_t off = 0;
-		bool res = msgpack_unpack_next(&msg, buffer, size, &off);
+		bool res = msgpack_unpack_next(&unpacked, inbuffer, size, &off);
 		if (!res) {
 			fprintf(stderr, "res == %d\n", res);
 			fprintf(stderr, "off == %zu\n", off);
 			return 1;
 		}
-		msgpack_object obj = msg.data;
+		msgpack_object obj = unpacked.data;
 		uint32_t id = (uint32_t) obj.via.u64;
 
-		msgpack_unpacked_destroy(&msg);
-		res = msgpack_unpack_next(&msg, buffer, size, &off);
+		msgpack_unpacked_destroy(&unpacked);
+		res = msgpack_unpack_next(&unpacked, inbuffer, size, &off);
 		if (!res) {
 			fprintf(stderr, "res == %d\n", res);
 			fprintf(stderr, "off == %zu\n", off);
 			return 1;
 		}
-		obj = msg.data;
+		obj = unpacked.data;
 		const char* path = obj.via.str.ptr;
 
-		PIN_SCORE_START();
+		PIN_SCORE_START(outbuffer);
+
 		LIBXML_TEST_VERSION
 		xmlDocPtr doc = xmlReadFile(path, NULL, 0);
 		if (doc != NULL)
 			xmlFreeDoc(doc);
 		xmlCleanupParser();
 		xmlMemoryDump();
-		msgpack_unpacked_destroy(&msg);
-		PIN_SCORE_END(id);
-	}
 
+		msgpack_unpacked_destroy(&unpacked);
+		free(inbuffer);
+		outbuffer = PIN_SCORE_END(id, socket);
+	}
 }

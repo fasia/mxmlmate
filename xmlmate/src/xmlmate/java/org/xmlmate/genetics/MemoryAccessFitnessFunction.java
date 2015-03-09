@@ -9,6 +9,7 @@ import org.msgpack.MessagePack;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlmate.XMLProperties;
 
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
@@ -35,8 +36,16 @@ public class MemoryAccessFitnessFunction extends BinaryBackendFitnessFunction {
 		ByteBuffer buffer = receiveResult();
 		BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
 		int num = unpk.readInt();
-		long[] la = unpk.read(long[].class);
-		logger.trace("received {} items", la.length);
+		boolean dead = unpk.readBoolean();
+		long[] la = new long[0];
+		if (dead) {
+		    logger.info("Chromosome {} crashed a worker!", num);
+		    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH, 
+			    "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+		} else {
+		    la = unpk.read(long[].class);
+		    logger.trace("Received {} items for chromosome {}", la.length, num);		    
+		}
 
 		XMLTestChromosome x = individual.getTestChromosome(num);
 		x.setLastExecutionResult(new AddressStoringExecutionResult(la));
@@ -45,6 +54,7 @@ public class MemoryAccessFitnessFunction extends BinaryBackendFitnessFunction {
 
 		addrs.addAll(la);
 		File outputFile = awaited.get(num);
+		assert null != outputFile;
 		// clean up temporary file
 		if (outputFile.exists() && !outputFile.delete()) {
 		    logger.warn("Could not delete temporary file after evaluating {}", outputFile.getAbsolutePath());

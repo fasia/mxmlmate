@@ -1,6 +1,5 @@
 #include <pin.H>
-#include "zmq.hpp"
-#include "zhelpers.hpp"
+#include <zmq.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,10 +18,6 @@ static string targetImage = "";	//name of the targeted binary image
 static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
 static Instructions_T divInstructions;
-zmq::context_t context(1);         // Prepare zmq context
-zmq::socket_t dataOut(context, ZMQ_PUSH); // Prepare zmq socket
-
-
 std::ostream * out = &cerr;
 
 /* ===================================================================== */
@@ -50,10 +45,11 @@ INT32 Usage() {
 	return -1;
 }
 
-VOID SendResults(uint32_t id) {
-	std::stringstream buffer;
+void *SendResults(uint32_t id, void *socket) {
+	msgpack::sbuffer buffer;
 	msgpack::pack(buffer, id);
-	std::map<ADDRINT,INT64> minima;
+	msgpack::pack(buffer, false);
+	std::map<ADDRINT, INT64> minima;
 	std::map<ADDRINT, std::list<INT64> >::iterator itmap;
 	for (itmap = divInstructions.begin(); itmap != divInstructions.end(); ++itmap) {
 		std::list<INT64>::iterator itli;
@@ -65,13 +61,15 @@ VOID SendResults(uint32_t id) {
 		}
 	}
 	msgpack::pack(buffer, minima);
-	buffer.seekg(0);
-	s_send(dataOut, buffer.str());
-}
 
-VOID DisposeZMQ() {
-	dataOut.close();
-	context.close();
+	size_t len = buffer.size();
+	void *buf = malloc(len);
+	if (NULL != buf) {
+		memcpy(buf, buffer.data(), len);
+		zmq_send_const(socket, buf, len, 0);
+//		*out << "Sent " << ret << " bytes." << endl;
+	}
+	return buf;
 }
 
 /* ===================================================================== */
@@ -83,8 +81,9 @@ VOID recordIns(ADDRINT ip, ADDRINT divisor) {
 	divInstructions[ip].push_back((INT64)divisor);
 }
 
-VOID resetCounters() {
+VOID resetCounters(void *ptr) {
 //	*out << "Resetting PIN counters" << endl;
+	free(ptr);
 	// go through divInstructions and clear the lists
 	std::map<ADDRINT, std::list<INT64> >::iterator iter;
 	for (iter = divInstructions.begin(); iter != divInstructions.end(); ++iter)
@@ -179,11 +178,10 @@ VOID Instruction(INS ins, VOID *v) {
 }
 
 VOID Fini(INT32 code, VOID *v) {
-	DisposeZMQ();
+	*out << "Freeing resources" << endl;
 	std::map<ADDRINT, std::list<INT64> >::iterator iter;
 		for (iter = divInstructions.begin(); iter != divInstructions.end(); ++iter)
 			delete &iter->second;
-//	OutputResults();
 }
 
 /*!
@@ -215,9 +213,6 @@ int main(int argc, char *argv[]) {
 		cerr << "Please provide the name of the target image!" << endl;
 		return Usage();
 	}
-
-	cout << "Connecting socket in PIN tool" << endl;
-	dataOut.connect("tcp://127.0.0.1:5557"); // TODO receive as param
 
 	// Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);

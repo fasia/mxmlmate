@@ -9,6 +9,7 @@ import org.evosuite.Properties;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlmate.XMLProperties;
 
 public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccessFitnessFunction {
     private static final long serialVersionUID = -5379138832761549718L;
@@ -42,8 +43,16 @@ public class SingletonPopulationMemoryAccessFitnessFunction extends MemoryAccess
 		BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
 		unpk.setArraySizeLimit(10000000);
 		int num = unpk.readInt();
-		long[] la = unpk.read(long[].class);
-		logger.trace("received {} items", la.length);
+		boolean dead = unpk.readBoolean();
+		long[] la = new long[0];
+		if (dead) {
+		    logger.info("Chromosome {} crashed a worker!", num);
+		    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH, 
+			    "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+		} else {
+		    la = unpk.read(long[].class);
+		    logger.trace("Received {} items for chromosome {}", la.length, num);
+		}
 
 		XMLTestChromosome x = individual.getTestChromosome(num);
 		x.setLastExecutionResult(new AddressStoringExecutionResult(la));

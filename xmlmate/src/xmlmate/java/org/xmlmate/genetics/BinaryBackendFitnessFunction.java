@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.evosuite.ga.FitnessFunction;
 import org.evosuite.utils.Randomness;
@@ -29,12 +30,14 @@ import org.zeromq.ZMQ.Socket;
 import com.google.common.base.Stopwatch;
 
 public abstract class BinaryBackendFitnessFunction extends FitnessFunction<XMLTestSuiteChromosome> {
+    private static final long serialVersionUID = 1204528250334934065L;
     private static final Logger logger = LoggerFactory.getLogger(BinaryBackendFitnessFunction.class);
     private final Context context;
     private final Socket dataOut;
     private final Socket coverageIn;
     private final MessagePack msg = new MessagePack();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    protected final static AtomicInteger crashCounter = new AtomicInteger(0);
 
     public static final Stopwatch evaluationClock = Stopwatch.createUnstarted();
 
@@ -43,8 +46,8 @@ public abstract class BinaryBackendFitnessFunction extends FitnessFunction<XMLTe
 	context = ZMQ.context(1);
 	dataOut = context.socket(ZMQ.PUSH);
 	coverageIn = context.socket(ZMQ.PULL);
-	// XXX make the addresses parameters to the program and pass them on to the PIN tool?
-	dataOut.bind("tcp://127.0.0.1:5556");
+	// XXX make the addresses parameters to the program
+	dataOut.connect("tcp://127.0.0.1:5556");
 	coverageIn.bind("tcp://127.0.0.1:5557");
     }
 

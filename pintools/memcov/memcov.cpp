@@ -1,6 +1,5 @@
 #include <pin.H>
-#include "zmq.hpp"
-#include "zhelpers.hpp"
+#include <zmq.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -17,8 +16,6 @@ typedef std::set<ADDRINT> Addrs_T;
 static string targetImage = "";	//name of the targeted binary image
 static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
-zmq::context_t context(1);         // Prepare zmq context
-zmq::socket_t dataOut(context, ZMQ_PUSH); // Prepare zmq socket
 static Addrs_T accessedAddresses;
 
 
@@ -47,25 +44,26 @@ INT32 Usage() {
 	return -1;
 }
 
-VOID DisposeZMQ() {
-	dataOut.close();
-	context.close();
-}
 
-VOID resetCounters() {
+VOID resetCounters(void *ptr) {
+	free(ptr);
 	accessedAddresses.clear();
 }
 
-VOID SendResults(uint32_t id) {
-	std::stringstream buffer;
-//	msgpack::packer pck = msgpack::packer(buffer);
-//	pck.pack_uint32(id);
+void *SendResults(uint32_t id, void *socket) {
+	msgpack::sbuffer buffer;
 	msgpack::pack(buffer, id);
+	msgpack::pack(buffer, false);
 	msgpack::pack(buffer, accessedAddresses);
-	buffer.seekg(0);
-//	std::cout << "sending buffer" << std::endl;
-	s_send(dataOut, buffer.str());
-//	std::cout << "buffer sent" << std::endl;
+
+	size_t len = buffer.size();
+	void *buf = malloc(len);
+	if (NULL != buf) {
+		memcpy(buf, buffer.data(), len);
+		zmq_send_const(socket, buf, len, 0);
+//		cerr << "Sent " << ret << " bytes." << endl;
+	}
+	return buf;
 }
 
 /* ===================================================================== */
@@ -123,10 +121,6 @@ VOID Routine(RTN rtn, VOID *v) {
 	}
 }
 
-VOID Fini(INT32 code, VOID *v) {
-	DisposeZMQ();
-}
-
 /*!
  * The main procedure of the tool.
  * This function is called when the application image is loaded but not yet started.
@@ -151,9 +145,6 @@ int main(int argc, char *argv[]) {
 		return Usage();
 	}
 
-	cout << "Connecting socket in PIN tool" << endl;
-	dataOut.connect("tcp://127.0.0.1:5557"); // TODO receive as param
-
 // Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);
 
@@ -161,9 +152,6 @@ int main(int argc, char *argv[]) {
 	TRACE_AddInstrumentFunction(Trace, 0);
 
 	RTN_AddInstrumentFunction(Routine, 0);
-
-// Register function to be called when the application exits
-	PIN_AddFiniFunction(Fini, 0);
 
 // Start the program, never returns
 	PIN_StartProgram();

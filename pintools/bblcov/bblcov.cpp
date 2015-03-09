@@ -1,6 +1,5 @@
 #include <pin.H>
-#include "zmq.hpp"
-#include "zhelpers.hpp"
+#include <zmq.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -20,10 +19,6 @@ static string targetImage = "";	//name of the targeted binary image
 static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
 static Blocks_T executedBlocks;
-zmq::context_t context(1);         // Prepare zmq context
-zmq::socket_t dataOut(context, ZMQ_PUSH); // Prepare zmq socket
-
-
 std::ostream * out = &cerr;
 
 /* ===================================================================== */
@@ -61,17 +56,28 @@ VOID OutputResults() {
 	*out << "===============================================" << endl;
 }
 
-VOID SendResults(uint32_t id) {
-	std::stringstream buffer;
+void *SendResults(uint32_t id, void *socket) {
+	msgpack::sbuffer buffer;
 	msgpack::pack(buffer, id);
+	msgpack::pack(buffer, false);
 	msgpack::pack(buffer, executedBlocks);
-	buffer.seekg(0);
-	s_send(dataOut, buffer.str());
+
+	size_t len = buffer.size();
+	void *buf = malloc(len);
+	if (NULL != buf) {
+		memcpy(buf, buffer.data(), len);
+		zmq_send_const(socket, buf, len, 0);
+//		*out << "Sent " << ret << " bytes." << endl;
+	}
+	return buf;
 }
 
-VOID DisposeZMQ() {
-	dataOut.close();
-	context.close();
+VOID resetCounters(void *ptr) {
+//	*out << "Resetting PIN counters" << endl;
+	free(ptr);
+	threadCount = 0;
+	insCount = 0;
+	executedBlocks.clear();
 }
 
 /* ===================================================================== */
@@ -82,13 +88,6 @@ VOID PIN_FAST_ANALYSIS_CALL Block(UINT32 instr, ADDRINT addr) {
 	if (executedBlocks.insert(addr).second) {
 		insCount += instr;
 	}
-}
-
-VOID resetCounters() {
-//	*out << "Resetting PIN counters" << endl;
-	threadCount = 0;
-	insCount = 0;
-	executedBlocks.clear();
 }
 
 /* ===================================================================== */
@@ -146,11 +145,6 @@ VOID Routine(RTN rtn, VOID *v) {
 	}
 }
 
-VOID Fini(INT32 code, VOID *v) {
-	DisposeZMQ();
-//	OutputResults();
-}
-
 /*!
  * The main procedure of the tool.
  * This function is called when the application image is loaded but not yet started.
@@ -181,9 +175,6 @@ int main(int argc, char *argv[]) {
 		return Usage();
 	}
 
-	cout << "Connecting socket in PIN tool" << endl;
-	dataOut.connect("tcp://127.0.0.1:5557"); // TODO receive as param
-
 	// Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);
 
@@ -194,9 +185,6 @@ int main(int argc, char *argv[]) {
 
 	// Register function to be called for every thread before it starts running
 	PIN_AddThreadStartFunction(ThreadStart, 0);
-
-	// Register function to be called when the application exits
-	PIN_AddFiniFunction(Fini, 0);
 
 	// Start the program, never returns
 	PIN_StartProgram();
