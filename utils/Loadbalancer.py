@@ -35,6 +35,7 @@ def main(front, forw, back):
                 forward.send(pck.bytes())
                 pck.reset()
                 del awaited[worker]
+                print('Worker %s died.' % worker)
             else:
                 if not workers:
                     poller.register(frontend, zmq.POLLIN)

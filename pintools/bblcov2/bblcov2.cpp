@@ -5,9 +5,10 @@
 #include <sstream>
 #include <stdlib.h>
 #include <set>
+#include <map>
 #include <msgpack.hpp>
 
-typedef std::set<ADDRINT> Blocks_T;
+typedef std::map<ADDRINT, std::set<ADDRINT> > BlockChain_T;
 
 /* ================================================================== */
 // Global variables 
@@ -16,7 +17,7 @@ typedef std::set<ADDRINT> Blocks_T;
 static string targetImage = "";	//name of the targeted binary image
 static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
-static Blocks_T executedBlocks;
+static BlockChain_T reachedBlocks;
 std::ostream * out = &cerr;
 
 /* ===================================================================== */
@@ -48,7 +49,7 @@ void *SendResults(uint32_t id, void *socket) {
 	msgpack::sbuffer buffer;
 	msgpack::pack(buffer, id);
 	msgpack::pack(buffer, false);
-	msgpack::pack(buffer, executedBlocks);
+	msgpack::pack(buffer, reachedBlocks);
 
 	size_t len = buffer.size();
 	void *buf = malloc(len);
@@ -63,15 +64,18 @@ void *SendResults(uint32_t id, void *socket) {
 VOID resetCounters(void *ptr) {
 //	*out << "Resetting PIN counters" << endl;
 	free(ptr);
-	executedBlocks.clear();
+	BlockChain_T::iterator iter;
+	for (iter = reachedBlocks.begin(); iter != reachedBlocks.end(); ++iter)
+			iter->second.clear();
+	reachedBlocks.clear();
 }
 
 /* ===================================================================== */
 // Analysis routines
 /* ===================================================================== */
 
-VOID PIN_FAST_ANALYSIS_CALL Block(UINT32 instr, ADDRINT addr) {
-	executedBlocks.insert(addr);
+VOID record(std::set<ADDRINT> *set, ADDRINT dest) {
+	set->insert(dest);
 }
 
 /* ===================================================================== */
@@ -96,10 +100,16 @@ VOID Trace(TRACE trace, VOID *v) {
 			ADDRINT addr = BBL_Address(bbl);
 			if (addr < imgLow || addr > imgHigh)
 				continue;
-			BBL_InsertCall(bbl, IPOINT_ANYWHERE, (AFUNPTR)Block, IARG_FAST_ANALYSIS_CALL, IARG_UINT32, BBL_NumIns(bbl), IARG_ADDRINT, BBL_Address(bbl), IARG_END);
+
+			INS ins = BBL_InsTail(bbl);
+			if (INS_IsBranchOrCall(ins)) {
+				std::set<ADDRINT> *set = &reachedBlocks[addr];
+				INS_InsertCall(ins, IPOINT_TAKEN_BRANCH, (AFUNPTR)record, IARG_PTR, set, IARG_BRANCH_TARGET_ADDR, IARG_END);
+			}
 		}
 	}
 }
+
 
 VOID Routine(RTN rtn, VOID *v) {
 	if (RTN_Name(rtn).find("PIN_SCORE_START") != std::string::npos) {
