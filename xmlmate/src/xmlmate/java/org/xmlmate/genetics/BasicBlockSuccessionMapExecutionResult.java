@@ -1,18 +1,17 @@
 package org.xmlmate.genetics;
 
 import gnu.trove.map.TLongObjectMap;
-import gnu.trove.set.TLongSet;
 
 import org.evosuite.testcase.ExecutionResult;
 
 public class BasicBlockSuccessionMapExecutionResult extends ExecutionResult {
-	private final TLongObjectMap<TLongSet> successions;
+	private final TLongObjectMap<long[]> successions;
 
-	public TLongObjectMap<TLongSet> getSuccessions() {
+	public TLongObjectMap<long[]> getSuccessions() {
 		return successions;
 	}
 
-	public BasicBlockSuccessionMapExecutionResult(TLongObjectMap<TLongSet> dist) {
+	public BasicBlockSuccessionMapExecutionResult(TLongObjectMap<long[]> dist) {
 		super(null);
 		successions = dist;
 	}

@@ -66,7 +66,7 @@ VOID resetCounters(void *ptr) {
 	free(ptr);
 	BlockChain_T::iterator iter;
 	for (iter = reachedBlocks.begin(); iter != reachedBlocks.end(); ++iter)
-			iter->second.clear();
+		iter->second.clear();
 	reachedBlocks.clear();
 }
 
@@ -74,8 +74,8 @@ VOID resetCounters(void *ptr) {
 // Analysis routines
 /* ===================================================================== */
 
-VOID record(std::set<ADDRINT> *set, ADDRINT dest) {
-	set->insert(dest);
+VOID record(ADDRINT src, ADDRINT dest) {
+	reachedBlocks[src].insert(dest);
 }
 
 /* ===================================================================== */
@@ -103,8 +103,7 @@ VOID Trace(TRACE trace, VOID *v) {
 
 			INS ins = BBL_InsTail(bbl);
 			if (INS_IsBranchOrCall(ins)) {
-				std::set<ADDRINT> *set = &reachedBlocks[addr];
-				INS_InsertCall(ins, IPOINT_TAKEN_BRANCH, (AFUNPTR)record, IARG_PTR, set, IARG_BRANCH_TARGET_ADDR, IARG_END);
+				INS_InsertCall(ins, IPOINT_TAKEN_BRANCH, (AFUNPTR)record, IARG_ADDRINT, addr, IARG_BRANCH_TARGET_ADDR, IARG_END);
 			}
 		}
 	}

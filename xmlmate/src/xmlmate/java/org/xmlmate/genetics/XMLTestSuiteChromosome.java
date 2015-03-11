@@ -156,6 +156,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     }
 
     public static void addSecondaryObjective(SecondaryObjective objective) {
+	logger.debug("Added secondary objective {}", objective.getClass().getName());
 	secondaryObjectives.add(objective);
     }
 
