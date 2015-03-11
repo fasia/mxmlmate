@@ -116,6 +116,7 @@ public class XMLProperties {
         options.addOption("schemaCoverage", false, "Use the schema coverage as sole fitness function.");
         options.addOption("hybridCoverage", false, "Use the hybrid coverage as fitness function maximizing both branch and schema coverages.");
         options.addOption("bblCoverage", false, "Use with PIN to maximize basic block coverage.");
+        options.addOption("bblSuccession", false, "Use with PIN to maximize basic block path of length two coverage.");
         options.addOption("memCoverage", false, "Use with PIN to maximize memory accesses.");
         options.addOption("div0Fitness", false, "Use with PIN to aim for div by zero.");
         options.addOption("r", "root", true, "Root element of the xml tree.");
@@ -173,6 +174,13 @@ public class XMLProperties {
 	if (line.hasOption("memCoverage")) {
 	    if (line.hasOption("class")) {
 		logger.error("You may not use the -class options with the -memCoverage option!");
+		return false;
+	    }
+	    return true;
+	}
+    if (line.hasOption("bblSuccession")) {
+	    if (line.hasOption("class")) {
+		logger.error("You may not use the -class options with the -bblSuccession option!");
 		return false;
 	    }
 	    return true;
@@ -349,6 +357,12 @@ public class XMLProperties {
 	    if (Properties.POPULATION == 1)
     		return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
 	    return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
+	}
+    if (line.hasOption("bblSuccession")) {
+	    RUN_NAME = "bblSuccession " + RUN_NAME;
+	    if (Properties.POPULATION == 1)
+    		return new SingletonPopulationBackendUseCase(factory, new BasicBlockSuccessionFitnessFunction());
+	    return new BinaryBackendUseCase(factory, new BasicBlockSuccessionFitnessFunction());
 	}
     if (line.hasOption("div0Fitness")) {
         RUN_NAME = "div0Fitness " + RUN_NAME;

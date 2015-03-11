@@ -1,83 +1,84 @@
 package org.xmlmate.genetics;
 
-import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongLongHashMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.procedure.TLongObjectProcedure;
-import gnu.trove.procedure.TLongProcedure;
+import gnu.trove.procedure.TObjectProcedure;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import org.msgpack.MessagePack;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Map;
+
 public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFunction {
 	private static final long serialVersionUID = 2226177116546744577L;
 	private static final Logger logger = LoggerFactory.getLogger(BasicBlockSuccessionFitnessFunction.class);
 	private final MessagePack msgUnpack = new MessagePack();
-	
+
 	public BasicBlockSuccessionFitnessFunction() {
 	    // TODO secondary objectives
 	}
-	
+
 	@Override
 	public double getFitness(XMLTestSuiteChromosome individual) {
 	    evaluationClock.start();
-	
-	    final TLongObjectMap<TLongSet> targets = new TLongObjectHashMap<TLongSet>();
-	
+
+	    final TLongObjectMap<TLongSet> targets = new TLongObjectHashMap<>();
+
 	    for (XMLTestChromosome x : individual.getTestChromosomes()) {
 	        if (!x.isChanged()) {
-	            TLongObjectMap<TLongSet> cached = ((BasicBlockSuccessionMapExecutionResult) x.getLastExecutionResult()).getSuccessions();                
+	            TLongObjectMap<TLongSet> cached = ((BasicBlockSuccessionMapExecutionResult) x.getLastExecutionResult()).getSuccessions();
 	            cached.forEachEntry(new UpdateTargets(targets));
 	        }
 	    }
 	    Map<Integer, File> awaited = sendChangedChromosomes(individual.getTestChromosomes());
-	
+
 	    logger.trace("Waiting for coverage of {} files", awaited.size());
-	
+
 	    for (int i = 0; i < awaited.size(); i++) {
-	    try {
-            ByteBuffer buffer = receiveResult();
-            BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
-            unpk.setArraySizeLimit(10000000);
-            int num = unpk.readInt();
-            boolean dead = unpk.readBoolean();
-            
-            TLongObjectMap<TLongSet> result = new TLongObjectHashMap<TLongSet>();
-            // TODO proceed from here
-            
-			if (dead) {
-			    logger.info("Chromosome {} crashed a worker!", num);
-			    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH, 
-				    "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
-			} else {
-			    int mapSize = unpk.readMapBegin();
-			    logger.trace("Chromosome {} triggered {} div instructions", num, mapSize);
-			    result = new TLongLongHashMap(mapSize, 0.68f, 0, Long.MAX_VALUE);
-			    for (int j = 0; j < mapSize; j++) {
-				long key = unpk.readLong();
-				long value = unpk.readLong();
-				if (value < min)
-				    min = value;
-				result.put(key, value);
-				if (value < mins.get(key))
-				    mins.put(key, value);
-			    }
-			    unpk.readMapEnd();
-			}
+            try {
+                ByteBuffer buffer = receiveResult();
+                BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
+                unpk.setArraySizeLimit(10000000);
+                int num = unpk.readInt();
+                boolean dead = unpk.readBoolean();
+
+                TLongObjectMap<TLongSet> result = new TLongObjectHashMap<>();
+
+                if (dead) {
+                    logger.info("Chromosome {} crashed a worker!", num);
+                    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH,
+                        "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+                } else {
+                    int mapSize = unpk.readMapBegin();
+                    result = new TLongObjectHashMap<>(mapSize);
+                    for (int j = 0; j < mapSize; j++) {
+                        int size = unpk.readMapBegin();
+                        long key = unpk.readLong();
+                        if (null==result.get(key))
+                            result.put(key, new TLongHashSet());
+                        TLongSet set = result.get(key);
+                        for (int k = 0; k < size; k++)
+                            set.add(unpk.readLong());
+                        unpk.readMapEnd();
+                    }
+                    unpk.readMapEnd();
+                }
+
+                result.forEachEntry(new UpdateTargets(targets));
+
                 XMLTestChromosome x = individual.getTestChromosome(num);
-                x.setLastExecutionResult(new DistanceMapExecutionResult(result));
-                x.setFitness(min);
+                x.setLastExecutionResult(new BasicBlockSuccessionMapExecutionResult(result));
+                CountTargets countTargets = new CountTargets();
+                result.forEachValue(countTargets);
+                x.setFitness(countTargets.getCount());
                 x.setChanged(false);
 
                 File outputFile = awaited.get(num);
@@ -92,9 +93,9 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
             }
         }
 
-        GetMinValue minEntry = new GetMinValue();
-        mins.forEachValue(minEntry);
-        long fitness = minEntry.min;
+        CountTargets countTargets = new CountTargets();
+        targets.forEachValue(countTargets);
+        long fitness = countTargets.getCount();
         individual.setFitness(fitness);
         individual.setChanged(false);
         evaluationClock.stop();
@@ -103,19 +104,9 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
 
     @Override
     public boolean isMaximizationFunction() {
-        return false;
+        return true;
     }
 
-    private static class GetMinValue implements TLongProcedure {
-	long min = Long.MAX_VALUE;
-	@Override
-	public boolean execute(long arg0) {
-	    if (arg0 < min)
-		min = arg0;
-	    return true;
-	}
-    }
-    
     private static class UpdateTargets implements TLongObjectProcedure<TLongSet> {
         private final TLongObjectMap<TLongSet>	targets;
 
@@ -130,6 +121,21 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
 			targets.get(a).addAll(b);
 			return true;
 		}
+    }
 
+    private static class CountTargets implements TObjectProcedure<TLongSet> {
+        private int count = 0;
+
+        public int getCount() {
+            return count;
+        }
+
+        @Override
+        public boolean execute(TLongSet object) {
+            if (object != null) {
+                count += object.size();
+            }
+            return true;
+        }
     }
 }
