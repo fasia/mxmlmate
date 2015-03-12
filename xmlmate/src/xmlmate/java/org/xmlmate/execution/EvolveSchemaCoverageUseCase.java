@@ -34,6 +34,8 @@ public class EvolveSchemaCoverageUseCase implements UseCase {
         // fitness function
         FitnessFunction<XMLTestSuiteChromosome> fitnessFunction = new SchemaCoverageFitnessFunction();
         ga.setFitnessFunction(fitnessFunction);
+        // make test suites aware of fitness orientation
+        XMLTestSuiteChromosome.fitnessMaximization = fitnessFunction.isMaximizationFunction();
 
         //secondary objectives
         XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeTotalLengthSecondaryObjective());

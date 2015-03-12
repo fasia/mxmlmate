@@ -27,6 +27,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     private static final Logger logger = LoggerFactory.getLogger(XMLTestSuiteChromosome.class);
     private static final List<SecondaryObjective> secondaryObjectives = new ArrayList<>(2);
     public static final SelectionFunction<XMLTestChromosome> selectionFunction = new TournamentSelection<>();
+    public static boolean fitnessMaximization = false;
     private double regexCoverage = 0.0d;
     private double elemCoverage = 0.0d;
     private double attrCoverage = 0.0d;
@@ -301,9 +302,23 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         return projectDir;
     }
 
+    private static final Comparator<XMLTestChromosome> xmlCompare = new Comparator<XMLTestChromosome>() {
+
+        @Override
+        public int compare(XMLTestChromosome o1, XMLTestChromosome o2) {
+            int diff = (int) o1.getFitness() - (int) o2.getFitness();
+            return fitnessMaximization ? -diff : diff;
+        }
+    };
+
     @Override
     public void mutate() {
         mutationClock.start();
+        Collections.sort(tests, xmlCompare);
+        List<XMLTestChromosome> newTests = new ArrayList<>(tests.size());
+        // elite
+        newTests.add(tests.get(0));
+
         // delete test cases?
         for (Iterator<XMLTestChromosome> iterator = tests.iterator(); iterator.hasNext(); ) {
             iterator.next();
@@ -314,7 +329,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             }
         }
 
-        int oldSize = tests.size();
+        int oldSize = tests.size() - 1; // -1 for elite
 
         List<Future<List<XMLTestChromosome>>> taskResults = new LinkedList<>();
         int chosen = 0;
@@ -332,10 +347,6 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
                 taskResults.add(mutatorService.submit(new Mutation(tests.get(index))));
             }
         }
-
-        List<XMLTestChromosome> newTests = new ArrayList<>(oldSize);
-        // TODO simulate elite
-
 
         // fill up unchanged
         newTests.addAll(selectionFunction.select(tests, oldSize - chosen));
@@ -357,7 +368,6 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             tests.add(testChromosomeFactory.getChromosome());
             setChanged(true);
         }
-
         mutationClock.stop();
     }
 

@@ -61,6 +61,8 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         // fitness function
         FitnessFunction fitnessFunction = chooseFitnessFunction();
         ga.setFitnessFunction(fitnessFunction);
+        // make test suites aware of fitness orientation
+        XMLTestSuiteChromosome.fitnessMaximization = fitnessFunction.isMaximizationFunction();
 
         // stopping conditions
         ZeroFitnessStoppingCondition zeroStop = new ZeroFitnessStoppingCondition();
