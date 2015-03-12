@@ -6,40 +6,39 @@ import gnu.trove.procedure.TLongObjectProcedure;
 import gnu.trove.procedure.TObjectProcedure;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import org.msgpack.MessagePack;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Map;
+
 public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFunction {
-	private static final long serialVersionUID = 2226177116546744577L;
-	private static final Logger logger = LoggerFactory.getLogger(BasicBlockSuccessionFitnessFunction.class);
-	private final MessagePack msgUnpack = new MessagePack();
-	
-	@Override
-	public double getFitness(XMLTestSuiteChromosome individual) {
-	    evaluationClock.start();
+    private static final long serialVersionUID = 2226177116546744577L;
+    private static final Logger logger = LoggerFactory.getLogger(BasicBlockSuccessionFitnessFunction.class);
+    private final MessagePack msgUnpack = new MessagePack();
 
-	    final TLongObjectMap<TLongSet> targets = new TLongObjectHashMap<>();
+    @Override
+    public double getFitness(XMLTestSuiteChromosome individual) {
+        evaluationClock.start();
 
-	    for (XMLTestChromosome x : individual.getTestChromosomes()) {
-	        if (!x.isChanged()) {
-	            TLongObjectMap<long[]> cached = ((BasicBlockSuccessionMapExecutionResult) x.getLastExecutionResult()).getSuccessions();
-	            cached.forEachEntry(new UpdateTargets(targets));
-	        }
-	    }
-	    Map<Integer, File> awaited = sendChangedChromosomes(individual.getTestChromosomes());
+        final TLongObjectMap<TLongSet> targets = new TLongObjectHashMap<>();
 
-	    logger.trace("Waiting for coverage of {} files", awaited.size());
+        for (XMLTestChromosome x : individual.getTestChromosomes()) {
+            if (!x.isChanged()) {
+                TLongObjectMap<long[]> cached = ((BasicBlockSuccessionMapExecutionResult) x.getLastExecutionResult()).getSuccessions();
+                cached.forEachEntry(new UpdateTargets(targets));
+            }
+        }
+        Map<Integer, File> awaited = sendChangedChromosomes(individual.getTestChromosomes());
 
-	    for (int i = 0; i < awaited.size(); i++) {
+        logger.trace("Waiting for coverage of {} files", awaited.size());
+
+        for (int i = 0; i < awaited.size(); i++) {
             try {
                 ByteBuffer buffer = receiveResult();
                 BufferUnpacker unpk = msgUnpack.createBufferUnpacker(buffer);
@@ -69,7 +68,7 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
                 XMLTestChromosome x = individual.getTestChromosome(num);
                 x.setLastExecutionResult(new BasicBlockSuccessionMapExecutionResult(result));
                 CountResults countResults = new CountResults();
-		result.forEachValue(countResults);
+                result.forEachValue(countResults);
                 x.setFitness(countResults.getCount());
                 x.setChanged(false);
 
@@ -100,19 +99,19 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
     }
 
     private static class UpdateTargets implements TLongObjectProcedure<long[]> {
-	private final TLongObjectMap<TLongSet> targets;
+        private final TLongObjectMap<TLongSet> targets;
 
-	public UpdateTargets(TLongObjectMap<TLongSet> targets) {
-	    this.targets = targets;
-	}
+        public UpdateTargets(TLongObjectMap<TLongSet> targets) {
+            this.targets = targets;
+        }
 
-	@Override
-	public boolean execute(long a, long[] b) {
-	    if (null == targets.get(a))
-		targets.put(a, new TLongHashSet());
-	    targets.get(a).addAll(b);
-	    return true;
-	}
+        @Override
+        public boolean execute(long a, long[] b) {
+            if (null == targets.get(a))
+                targets.put(a, new TLongHashSet());
+            targets.get(a).addAll(b);
+            return true;
+        }
     }
 
     private static class CountTargets implements TObjectProcedure<TLongSet> {
@@ -130,7 +129,7 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
             return true;
         }
     }
-    
+
     private static class CountResults implements TObjectProcedure<long[]> {
         private int count = 0;
 
@@ -138,11 +137,11 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
             return count;
         }
 
-	@Override
-	public boolean execute(long[] arg0) {
-	    count += arg0.length;
-	    return true;
-	}
+        @Override
+        public boolean execute(long[] arg0) {
+            count += arg0.length;
+            return true;
+        }
 
     }
 }

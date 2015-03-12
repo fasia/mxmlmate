@@ -2,7 +2,6 @@ package org.xmlmate.genetics;
 
 import nu.xom.Serializer;
 import nu.xom.canonical.Canonicalizer;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.xerces.xs.XSElementDeclaration;
 import org.evosuite.Properties;
@@ -24,7 +23,6 @@ import org.xmlmate.xml.AwareElement;
 import org.xmlmate.xml.AwareInstantiator;
 
 import javax.xml.namespace.QName;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -192,7 +190,7 @@ public class XMLTestChromosome extends ExecutableChromosome {
 
     @Override
     public boolean localSearch(LocalSearchObjective<? extends Chromosome> objective) {
-    	logger.trace("Local search on test");
+        logger.trace("Local search on test");
         if (doc.smallNumericMutation()) {
             setChanged(true);
             LocalSearchBudget.getInstance().countLocalSearchOnTest();

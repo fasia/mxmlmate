@@ -3,7 +3,6 @@ package org.xmlmate.xml.metrics;
 import org.apache.xerces.xs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlmate.XMLProperties;
 
 import java.util.HashSet;
 

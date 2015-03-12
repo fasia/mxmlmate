@@ -31,14 +31,15 @@ import java.util.Set;
 public class XMLNoIOTestRunner implements InterfaceTestRunnable {
     private static final Logger logger = LoggerFactory.getLogger(XMLNoIOTestRunner.class);
     private static final Set<String> knownExceptions = new HashSet<>(10);
-    private final Map<Integer, Throwable> exceptionsThrown = new HashMap<>(1,1.0f);
+    private final Map<Integer, Throwable> exceptionsThrown = new HashMap<>(1, 1.0f);
     private final XMLTestChromosome chrom;
     private static Transformer transformer;
 
     static {
         try {
             transformer = TransformerFactory.newInstance().newTransformer();
-        } catch (TransformerConfigurationException ignored) {}
+        } catch (TransformerConfigurationException ignored) {
+        }
     }
 
     private int numExceptions;

@@ -4,18 +4,17 @@ import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.hash.TLongLongHashMap;
 import gnu.trove.procedure.TLongLongProcedure;
 import gnu.trove.procedure.TLongProcedure;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Map;
-
 import org.evosuite.Properties;
 import org.msgpack.MessagePack;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Map;
 
 public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
     private static final long serialVersionUID = 2226177116546744577L;
@@ -51,29 +50,29 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
                 unpk.setArraySizeLimit(10000000);
                 int num = unpk.readInt();
                 boolean dead = unpk.readBoolean();
-                
+
                 TLongLongMap result = new TLongLongHashMap(0, 0.68f, 0, Long.MAX_VALUE);
                 long min = Long.MAX_VALUE;
-                
-		if (dead) {
-		    logger.info("Chromosome {} crashed a worker!", num);
-		    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH, 
-			    "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
-		} else {
-		    int mapSize = unpk.readMapBegin();
-		    logger.trace("Chromosome {} triggered {} div instructions", num, mapSize);
-		    result = new TLongLongHashMap(mapSize, 0.68f, 0, Long.MAX_VALUE);
-		    for (int j = 0; j < mapSize; j++) {
-			long key = unpk.readLong();
-			long value = unpk.readLong();
-			if (value < min)
-			    min = value;
-			result.put(key, value);
-			if (value < mins.get(key))
-			    mins.put(key, value);
-		    }
-		    unpk.readMapEnd();
-		}
+
+                if (dead) {
+                    logger.info("Chromosome {} crashed a worker!", num);
+                    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH,
+                        "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+                } else {
+                    int mapSize = unpk.readMapBegin();
+                    logger.trace("Chromosome {} triggered {} div instructions", num, mapSize);
+                    result = new TLongLongHashMap(mapSize, 0.68f, 0, Long.MAX_VALUE);
+                    for (int j = 0; j < mapSize; j++) {
+                        long key = unpk.readLong();
+                        long value = unpk.readLong();
+                        if (value < min)
+                            min = value;
+                        result.put(key, value);
+                        if (value < mins.get(key))
+                            mins.put(key, value);
+                    }
+                    unpk.readMapEnd();
+                }
                 XMLTestChromosome x = individual.getTestChromosome(num);
                 x.setLastExecutionResult(new DistanceMapExecutionResult(result));
                 x.setFitness(min);
@@ -106,15 +105,16 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
     }
 
     private static class GetMinValue implements TLongProcedure {
-	long min = Long.MAX_VALUE;
-	@Override
-	public boolean execute(long arg0) {
-	    if (arg0 < min)
-		min = arg0;
-	    return true;
-	}
+        long min = Long.MAX_VALUE;
+
+        @Override
+        public boolean execute(long arg0) {
+            if (arg0 < min)
+                min = arg0;
+            return true;
+        }
     }
-    
+
     private static class UpdateMinimum implements TLongLongProcedure {
         private final TLongLongMap mins;
 

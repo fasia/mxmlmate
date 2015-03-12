@@ -1,20 +1,9 @@
 package org.xmlmate.genetics;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import nu.xom.Node;
 import nu.xom.ParentNode;
-
-import org.apache.xerces.xs.XSComplexTypeDefinition;
-import org.apache.xerces.xs.XSElementDeclaration;
-import org.apache.xerces.xs.XSModelGroup;
-import org.apache.xerces.xs.XSParticle;
-import org.apache.xerces.xs.XSTerm;
-import org.apache.xerces.xs.XSTypeDefinition;
+import org.apache.xerces.xs.*;
 import org.evosuite.Properties;
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.ConstructionFailedException;
@@ -23,7 +12,10 @@ import org.evosuite.utils.Randomness;
 import org.xmlmate.XMLProperties;
 import org.xmlmate.xml.AwareElement;
 
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class XMLCrossOverFunction extends CrossOverFunction {
     private static final long serialVersionUID = -3420371603988147237L;
@@ -208,7 +200,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
 
         // choose next element declaration to be considered
         XSElementDeclaration decl = Randomness.choice(agenda);
-        
+
         // these are no longer needed
         common = null;
         agenda = null;
@@ -262,10 +254,10 @@ public class XMLCrossOverFunction extends CrossOverFunction {
                         switch (mgroup.getCompositor()) {
                             case XSModelGroup.COMPOSITOR_SEQUENCE:
                                 // TODO implement the subtle differences in handling of SEQUENCE
-                            	break;
+                                break;
                             case XSModelGroup.COMPOSITOR_ALL:
                                 // it's the same for choice and all for now...
-                            	break;
+                                break;
                             case XSModelGroup.COMPOSITOR_CHOICE: {
                                 // we can freely swap any children of choice elements
                                 HashSet<AwareElement> choices1 = new HashSet<>();
@@ -306,7 +298,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
     public void crossOver(Chromosome parent1, Chromosome parent2) throws ConstructionFailedException {
         if (parent1 == parent2) return;
         assert parent1 instanceof XMLTestSuiteChromosome && parent2 instanceof XMLTestSuiteChromosome : "Tried to crossover "
-                + parent1.getClass().getName() + " and " + parent2.getClass().getName();
+            + parent1.getClass().getName() + " and " + parent2.getClass().getName();
         crossOverSuites((XMLTestSuiteChromosome) parent1, (XMLTestSuiteChromosome) parent2);
     }
 }

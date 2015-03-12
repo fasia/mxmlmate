@@ -1,7 +1,6 @@
 package org.xmlmate.xml;
 
 import dk.brics.automaton.*;
-
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -13,25 +12,27 @@ import org.apache.xerces.xs.XSObjectList;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.evosuite.utils.Randomness;
 import org.xmlmate.XMLProperties;
-
 import regex.XSDRegLexer;
 import regex.XSDRegParser;
 import regex.XSDRegParser.RegExpContext;
 
 import javax.xml.XMLConstants;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ValueGenerator {
-    /** Stores used automata. */
+    /**
+     * Stores used automata.
+     */
     private static final ConcurrentHashMap<XSSimpleTypeDefinition, Automaton> cache = new ConcurrentHashMap<>();
-    private static final DatatypesAutomatonProvider automatonProvider = new DatatypesAutomatonProvider()
-    {
-//        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
-        private final Automaton	charAutomaton	= new RegExp("[a-zA-Z0-9]").toAutomaton();
+    private static final DatatypesAutomatonProvider automatonProvider = new DatatypesAutomatonProvider() {
+        //        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
+        private final Automaton charAutomaton = new RegExp("[a-zA-Z0-9]").toAutomaton();
         private final Automaton hexBinary = new RegExp("([A-Fa-f0-9][A-Fa-f0-9])+").toAutomaton();
-        
+
         @Override
         public Automaton getAutomaton(String name) {
             if ("Char".equalsIgnoreCase(name))
@@ -39,37 +40,37 @@ public final class ValueGenerator {
             if ("string".equalsIgnoreCase(name))
                 return charAutomaton.repeat();
             if ("hexBinary".equalsIgnoreCase(name))
-            	return hexBinary;
+                return hexBinary;
             return super.getAutomaton(name);
         }
     };
     private static Automaton rndString = Automaton.minimize(automatonProvider.getAutomaton("Char").repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
     private static Set<String> knownTypes = new HashSet<>(Arrays.asList(
-            "NCName",
-            // "QName",
-            // "URI",
-            "string",
-            "boolean",
-            "decimal",
-            "float",
-            "double", // not really known - use float instead
-            "integer",
-            "hexBinary",
-            "base64Binary",
-            "language",
-            // these work unreliably
-            "duration",
-            "dateTime",
-            "time",
-            "date",
-            "gYearMonth",
-            "gYear",
-            "gMonthDay",
-            "gDay",
-            // untested
-            "NCNames",
-            "Nmtokens",
-            "Names"
+        "NCName",
+        // "QName",
+        // "URI",
+        "string",
+        "boolean",
+        "decimal",
+        "float",
+        "double", // not really known - use float instead
+        "integer",
+        "hexBinary",
+        "base64Binary",
+        "language",
+        // these work unreliably
+        "duration",
+        "dateTime",
+        "time",
+        "date",
+        "gYearMonth",
+        "gYear",
+        "gMonthDay",
+        "gDay",
+        // untested
+        "NCNames",
+        "Nmtokens",
+        "Names"
     ));
 
     private ValueGenerator() {

@@ -1,7 +1,6 @@
 package org.xmlmate.xml;
 
 import nu.xom.*;
-
 import org.apache.xerces.xs.*;
 import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.xmlmate.XMLProperties;
 
 import javax.xml.XMLConstants;
-
 import java.util.*;
 
 /**
@@ -39,12 +37,12 @@ public class AwareElement extends Element {
         this.decl = decl;
     }
 
-    
+
     @Override
     protected Element shallowCopy() {
-    	AwareElement e = new AwareElement(getQualifiedName(), getNamespaceURI(), decl);
-    	e.isAny = isAny;
-    	return e;
+        AwareElement e = new AwareElement(getQualifiedName(), getNamespaceURI(), decl);
+        e.isAny = isAny;
+        return e;
     }
 
     public static AwareElement anyElem(String uri) {
@@ -83,10 +81,10 @@ public class AwareElement extends Element {
         setLocalName(newDecl.getName());
         NamespaceManager nsm = NamespaceManager.getInstance();
         String newNamespace = newDecl.getNamespace();
-        if (null!=newNamespace && !newNamespace.equals(getNamespaceURI())) {
-        	String prefix = nsm.getPrefix(newNamespace);
-        	setNamespacePrefix(prefix);
-        	setNamespaceURI(newNamespace);	
+        if (null != newNamespace && !newNamespace.equals(getNamespaceURI())) {
+            String prefix = nsm.getPrefix(newNamespace);
+            setNamespacePrefix(prefix);
+            setNamespaceURI(newNamespace);
         }
         // deregister from old set
         Map<XSElementDeclaration, Set<AwareElement>> eleMap = getEleMap();
@@ -140,7 +138,7 @@ public class AwareElement extends Element {
             case XSTypeDefinition.COMPLEX_TYPE: {
                 XSComplexTypeDefinition complexType = (XSComplexTypeDefinition) type;
             /*Elements children = getChildElements();
-			final int kidCount = children.size();
+            final int kidCount = children.size();
 
 			// mutate some of its children first
 			int[] indices = new int[kidCount];
@@ -210,7 +208,7 @@ public class AwareElement extends Element {
         List<XSComplexTypeDefinition> subTypes = new ArrayList<>();
         XSNamedMap complexTypes = XMLProperties.SCHEMA_INSTANCE.getComponents(XSTypeDefinition.COMPLEX_TYPE);
         short anyDerivation = XSConstants.DERIVATION_EXTENSION | XSConstants.DERIVATION_LIST | XSConstants.DERIVATION_RESTRICTION
-                | XSConstants.DERIVATION_SUBSTITUTION | XSConstants.DERIVATION_UNION;
+            | XSConstants.DERIVATION_SUBSTITUTION | XSConstants.DERIVATION_UNION;
         for (int i = 0; i < complexTypes.getLength(); i++) {
             XSComplexTypeDefinition type = (XSComplexTypeDefinition) complexTypes.item(i);
             if (!type.getAbstract() && type.derivedFromType(complexType, anyDerivation))
@@ -489,7 +487,7 @@ public class AwareElement extends Element {
         if (!stype.getNumeric()) return false;
 
         // TODO implement occasional range inversion
-        
+
         int value;
         try {
             value = Integer.parseInt(getValue());
@@ -500,7 +498,7 @@ public class AwareElement extends Element {
         if (Randomness.nextBoolean())
             offset = -offset;
         removeChildren();
-        appendChild(Integer.toString(value+offset));
+        appendChild(Integer.toString(value + offset));
         logger.trace("Local search offset {} by {}", getLocalName(), offset);
         return true;
     }

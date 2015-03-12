@@ -1,7 +1,10 @@
 package org.xmlmate.xml;
 
 import nu.xom.Attribute;
-import org.apache.xerces.xs.*;
+import org.apache.xerces.xs.StringList;
+import org.apache.xerces.xs.XSConstants;
+import org.apache.xerces.xs.XSElementDeclaration;
+import org.apache.xerces.xs.XSNamedMap;
 import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +20,7 @@ public class AwareInstantiator {
     private static final Logger logger = LoggerFactory.getLogger(AwareInstantiator.class);
 
     private AwareInstantiator() {
-    // prohibit creation
+        // prohibit creation
     }
 
     private static QName guessRootElem() {

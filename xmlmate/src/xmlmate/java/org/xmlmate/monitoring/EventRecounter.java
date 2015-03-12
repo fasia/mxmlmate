@@ -1,7 +1,6 @@
 package org.xmlmate.monitoring;
 
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Stopwatch;
 import org.evosuite.ga.Chromosome;
 import org.evosuite.ga.GeneticAlgorithm;
 import org.evosuite.ga.SearchListener;
@@ -9,7 +8,7 @@ import org.evosuite.testsuite.AbstractTestSuiteChromosome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Stopwatch;
+import java.util.concurrent.TimeUnit;
 
 public class EventRecounter implements SearchListener {
     private static final Logger logger = LoggerFactory.getLogger(EventRecounter.class);
@@ -32,7 +31,7 @@ public class EventRecounter implements SearchListener {
             size += chromosome.size();
         }
         Chromosome bestIndividual = algorithm.getBestIndividual();
-        
+
         logger.info("Generation {} had size {}, length {}, and took {}. Best fitness {} from gen {}", algorithm.getAge(), size, length, generationClock, bestIndividual.getFitness(), bestIndividual.getAge());
         generationClock.reset();
         generationClock.start();
@@ -40,8 +39,8 @@ public class EventRecounter implements SearchListener {
 
     @Override
     public void searchFinished(GeneticAlgorithm<?> algorithm) {
-    	globalClock.stop();
-        logger.info(String.format("Average generation duration: %s sec.", globalClock.elapsed(TimeUnit.SECONDS) / (double)(algorithm.getAge() + 1)));
+        globalClock.stop();
+        logger.info(String.format("Average generation duration: %s sec.", globalClock.elapsed(TimeUnit.SECONDS) / (double) (algorithm.getAge() + 1)));
     }
 
     @Override

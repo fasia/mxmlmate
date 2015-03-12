@@ -59,7 +59,7 @@ public class MeasureSchemaCoverageUseCase implements UseCase {
                 double schemaRegexCoverage = x.getSchemaRegexCoverage();
                 trans += schemaRegexCoverage;
                 String schemaCoverage = String
-                        .format(Locale.US, "%.2f,\t%.2f,\t%.2f,\n", schemaElementCoverage, schemaAttributeCoverage, schemaRegexCoverage);
+                    .format(Locale.US, "%.2f,\t%.2f,\t%.2f,\n", schemaElementCoverage, schemaAttributeCoverage, schemaRegexCoverage);
                 fw.write(schemaCoverage);
                 logger.info("{} in {}", schemaCoverage, dir);
             }

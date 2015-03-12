@@ -1,27 +1,9 @@
 package org.xmlmate;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.namespace.QName;
-
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.Transition;
 import nu.xom.Element;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xerces.impl.xs.XMLSchemaLoader;
@@ -34,14 +16,7 @@ import org.evosuite.ga.ChromosomeFactory;
 import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlmate.execution.BinaryBackendUseCase;
-import org.xmlmate.execution.EvolveBranchCoverageUseCase;
-import org.xmlmate.execution.EvolveHybridCoverageUseCase;
-import org.xmlmate.execution.EvolveSchemaCoverageUseCase;
-import org.xmlmate.execution.GenerateSingleFileUseCase;
-import org.xmlmate.execution.MeasureSchemaCoverageUseCase;
-import org.xmlmate.execution.SingletonPopulationBackendUseCase;
-import org.xmlmate.execution.UseCase;
+import org.xmlmate.execution.*;
 import org.xmlmate.genetics.*;
 import org.xmlmate.util.InstrumentationManager;
 import org.xmlmate.xml.AwareElement;
@@ -50,8 +25,14 @@ import org.xmlmate.xml.metrics.SchemaAllVisitor;
 import org.xmlmate.xml.metrics.SchemaRegexVisitor;
 import org.xmlmate.xml.metrics.SchemaTraverser;
 
-import dk.brics.automaton.Automaton;
-import dk.brics.automaton.Transition;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("PublicField")
 public class XMLProperties {
@@ -156,51 +137,51 @@ public class XMLProperties {
     }
 
     private static boolean hasRequiredParams(CommandLine line) {
-	if (!line.hasOption("schema")) {
-	    logger.error("No path to schema provided!");
-	    return false;
-	}
-	if (line.hasOption("bblCoverage")) {
-	    if (line.hasOption("prefix"))
-		logger.warn("prefix matching option not supported for bblCoverage use case!");
-	    if (line.hasOption("ignore-packages"))
-		logger.warn("ignore-packages matching option not supported for bblCoverage use case!");
-	    if (line.hasOption("class")) {
-		logger.error("You may not use the -class option with -bblCoverage!");
-		return false;
-	    }
-	    return true;
-	}
-	if (line.hasOption("memCoverage")) {
-	    if (line.hasOption("class")) {
-		logger.error("You may not use the -class options with the -memCoverage option!");
-		return false;
-	    }
-	    return true;
-	}
-    if (line.hasOption("bblSuccession")) {
-	    if (line.hasOption("class")) {
-		logger.error("You may not use the -class options with the -bblSuccession option!");
-		return false;
-	    }
-	    return true;
-	}
-    if (line.hasOption("div0Fitness")) {
-        if (line.hasOption("class")) {
-            logger.error("You may not use the -class options with the -div0Fitness option!");
+        if (!line.hasOption("schema")) {
+            logger.error("No path to schema provided!");
             return false;
         }
-        if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population"))!=1) {
-            logger.error("div0Fitness can only be used with a population of 1!");
-            return false;
+        if (line.hasOption("bblCoverage")) {
+            if (line.hasOption("prefix"))
+                logger.warn("prefix matching option not supported for bblCoverage use case!");
+            if (line.hasOption("ignore-packages"))
+                logger.warn("ignore-packages matching option not supported for bblCoverage use case!");
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class option with -bblCoverage!");
+                return false;
+            }
+            return true;
         }
-        return true;
-    }
+        if (line.hasOption("memCoverage")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -memCoverage option!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("bblSuccession")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -bblSuccession option!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("div0Fitness")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -div0Fitness option!");
+                return false;
+            }
+            if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
+                logger.error("div0Fitness can only be used with a population of 1!");
+                return false;
+            }
+            return true;
+        }
 
-	boolean hasRoot = line.hasOption("root");
-	if (line.hasOption("class") && line.hasOption("prefix"))
-	    return !line.hasOption("samples") || hasRoot;
-	return hasRoot && (line.hasOption("single") || line.hasOption("measure") || line.hasOption("schemaCoverage"));
+        boolean hasRoot = line.hasOption("root");
+        if (line.hasOption("class") && line.hasOption("prefix"))
+            return !line.hasOption("samples") || hasRoot;
+        return hasRoot && (line.hasOption("single") || line.hasOption("measure") || line.hasOption("schemaCoverage"));
     }
 
     private static void printHelpAndQuit(Options options) {
@@ -296,12 +277,12 @@ public class XMLProperties {
             logger.warn("No root element specified. Will resort to guessing.");
 
         if (line.hasOption("class")) {
-        	if (line.hasOption("bblCoverage")) {
-        		String errorMessage = "Options -class and -bblCoverage are incompatible!";
-        		logger.error(errorMessage);
-        		throw new RuntimeException(errorMessage);
-        	}
-        		
+            if (line.hasOption("bblCoverage")) {
+                String errorMessage = "Options -class and -bblCoverage are incompatible!";
+                logger.error(errorMessage);
+                throw new RuntimeException(errorMessage);
+            }
+
             // check driver class
             Properties.TARGET_CLASS = line.getOptionValue("class");
             // check prefixes
@@ -348,29 +329,29 @@ public class XMLProperties {
             RUN_NAME = "hybridCoverage " + RUN_NAME;
             return new EvolveHybridCoverageUseCase(factory);
         }
-	if (line.hasOption("bblCoverage")) {
-	    RUN_NAME = "bblCoverage " + RUN_NAME;
-	    return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction());
-	}
-	if (line.hasOption("memCoverage")) {
-	    RUN_NAME = "memCoverage " + RUN_NAME;
-	    if (Properties.POPULATION == 1)
-    		return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
-	    return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
-	}
-    if (line.hasOption("bblSuccession")) {
-	    RUN_NAME = "bblSuccession " + RUN_NAME;
-	    if (Properties.POPULATION == 1)
-    		return new SingletonPopulationBackendUseCase(factory, new BasicBlockSuccessionFitnessFunction());
-	    return new BinaryBackendUseCase(factory, new BasicBlockSuccessionFitnessFunction());
-	}
-    if (line.hasOption("div0Fitness")) {
-        RUN_NAME = "div0Fitness " + RUN_NAME;
-        assert Properties.POPULATION == 1;
-        return new SingletonPopulationBackendUseCase(factory, new DivByZeroFitnessFunction());
-    }
-    RUN_NAME = "branchCoverage " + RUN_NAME;
-    return new EvolveBranchCoverageUseCase(factory);
+        if (line.hasOption("bblCoverage")) {
+            RUN_NAME = "bblCoverage " + RUN_NAME;
+            return new BinaryBackendUseCase(factory, new BasicBlockCoverageFitnessFunction());
+        }
+        if (line.hasOption("memCoverage")) {
+            RUN_NAME = "memCoverage " + RUN_NAME;
+            if (Properties.POPULATION == 1)
+                return new SingletonPopulationBackendUseCase(factory, new SingletonPopulationMemoryAccessFitnessFunction());
+            return new BinaryBackendUseCase(factory, new MemoryAccessFitnessFunction());
+        }
+        if (line.hasOption("bblSuccession")) {
+            RUN_NAME = "bblSuccession " + RUN_NAME;
+            if (Properties.POPULATION == 1)
+                return new SingletonPopulationBackendUseCase(factory, new BasicBlockSuccessionFitnessFunction());
+            return new BinaryBackendUseCase(factory, new BasicBlockSuccessionFitnessFunction());
+        }
+        if (line.hasOption("div0Fitness")) {
+            RUN_NAME = "div0Fitness " + RUN_NAME;
+            assert Properties.POPULATION == 1;
+            return new SingletonPopulationBackendUseCase(factory, new DivByZeroFitnessFunction());
+        }
+        RUN_NAME = "branchCoverage " + RUN_NAME;
+        return new EvolveBranchCoverageUseCase(factory);
     }
 
     private static void parseModel() {

@@ -11,27 +11,27 @@ public class MaximizeDivisionsSecondaryObjective extends SecondaryObjective {
 
 
     private long getCumulativeFitness(XMLTestSuiteChromosome individual) {
-	long sum = 0l;
-	for (XMLTestChromosome x : individual.getTestChromosomes())
-	    sum += ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances().size();
-	return sum;
+        long sum = 0l;
+        for (XMLTestChromosome x : individual.getTestChromosomes())
+            sum += ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances().size();
+        return sum;
     }
 
     @Override
     public int compareChromosomes(Chromosome chromosome1, Chromosome chromosome2) {
-	if (chromosome1 instanceof XMLTestSuiteChromosome && chromosome2 instanceof XMLTestSuiteChromosome) {
-	    XMLTestSuiteChromosome x1 = (XMLTestSuiteChromosome) chromosome1;
-	    XMLTestSuiteChromosome x2 = (XMLTestSuiteChromosome) chromosome2;
-	    return (int)(getCumulativeFitness(x2) - getCumulativeFitness(x1));
-	}
-	logger.warn("Tried to use MinimizeCumulativeZeroDistanceSecondaryObjective for non XML Suite chromosomes");
-	return 0;
+        if (chromosome1 instanceof XMLTestSuiteChromosome && chromosome2 instanceof XMLTestSuiteChromosome) {
+            XMLTestSuiteChromosome x1 = (XMLTestSuiteChromosome) chromosome1;
+            XMLTestSuiteChromosome x2 = (XMLTestSuiteChromosome) chromosome2;
+            return (int) (getCumulativeFitness(x2) - getCumulativeFitness(x1));
+        }
+        logger.warn("Tried to use MinimizeCumulativeZeroDistanceSecondaryObjective for non XML Suite chromosomes");
+        return 0;
     }
 
     @Override
     public int compareGenerations(Chromosome parent1, Chromosome parent2, Chromosome child1, Chromosome child2) {
-	// TODO Auto-generated method stub
-	return 0;
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }
