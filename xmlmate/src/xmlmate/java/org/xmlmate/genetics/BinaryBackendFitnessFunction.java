@@ -31,7 +31,7 @@ public abstract class BinaryBackendFitnessFunction extends FitnessFunction<XMLTe
     private final Socket coverageIn;
     private final MessagePack msg = new MessagePack();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    protected final static AtomicInteger crashCounter = new AtomicInteger(0);
+    private final static AtomicInteger crashCounter = new AtomicInteger(0);
 
     public static final Stopwatch evaluationClock = Stopwatch.createUnstarted();
 
@@ -97,6 +97,20 @@ public abstract class BinaryBackendFitnessFunction extends FitnessFunction<XMLTe
             }
         }
         return awaited;
+    }
+
+    protected final void storeCrashChromosome(XMLTestChromosome x) {
+        logger.info("A worker has crashed!");
+        File projectDir = new File(XMLProperties.OUTPUT_PATH, XMLProperties.RUN_NAME);
+        if (!projectDir.mkdirs()) {
+            logger.error("Could not create output directory '{}'", projectDir.getAbsolutePath());
+            return;
+        }
+        try {
+            x.writeToFile(new File(projectDir, "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+        } catch (IOException e) {
+            logger.error("Could not store crash chromosome!", e);
+        }
     }
 
     protected final ByteBuffer receiveResult() {

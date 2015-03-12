@@ -39,9 +39,7 @@ public class MemoryAccessFitnessFunction extends BinaryBackendFitnessFunction {
                 boolean dead = unpk.readBoolean();
                 long[] la = EMPTY_RESULT;
                 if (dead) {
-                    logger.info("Chromosome {} crashed a worker!", num);
-                    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH,
-                        "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+                    storeCrashChromosome(individual.getTestChromosome(num));
                 } else {
                     la = unpk.read(long[].class);
                     logger.trace("Received {} items for chromosome {}", la.length, num);

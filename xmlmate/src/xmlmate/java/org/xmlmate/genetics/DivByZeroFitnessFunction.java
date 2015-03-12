@@ -55,9 +55,7 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
                 long min = Long.MAX_VALUE;
 
                 if (dead) {
-                    logger.info("Chromosome {} crashed a worker!", num);
-                    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH,
-                        "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+                    storeCrashChromosome(individual.getTestChromosome(num));
                 } else {
                     int mapSize = unpk.readMapBegin();
                     logger.trace("Chromosome {} triggered {} div instructions", num, mapSize);

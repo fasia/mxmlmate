@@ -49,9 +49,7 @@ public class BasicBlockSuccessionFitnessFunction extends BinaryBackendFitnessFun
                 TLongObjectMap<long[]> result = new TLongObjectHashMap<>();
 
                 if (dead) {
-                    logger.info("Chromosome {} crashed a worker!", num);
-                    individual.getTestChromosome(num).writeToFile(new File(XMLProperties.OUTPUT_PATH,
-                        "crash" + crashCounter.incrementAndGet() + XMLProperties.FILE_EXTENSION), true);
+                    storeCrashChromosome(individual.getTestChromosome(num));
                 } else {
                     int mapSize = unpk.readMapBegin();
                     result = new TLongObjectHashMap<>(mapSize);
