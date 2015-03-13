@@ -4,6 +4,7 @@ import gnu.trove.map.TLongLongMap;
 import gnu.trove.map.hash.TLongLongHashMap;
 import gnu.trove.procedure.TLongLongProcedure;
 import gnu.trove.procedure.TLongProcedure;
+
 import org.evosuite.Properties;
 import org.msgpack.MessagePack;
 import org.msgpack.unpacker.BufferUnpacker;
@@ -15,28 +16,26 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
+public class IntegerOverflowFitnessFunction extends BinaryBackendFitnessFunction {
     private static final long serialVersionUID = 2226177116546744577L;
-    private static final Logger logger = LoggerFactory.getLogger(DivByZeroFitnessFunction.class);
-    private static final TLongLongMap EMPTY_RESULT = new TLongLongHashMap(0, 0.68f, 0, Long.MAX_VALUE);
+    private static final Logger logger = LoggerFactory.getLogger(IntegerOverflowFitnessFunction.class);
+    private static final TLongLongMap EMPTY_RESULT = new TLongLongHashMap(0);
     private final MessagePack msgUnpack = new MessagePack();
 
-    public DivByZeroFitnessFunction() {
-        assert Properties.POPULATION == 1 : "The DivByZeroFitnessFunction can only be used with a singleton population!";
-        XMLTestSuiteChromosome.addSecondaryObjective(new MaximizeDivisionsSecondaryObjective());
-        XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeCumulativeZeroDistanceSecondaryObjective());
+    public IntegerOverflowFitnessFunction() {
+        assert Properties.POPULATION == 1 : "The IntegerOverflowFitnessFunction can only be used with a singleton population!";
     }
 
     @Override
     public double getFitness(XMLTestSuiteChromosome individual) {
         evaluationClock.start();
 
-        final TLongLongMap mins = new TLongLongHashMap(Properties.MAX_SIZE, 0.68f, 0, Long.MAX_VALUE);
-
+        final TLongLongMap maxes = new TLongLongHashMap(Properties.MAX_SIZE);
+        
         for (XMLTestChromosome x : individual.getTestChromosomes()) {
             if (!x.isChanged()) {
                 TLongLongMap cached = ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances();
-                cached.forEachEntry(new UpdateMinimum(mins));
+                cached.forEachEntry(new UpdateMaximum(maxes));
             }
         }
         Map<Integer, File> awaited = sendChangedChromosomes(individual.getTestChromosomes());
@@ -52,28 +51,28 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
                 boolean dead = unpk.readBoolean();
 
                 TLongLongMap result = EMPTY_RESULT;
-                long min = Long.MAX_VALUE;
+                long max = 0L;
 
                 if (dead) {
                     storeCrashChromosome(individual.getTestChromosome(num));
                 } else {
                     int mapSize = unpk.readMapBegin();
-                    logger.trace("Chromosome {} triggered {} div instructions", num, mapSize);
-                    result = new TLongLongHashMap(mapSize, 0.68f, 0, Long.MAX_VALUE);
+                    logger.trace("Chromosome {} triggered {} mul instructions", num, mapSize);
+                    result = new TLongLongHashMap(mapSize);
                     for (int j = 0; j < mapSize; j++) {
                         long key = unpk.readLong();
                         long value = unpk.readLong();
-                        if (value < min)
-                            min = value;
+                        if (value > max)
+                            max = value;
                         result.put(key, value);
-                        if (value < mins.get(key))
-                            mins.put(key, value);
+                        if (value > maxes.get(key))
+                            maxes.put(key, value);
                     }
                     unpk.readMapEnd();
                 }
                 XMLTestChromosome x = individual.getTestChromosome(num);
                 x.setLastExecutionResult(new DistanceMapExecutionResult(result));
-                x.setFitness(min);
+                x.setFitness(max);
                 x.setChanged(false);
 
                 File outputFile = awaited.get(num);
@@ -88,9 +87,9 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
             }
         }
 
-        GetMinValue minEntry = new GetMinValue();
-        mins.forEachValue(minEntry);
-        long fitness = minEntry.min;
+        GetMaxValue minEntry = new GetMaxValue();
+        maxes.forEachValue(minEntry);
+        long fitness = minEntry.max;
         individual.setFitness(fitness);
         individual.setChanged(false);
         evaluationClock.stop();
@@ -99,32 +98,32 @@ public class DivByZeroFitnessFunction extends BinaryBackendFitnessFunction {
 
     @Override
     public boolean isMaximizationFunction() {
-        return false;
+        return true;
     }
 
-    private static class GetMinValue implements TLongProcedure {
-        long min = Long.MAX_VALUE;
+    private static class GetMaxValue implements TLongProcedure {
+        long max = 0L;
 
         @Override
         public boolean execute(long arg0) {
-            if (arg0 < min)
-                min = arg0;
+            if (arg0 > max)
+                max = arg0;
             return true;
         }
     }
 
-    private static class UpdateMinimum implements TLongLongProcedure {
-        private final TLongLongMap mins;
+    private static class UpdateMaximum implements TLongLongProcedure {
+        private final TLongLongMap maxes;
 
-        public UpdateMinimum(TLongLongMap mins) {
-            this.mins = mins;
+        public UpdateMaximum(TLongLongMap maxes) {
+            this.maxes = maxes;
         }
 
         @Override
         public boolean execute(long a, long b) {
-            long prev = mins.get(a);
-            if (b < prev)
-                mins.put(a, b);
+            long prev = maxes.get(a);
+            if (b > prev)
+                maxes.put(a, b);
             return true;
         }
     }

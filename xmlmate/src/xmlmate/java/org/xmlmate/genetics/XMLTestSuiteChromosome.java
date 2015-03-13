@@ -319,12 +319,14 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         // elite
         newTests.add(tests.get(0));
 
+
         // delete test cases?
-        for (Iterator<XMLTestChromosome> iterator = tests.iterator(); iterator.hasNext(); ) {
-            iterator.next();
+        ListIterator<XMLTestChromosome> li = tests.listIterator(tests.size());
+        while(li.hasPrevious()) {
+            li.previous();
             if (Randomness.nextDouble() < 0.01 && tests.size() > 2) {
                 logger.trace("Removing an xml file");
-                iterator.remove();
+                li.remove();
                 setChanged(true);
             }
         }
