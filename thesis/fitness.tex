@@ -13,14 +13,14 @@ but posses subtle differences that e.g. might lead to slightly more or less favo
 the future. The next sections describe some of the new fitness function implementations available with the 
 extended and improved \xmlmate.
 %### 
-\subsubsection{Schema Coverage}
+\subsubsection{Schema Coverage Fitness Function}
 %###
 \label{sec:fit:schema}
 The very first extension from pure \java branch coverage and exception oriented fitness functions employed 
 previously in \xmlmate is the \texttt{Schema Coverage} fitness function. Its goal is to maximize the number 
 of schema rules used in the generated inputs. The reasoning behind this is that inputs which exhibit most of 
 the features described in the specification should also trigger more functionality in the program under test. 
-More concretely the schema coverage fitness value is computed as a weighted average of the three values:
+More concretely the schema coverage fitness value is computed as the average of the folowing three values:
 \begin{description}
   \item[element coverage] describes how many element declarations were instantiated in the generated inputs, 
   including substitution group members. A substitution group consists of jointly declared elements, which 
@@ -47,7 +47,10 @@ More concretely the schema coverage fitness value is computed as a weighted aver
   over all type definitions regarded together.
 \end{description}
 
-\improvement{Describe how exactly the fitness value is calculated (with a formula)}
+If the element, attribute and transition coverages are designated as $c_e$, $c_a$, and $c_t$ respectively and
+are numbers between zero and one, the overall schema coverage fitness value can be computed as $1 -
+\frac{c_e+c_a+c_t}{3}$, which makes this a \emph{minimization} fitness function, meaning that the genetic
+algorithm of \evosuite will try to get the value as close to zero as possible, which is its default behavior.
     
 Contrary to the initial expectations, \improvement{mention in the Evaluation section} the results do not 
 necessarily show a strong correlation between high schema coverage and some kinds of code coverage like 
@@ -64,7 +67,7 @@ fitness - no system under test, no brokers or converters are needed to compute t
 There is also no need for \texttt{IO} operations, as all \xml tree evaluations are processed in-memory.
 
 %### 
-\subsubsection{Basic Block Coverage}
+\subsubsection{Basic Block Coverage Fitness Function}
 %###
 A more or less direct transfer of \evosuite's \texttt{Instruction Count} fitness function is the 
 \texttt{Basic Block Coverage} fitness function, which aims to maximize the number of basic blocks 
@@ -156,6 +159,11 @@ under test. One consequence of this is that this fitness function must be a maxi
 that higher fitness values are considered better, which is somewhat atypical for \evosuite. Even though it has
 some degree of support for maximization functions, multiple code defects surfaced during the development that
 mostly had to do with hard-coded assumptions about the fitness function always being a minimization function.
+
+%### 
+\subsubsection{Basic Block Succession Fitness Function}
+%### 
+
 %### 
 \subsubsection{Memory Access}
 %###
@@ -203,14 +211,18 @@ employed population consisting of one suite. This, however, would have been unfa
 efforts as per \cref{sec:par} because \evosuite does not allow parallel evaluation of test suites without some
 major intrusion in its code base.
 %### 
-\subsubsection{Division by Zero}
+\subsubsection{Division by Zero Fitness Function}
 %###
-% different secondary objective
+% different secondary objectives
+
+%### 
+\subsubsection{Context Switches Fitness Function}
+%### 
  
 %### 
-\subsubsection{Integer Overflow}
+\subsubsection{Integer Overflow Fitness Function}
 %### 
 
 %### 
-\subsubsection{Buffer Overflow}
+\subsubsection{Buffer Overflow Fitness Function}
 %###

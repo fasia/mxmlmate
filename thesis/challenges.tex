@@ -50,7 +50,7 @@ internally and thus very lightweight.
 Since \xmlmate now comprises several processes, a communication protocol must be put in place to 
 interconnect the individual components. The communication channels themselves are built on top of
 the \zmq messaging library with \msgpack as the serialization/deserialization engine. The current
-implementation uses tcp loopback\footnote{TCP loopback is used because the pure \java implementation 
+implementation uses tcp\footnote{TCP loopback is used because the pure \java implementation 
 of \zmq does not support \texttt{ipc} on the Windows platform, which I do most of the development on.
 Using a JNI based Java wrapper as a drop-in replacement would alleviate this problem, 
 but it is not considered to be worth the effort.} 
@@ -72,45 +72,76 @@ into the identifying number and whatever data format is expected by the current 
 As far as the \java part of \xmlmate is concerned this is all it ever sees of the entire process, and so it 
 must rely on the pintool monitoring the application under test to collect and send back fitness results.
 
+A load balancer has three \zmq sockets through which it communicates with the rest of the system - they are
+called \emph{frontend}, \emph{backend} and \emph{forward}. When a message is received on the frontend,
+which is a \texttt{PULL} type socket, it is sent to the balancer's next available worker through
+the backend \texttt{ROUTER} type socket, and the worker is removed from the available worker queue. When the
+response arrives from a worker on the backend, it is redirected through the forward \texttt{PUSH} type socket
+further down the processing pipeline, and the worker is returned to the available worker queue. 
 
-A format converter receives a \zmq message via \texttt{PULL} on port 5556, unpacks it with \msgpack, 
-stores the identifying number, converts the file, packs the stored number followed by the path to 
-the converted file with \msgpack into another \zmq message and sends it out via \texttt{PUSH} on port 5560.
+Whenever a new worker wishes to join the balancer it sends a \texttt{RDY} message to the balancer's backend,
+which causes the worker's identity to be added to the queue of available workers. Similarly, when a worker
+process dies, its lifeguard signals the balancer with a \texttt{DEAD} message, which makes it forward a
+message with the corresponding input file number and the \texttt{dead} flag set to true further down the
+processing pipeline; the worker's identity is also removed form the worker queue. The most common system setup
+consists of two balancers operating on ports 5556, 5570, 5560, and 5560, 5580, 5557 as their frontends,
+backends, and forwards, respectively.
 
+A format converter has a single \texttt{DEALER} type socket operating on default port 5570.
+When a format converter is first started, it registers itself with its load balancer facade by sending a
+\texttt{RDY} message. Afterwards it receives \zmq messages, unpacks them with \msgpack, stores their
+identifying number, converts the file, packs the stored number followed by the path to the converted file with
+\msgpack into new \zmq messages and sends them out to its load balancer as a response.
 
-The broker is very simple: it pulls in messages on port 5560 and pushes them out again unaltered on port 5570.
-
-
-A test driver listens on port 5570 (or 5556 if there are no converters) for incoming \zmq messages and unpacks
-them with \msgpack into the identifying number and a path. It then calls \texttt{PIN\_SCORE\_START()} to 
-signal the start of the execution of the system under test to the monitoring pintool, whereafter it passes the 
-received file path to the sut for execution. When the sut finishes and control returns to the test driver, 
-it calls \texttt{PIN\_SCORE\_END(number)} with the number stored from the message earlier.
-
+Similarly to format converters, a test driver also has a \texttt{DEALER} type socket, which operates on the
+default port 5580 and with which it registers itself with its load balancer by sending \texttt{RDY}. After
+registration, the test driver listens for incoming \zmq messages and unpacks them with \msgpack
+into the identifying number and a path. It then calls \texttt{PIN\_SCORE\_START()} to signal the start of the
+execution of the system under test to the monitoring pintool, whereafter it passes the received file path to
+the sut for execution. When the sut finishes and control returns to the test driver, it calls
+\texttt{PIN\_SCORE\_END(number)} with the number stored from the message earlier.
 
 When a test driver calls \texttt{PIN\_SCORE\_START()}, the call gets replaced with a call to a method in the 
 pintool that clears its internal information buffers, thereby resetting all currently gathered fitness related 
 information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets replaced with 
-one that packs and sends out a message containing the identifying number and any fitness information via \zmq 
-\texttt{PUSH} on port 5557.
-Please note that all ports mentioned above are customizable and even the message carrier can be changed from
-tcp to any other protocol supported by \zmq, of which there are plenty. 
+one that packs and sends out a message containing the identifying number and any fitness information via
+the same \zmq \texttt{DEALER} socket the test driver received the original message on. This is possible
+because the pintool and the test driver run in the same process, which means they both have access to the same
+memory, and so a pointer can be easily shared between the two components.
 
-Also, at first, the role of the broker component might seem unclear, or the broker itself might make the
-impression of being largely unnecessary, as it seems logical that converters could be directly connected to
-the test drivers without it. However, as mentioned in \cref{sec:zmq}, \zmq has two concepts of linking its
-sockets: connecting for dynamic components, whose number is unknown a priori, and binding for static ones.
-Also, sockets sitting on opposite ends of a transport channel must use different linking modes.
-One of the design goals for the new \xmlmate extension was that it should be able to work with a variable
-number of converter and driver processes as a measure of adequate resource allocation adapting for different
-workloads (e.g. output file formats). To make the converters and drivers pluggable, they must be
-\emph{connecting}, and since the other side must \emph{bind}, they cannot be directly linked to each other. 
-The solution is to add a permanent component which binds the other ends of their respective connections and
-forwards the messages. So yes, for now the existence of the broker is due to a technicality, but in the future
-it may be enhanced with actual load balancing functionality, which could have a huge positive impact on the
-overall performance.
+Because test drivers can sometimes terminate unpredictably and unexpectedly (e.g. due to receiving an input
+file that causes them to fail because of a vulnerability), they are always started and guarded by special
+lifeguard processes. Whenever control returns to the lifeguard process itself, which means that the guarded
+process has terminated, it assumes its identity, creates a \texttt{DEALER} socket and sends out a \texttt{DEAD}
+message to the load balancer. Afterwards, it destroys the socket and restarts the test driver.
 
-\unsure{mention starting synchronization}
+Please note that all ports mentioned above are customizable and even the individual message carriers for
+each leg of the communication pathway can be changed from tcp to any other protocol supported by \zmq, of which
+there are plenty.
+
+% Also, at first, the role of the broker component might seem unclear, or the broker itself might make the
+% impression of being largely unnecessary, as it seems logical that converters could be directly connected to
+% the test drivers without it. However, as mentioned in \cref{sec:zmq}, \zmq has two concepts of linking its
+% sockets: connecting for dynamic components, whose number is unknown a priori, and binding for static ones.
+% Also, sockets sitting on opposite ends of a transport channel must use different linking modes.
+% One of the design goals for the new \xmlmate extension was that it should be able to work with a variable
+% number of converter and driver processes as a measure of adequate resource allocation adapting for different
+% workloads (e.g. output file formats). To make the converters and drivers pluggable, they must be
+% \emph{connecting}, and since the other side must \emph{bind}, they cannot be directly linked to each other.
+% The solution is to add a permanent component which binds the other ends of their respective connections and
+% forwards the messages. So yes, for now the existence of the broker is due to a technicality, but in the future
+% it may be enhanced with actual load balancing functionality, which could have a huge positive impact on the
+% overall performance.
+
+The described system contains quite a number of components and it is at least somewhat important to start them
+up in a manner that does not exhibit the slow joiner syndrome - a condition, when a worker which is slow to
+join the system, does not receive its fair share of work items because all of them were already distributed
+among its faster peers. To avoid this pitfall, it is advisable to start up the load balancers first, followed
+by converter and test driver processes, and then finally \xmlmate itself. To make sure that all other
+processes have formed the necessary connections, the default behavior of \xmlmate is to wait for a maximum of
+thirty seconds for a user input confirming the readiness of all other system components. After this timeout the
+process will be started automatically, thus making it well suited for unsupervised use.
+
 \change[inline]{make pretty communication graph}
 %###
 \subsubsection{Format Converters}
@@ -200,6 +231,7 @@ thresholds to otherwise completely parallel execution.
 %###
 \subsubsection{Local Search}
 %###
+\info{update for range inversion after it's implemented}
 As previously mentioned, one of the core principles of \xmlmate was to always create schema-valid inputs; 
 however, this no longer complies with current requirements in the use case of security testing as the 
 inputs that most often cause the targeted program to fail usually deviate from the specification in 

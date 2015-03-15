@@ -39,11 +39,20 @@ the registers that are overwritten by the injected code so the application conti
 
 Generally, the instrumentation with \pin consists of two components: a mechanism that decides where and what code to insert, 
 and the code to be executed at insertion points. These two components, called \emph{instrumentation} and \emph{analysis} 
-code are hosted in a single executable called a \emph{Pintool}, which functions like a plugin to the \pin framework.
+code are hosted in a single executable called a \emph{pintool}, which functions like a plugin to the \pin framework.
 A pintool can register callbacks on different levels of granularity, varying from single instructions over procedures
 to entire binary images, in order to receive context-dependent information and access to values of particular interest.
-\improvement{Mention gcov and valgrind}
-\unsure[inline]{maybe add small example}
+
+\pin provides two modes of execution: just-in-time (jit) and probe. The latter is designed for replacing
+entire individual routines and offers a very small API, but relatively good performance. The former provides
+a rich API and access to granularity levels much more precise than routine level, but the instrumented process
+suffers a significant performance penalty. For the purpose of using \pin as part of specific fitness functions
+a high level of detail is necessary, which is why jit mode is used. To somewhat compensate for the performance
+loss, a system has been put in place, which allows to parallelize the execution of processes instrumented with
+\pin. \Cref{sec:par} gives more details about these parallelization efforts.
+
+\improvement[inline]{Mention gcov}
+\unsure[inline]{Mention valgrind}
 %### 
 \subsubsection{ZeroMQ}
 %###
