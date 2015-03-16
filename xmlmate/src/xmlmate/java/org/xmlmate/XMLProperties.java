@@ -3,6 +3,7 @@ package org.xmlmate;
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.Transition;
 import nu.xom.Element;
+
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import org.xmlmate.xml.metrics.SchemaRegexVisitor;
 import org.xmlmate.xml.metrics.SchemaTraverser;
 
 import javax.xml.namespace.QName;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -100,6 +102,7 @@ public class XMLProperties {
         options.addOption("bblSuccession", false, "Use with PIN to maximize basic block path of length two coverage.");
         options.addOption("memCoverage", false, "Use with PIN to maximize memory accesses.");
         options.addOption("div0Fitness", false, "Use with PIN to aim for div by zero.");
+        options.addOption("intOverflow", false, "Use with PIN to aim for integer overflows.");
         options.addOption("r", "root", true, "Root element of the xml tree.");
         options.addOption("a", "samples", true, "Path to samples (file or folder). If given, root must also be given.");
         options.addOption("t", "timeout", true, "Termination time in sec. Default is " + GLOBAL_TIMEOUT);
@@ -173,6 +176,17 @@ public class XMLProperties {
             }
             if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
                 logger.error("div0Fitness can only be used with a population of 1!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("intOverflow")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -intOverflow option!");
+                return false;
+            }
+            if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
+                logger.error("intOverflow can only be used with a population of 1!");
                 return false;
             }
             return true;
@@ -349,6 +363,11 @@ public class XMLProperties {
             RUN_NAME = "div0Fitness " + RUN_NAME;
             assert Properties.POPULATION == 1;
             return new SingletonPopulationBackendUseCase(factory, new DivByZeroFitnessFunction());
+        }
+        if (line.hasOption("intOverflow")) {
+        	RUN_NAME = "intOverflow " + RUN_NAME;
+        	assert Properties.POPULATION == 1;
+        	return new SingletonPopulationBackendUseCase(factory, new IntegerOverflowFitnessFunction());
         }
         RUN_NAME = "branchCoverage " + RUN_NAME;
         return new EvolveBranchCoverageUseCase(factory);

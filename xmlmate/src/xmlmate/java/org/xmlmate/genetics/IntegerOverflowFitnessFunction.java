@@ -61,7 +61,8 @@ public class IntegerOverflowFitnessFunction extends BinaryBackendFitnessFunction
                     result = new TLongLongHashMap(mapSize);
                     for (int j = 0; j < mapSize; j++) {
                         long key = unpk.readLong();
-                        long value = unpk.readLong();
+                        long[] values = unpk.read(long[].class);
+                        long value = values[0] + values[1];
                         if (value > max)
                             max = value;
                         result.put(key, value);

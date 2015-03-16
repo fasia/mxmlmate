@@ -363,7 +363,6 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         tests = newTests;
         setChanged(true);
 
-        assert size() == oldSize;
         // Add new test cases
         for (int count = 1; (Randomness.nextDouble() <= StrictMath.pow(Properties.P_TEST_INSERTION, count)) && (size() < Properties.MAX_SIZE); count++) {
             logger.trace("Adding new xml file. (Current size is {})", size());
