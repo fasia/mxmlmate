@@ -163,11 +163,30 @@ mostly had to do with hard-coded assumptions about the fitness function always b
 %### 
 \subsubsection{Basic Block Succession Fitness Function}
 %### 
+The \texttt{Basic Block Succession} fitness function is an extension of the \texttt{Basic Block Coverage}
+fitness function in that it is also heavily based on observing the execution of basic blocks. However, this
+extension also considers the order in which the blocks are executed. More specifically, for each basic block
+this fitness function aims to maximize the number of unique basic blocks that are executed immediately after.
+Put differently, the \texttt{Basic Block Succession} fitness function provides guidance for maximizing the
+number of control paths of length two taken by the program under test. According to the
+author\footnote{http://lcamtuf.blogspot.de/2014/08/a-bit-more-about-american-fuzzy-lop.html} of the
+\texttt{American Fuzzy Lop} smart fuzzing tool\cite{afl} this strategy strikes a good balance between
+fitness function complexity and effectiveness, and is very helpful in finding defects.
+
+To accomplish its task, the pintool maintains a map, which contains an address for each basic block that was
+observed to be executed as a key. Each key is assigned as value a set of all basic blocks that were executed
+immediately after it - be it by fall-through, call, return, or conditional jump. 
+
+The \java part of the \texttt{Basic Block Succession} fitness function receives this map data for each file in
+the suite, and collates and merges it into a single basic block successor graph in order to determine the
+fitness of the entire suite. The fitness value is then calculated as the number of edges of this graph. 
+\improvement[inline]{Add graph example (+merging)}
 
 %### 
 \subsubsection{Memory Access}
 %###
-All previously mentioned fitness functions are aimed at increasing a coverage of one sort or another; however,
+\label{sec:memcov}
+All previously described fitness functions are aimed at increasing a coverage of one sort or another; however,
 in the context of using \xmlmate to try and find vulnerabilities in the system under test, this is not
 necessarily the most promising approach. In order to be able to find vulnerabilities having to do with
 operations such as reading from and writing to memory, such as null pointer dereferences or buffer underflows
@@ -213,16 +232,85 @@ major intrusion in its code base.
 %### 
 \subsubsection{Division by Zero Fitness Function}
 %###
-% different secondary objectives
+Like the \texttt{Memory Access} fitness function, the \texttt{Division by Zero} fitness function is also
+designed to find vulnerabilities in the program under test instead of simply improving test input quality. In
+particular, this fitness function aims to uncover a single class of denial of service vulnerabilities -
+unhandled arithmetic exceptions that arise from performing division by zero.
+
+When the program under test processes an input file, it usually executes multiple distinct division
+instructions, and many of them - multiple times, so there is no simple and obvious way to directly assign a
+fitness value to an input file. The first idea is to record all observed instances of division and choose the
+smallest absolute value of a divisor as the fitness score. However, such an assignment is not very beneficial
+to the diversity of the inputs' gene pool as it makes it converge to smaller files with a minimum number of
+executed divisions as long as there is at least one divisor close to zero. Such a constriction opposes the
+goal of triggering a division exception as it artificially and unnecessarily limits the number of sites
+that are considered for exploration. 
+
+To counteract this effect additional secondary objectives were put in place. The first secondary objective is
+the \texttt{MaximizeDivisionsSecondaryObjective} and its goal is to enlarge the number of sites in the
+program under test that are being explored by the search process by increasing the number of division
+instructions covered by a suite. Using only this single secondary objective, however, leads to individuals
+simply growing in size over the course of evolution, while keeping at least one close-to-zero divisor. While
+this is beneficial to the diversity of the suites, it causes an unwelcome strain on the performance, which
+is why another secondary - or rather a tertiary - objective has been added - the
+\texttt{MinimizeCumulativeZeroDistanceSecondaryObjective}. The goal of this objective is to prevent an
+uncontrolled growth and ensure overall improvement of quality of the individuals by keeping the cumulative
+divisor distance to zero as small as possible.
+
+At runtime the pintool component of the \texttt{Division by Zero} fitness function intercepts all invocations
+of the \texttt{DIV} and \texttt{IDIV} x86 instructions and records the divisor value in a list, which is
+associated with the address of the instruction in question by means of a map container. When the execution of
+the system under test has ended, for each division instruction the pintool keeps only the divisor with the
+smallest zero distance when it packages the message to be sent out to its \java fitness function counterpart.
+There is a reason behind selecting the best divisor only after the main runtime instead of doing it on-the-fly,
+even though it wastes some memory space for storing all observed divisors. This is an instance of the classical
+runtime vs memory requirement trade off: by having injected code simply append any new value to a list
+instead of doing comparisons to decide whether to keep or reject the new value, the code is simple enough to
+be inlined and thus performs considerably faster; and with main memory being available in abundance on  modern
+computers and execution speed being the most limiting factor, it seems like a good trade off to make.
+
+Because the \texttt{Division by Zero} fitness function is meant to be used for vulnerability scanning, it is
+exclusively compatible with the singleton population evolution mode introduced in \cref{sec:memcov}. The \java
+component of this fitness function keeps a record of all executed division instructions alongside the absolute
+value of their divisor closest to zero for each file in a suite. The overall fitness score of the entire suite
+is then determined by finding the minimal divisor distance over all division instructions over all files in
+the suite.
+
+As previously suggested, this fitness function currently only supports integer based division instructions
+because \pin imposes a limitation on retrieving floating point values from
+registers\footnote{\url{https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/index.html\#FP}}.
+Working around this and adding support for \texttt{SIMD} instructions are some planned future improvements.
+
+An intuition is that it is unusual for valid well formed inputs to cause divisions by zero in the program under
+test. It is therefore recommended to use the local search feature described in \cref{sec:local}, which is
+capable of producing values beyond the range of validity, in order to increase the chances of actually
+triggering arithmetic exceptions.
 
 %### 
-\subsubsection{Context Switches Fitness Function}
+%\subsubsection{Context Switches Fitness Function}
 %### 
+% TODO mention in future work section
  
 %### 
 \subsubsection{Integer Overflow Fitness Function}
 %### 
+Continuing in the vein of fitness functions specialized in narrow categories of vulnerabilities, the next
+fitness function is the \texttt{Integer Overflow Fitness Function}. Just as the name suggests, its aim is to
+guide the evolution of inputs towards causing an unhandled integer overflow. Integer overflows are often
+suitable as vessels for denial of service attacks as well as access control attacks, and therefore of
+critical severity. 
+
+In order to achieve its goal the \texttt{Integer Overflow} fitness function\ldots
+% method - multiplications (and additions)
+% need for local search
+% singleton population
+% standard secondary objectives?
 
 %### 
 \subsubsection{Buffer Overflow Fitness Function}
 %###
+% motivation
+% method and relation to memory access fitness function
+% singleton population
+% secondary objectives
+% local search
