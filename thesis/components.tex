@@ -84,4 +84,24 @@ of the components involved in the new extended \xmlmate work process.
 \end{itemize}
 \improvement[inline]{Add illustration of system components}
 
-\unsure[inline]{Maybe describe mockups used in the development process}
+When developing such a diverse ecosystem it is important to be able to inspect and test each component
+individually, so as not to lose track of important details, and be able to isolate faults efficiently without
+having to keep the entire system in the focus of attention. This is best accomplished by having very light
+mockup versions of the most important system components, so that the entire system does not have to be launched
+when concentrating on a single component. Instead, only the real component under investigation has to be
+started, while the rest of the system is being simulated by the ``bare bones'' component  mockups. 
+
+Examples for such mockup components that were used during development include two test driver mockups - one
+written in \java and one in {\small C}, which were used to test basic \zmq connectivity and
+cross-language \msgpack serialization/deserialization respectively. Several mockups for the system under test
+were used to test the \java parts of \xmlmate's fitness functions by simply sending random data in the
+required \msgpack format without requiring any binary instrumentation. As for the ``other side'' of the system
+- there is a mock version of \xmlmate itself, which sends out work items that consist of hardcoded file paths,
+which alleviates the need to generate new input files, as well as provides deterministic inputs as a means to
+test the consistency of the values reported by the pintool components of fitness functions. Having this mockup
+send out predefined work items additionally allows to skip any format conversion phase, which further lightens
+the complexity of the system. 
+
+In most cases, when implementing new components of a system from scratch, I found it to be very advisable to
+start with their mockup version, as the effort is usually worthwhile because any mistakes can be caught
+cheaply and early on and most of the code is directly transferable to the finished component.

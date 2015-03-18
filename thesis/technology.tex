@@ -29,7 +29,7 @@ Unfortunately, it only exposes its functionality via \java interfaces, which mak
 %### 
 \subsubsection{PIN}
 %### 
-{\small Intel} \pin\cite{pin} is a dynamic binary instrumentation framework for the IA-32 and x86-64 instruction-set architectures 
+{\small Intel} \pin\cite{Luk05pin:building} is a dynamic binary instrumentation framework for the IA-32 and x86-64 instruction-set architectures 
 that enables the creation of program analysis tools, which perform the instrumentation at run time on  
 compiled binary files. Thus, it requires no recompiling of source code and can support instrumenting programs that dynamically generate code.
 \pin allows a tool to insert arbitrary code (written in {\small C} or \cpp) in arbitrary places in the executable, for which it 
@@ -51,8 +51,14 @@ a high level of detail is necessary, which is why jit mode is used. To somewhat 
 loss, a system has been put in place, which allows to parallelize the execution of processes instrumented with
 \pin. \Cref{sec:par} gives more details about these parallelization efforts.
 
-\improvement[inline]{Mention gcov}
-\unsure[inline]{Mention valgrind}
+At one point, the GNU test coverage tool \texttt{gcov}\cite{gcov} was considered as an alternative to using
+\pin, yet the decision finally rested with \pin because gcov is inferior in many points: it is only
+compatible with code compiled with \texttt{GCC} using debug flags and with optimizations turned off, and it
+lacks the rich API that \pin offers as it is merely capable of indicating lines of code that were executed, and
+thus is severely lacking in features.
+
+There was also a consideration to use \texttt{Valgrind}\cite{Nethercote03valgrind:a} instead of \pin, but \pin
+won this case as well, though mostly due to its more easily accessible and example-rich documentation. 
 %### 
 \subsubsection{ZeroMQ}
 %###
@@ -99,10 +105,10 @@ the gigantic community support like that of \zmq, which ultimately lead me to no
 \subsubsection{MessagePack}
 %### 
 Because a messaging library only solves the problem of getting \emph{arbitrary data} between peers, it 
-alone does not suffice for creating a fully fledged communication protocol - this is where serialization/deserialization libraries 
-usually come in. \msgpack\cite{msgpack} is one such serialization format that is highly efficient as it based on 
-binary representation of data. It is implemented as a library in at least 20 programming languages. 
-Once again, \xmlmate uses the ones for \java, \python, {\small C}, and \cpp.
+alone does not suffice for creating a fully fledged communication protocol - this is where
+serialization/deserialization libraries usually come in. \msgpack{}\cite{msgpack} is one such serialization
+format that is highly efficient as it uses binary representation of data. It is implemented as a library in at
+least 20 programming languages. Once again, \xmlmate uses the ones for \java, \python, {\small C}, and \cpp.
 While \msgpack is very efficient in what it does, it has some disadvantages such as 
 \begin{itemize}
   \item Integer values are limited to be in $[-2^{63}, 2^{64}-1]$.
@@ -110,15 +116,20 @@ While \msgpack is very efficient in what it does, it has some disadvantages such
   \item It is the user's responsibility to ensure correct endianness across all endpoints.
 \end{itemize}
 
-There is another relatively young binary serialization format \emph{CBOR}\footnote{\url{http://tools.ietf.org/html/rfc7049}} 
-that does not have many of {\small MessagePack's} disadvantages, while being comparatively as efficient.
+There is another relatively young binary serialization format
+{\small CBOR}\footnote{\url{http://tools.ietf.org/html/rfc7049}} that does not have many of {\small
+MessagePack's} disadvantages, while being comparatively as efficient.
 There are implementations in {\small C}, \python and \java; however, at the time of {\small XMLMate's}
-conception I did not know of their existence. This might be a subject of some future enhancement.
-\info{Mention in Future Work}
+conception I did not know of their existence. 
 % C (https://github.com/upwhere/ccbor), 
 % Python (https://code.google.com/p/cbor/) 
 % and Java (https://github.com/c-rack/cbor-java)
-\unsure{Mention Protobuf, Cap'n Proto, SBE, and FlatBuffers}
+After some additional research more serialization/deserialization formats and libraries were found, like
+{\small Cap'n Proto}\footnote{\url{https://capnproto.org/}},
+{\small Simple Binary Encoding}\footnote{\url{https://real-logic.github.io/simple-binary-encoding/}}, and
+{\small FlatBuffers}\footnote{\url{https://google.github.io/flatbuffers/}} with some more promising than
+others. Finding a more suitable replacement for \msgpack might be a subject of some future enhancement.
+\info{Mention in Future Work}
 %### 
 \subsubsection{GNU Trove}
 %### 
