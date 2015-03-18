@@ -81,6 +81,11 @@ VOID recordIns(ADDRINT ip, ADDRINT divisor) {
 	divInstructions[ip].push_back((INT64)divisor);
 }
 
+VOID recordIns2(ADDRINT ip, UINT64 *addr) {
+	// cout << ip << " / " << divisor << endl;
+	divInstructions[ip].push_back(*addr);
+}
+
 VOID resetCounters(void *ptr) {
 //	*out << "Resetting PIN counters" << endl;
 	free(ptr);
@@ -149,7 +154,10 @@ VOID Instruction(INS ins, VOID *v) {
     	// divisor is 0th argument
     	// initialize container list on first contact
     	divInstructions[INS_Address(ins)] = *(new std::list<INT64>);
-    	INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 0), IARG_END);
+    	if (INS_OperandIsReg(ins, 0))
+    		INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 0), IARG_END);
+    	else if (INS_OperandIsMemory(ins, 0))
+    		INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns2, IARG_INST_PTR, IARG_MEMORYREAD_EA, IARG_END);
     	break;
     }
     // temporarily unsupported
