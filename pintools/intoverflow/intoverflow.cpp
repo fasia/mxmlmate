@@ -18,7 +18,7 @@ typedef std::map<ADDRINT, std::list<std::pair<INT64, INT64> > > Instructions_T;
 static string targetImage = "";	//name of the targeted binary image
 static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
-static Instructions_T mulInstructions;
+static Instructions_T instructions;
 std::ostream * out = &cerr;
 
 /* ===================================================================== */
@@ -53,11 +53,14 @@ void *SendResults(uint32_t id, void *socket) {
 	std::map<ADDRINT, std::pair<INT64, INT64> > maxima;
 	Instructions_T::iterator itmap;
 
-	for (itmap = mulInstructions.begin(); itmap != mulInstructions.end(); ++itmap) {
+	for (itmap = instructions.begin(); itmap != instructions.end(); ++itmap) {
 		std::list<std::pair<INT64, INT64> >::iterator itli;
 		for (itli = itmap->second.begin(); itli != itmap->second.end(); ++itli) {
-			INT64 first = std::abs(itli->first) >> 1;
-			INT64 second = std::abs(itli->second) >> 1;
+			// the absolute values here cause noise in case of ADD instructions
+//			INT64 first = std::abs(itli->first) >> 1;
+//			INT64 second = std::abs(itli->second) >> 1;
+			INT64 first = (itli->first) >> 1;
+			INT64 second = (itli->second) >> 1;
 			INT64 sum = first + second;
 			std::map<ADDRINT, std::pair<INT64, INT64> >::iterator itr = maxima.find(itmap->first);
 			if (itr == maxima.end() || sum > itr->second.first + itr->second.second)
@@ -82,12 +85,12 @@ void *SendResults(uint32_t id, void *socket) {
 
 VOID recordIns(ADDRINT ip, INT64 factor1, INT64 factor2) {
 //	cout << factor1 << " * " << factor2 << endl;
-	mulInstructions[ip].push_back(std::make_pair(factor1,factor2));
+	instructions[ip].push_back(std::make_pair(factor1,factor2));
 }
 
 VOID recordIns2(ADDRINT ip, INT64 factor1, UINT64 *addr) {
 //	cout << factor1 << " ** " << *addr << endl;
-	mulInstructions[ip].push_back(std::make_pair(factor1,*addr));
+	instructions[ip].push_back(std::make_pair(factor1,*addr));
 }
 
 VOID resetCounters(void *ptr) {
@@ -95,7 +98,7 @@ VOID resetCounters(void *ptr) {
 	free(ptr);
 	// go through divInstructions and clear the lists
 	Instructions_T::iterator iter;
-	for (iter = mulInstructions.begin(); iter != mulInstructions.end(); ++iter)
+	for (iter = instructions.begin(); iter != instructions.end(); ++iter)
 		iter->second.clear();
 }
 
@@ -166,7 +169,7 @@ VOID Instruction(INS ins, VOID *v) {
     case XED_ICLASS_IMUL:
     {
     	// initialize container list on first contact
-    	mulInstructions[INS_Address(ins)] = *(new std::list<std::pair<INT64, INT64> >);
+    	instructions[INS_Address(ins)] = *(new std::list<std::pair<INT64, INT64> >);
     	int offset = 0;
     	switch (INS_OperandCount(ins)) {
     		case 4:
@@ -194,7 +197,7 @@ VOID Instruction(INS ins, VOID *v) {
 						// op2 is immediate
 						cout << "REG * IMM" << endl;
 						INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR,
-								IARG_REG_VALUE, INS_OperandReg(ins, first), IARG_REG_VALUE, INS_OperandImmediate(ins, second), IARG_END);
+								IARG_REG_VALUE, INS_OperandReg(ins, first), IARG_ADDRINT, INS_OperandImmediate(ins, second), IARG_END);
 					}
 					// op2 is unknown type
 				} else if (INS_OperandIsMemory(ins, first)) {
@@ -207,8 +210,8 @@ VOID Instruction(INS ins, VOID *v) {
 					} else if (INS_OperandIsImmediate(ins, second)) {
 						// op2 is immediate
 						cout << "MEM * IMM" << endl;
-						INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR,
-								IARG_REG_VALUE, INS_OperandImmediate(ins, second), IARG_MEMORYREAD_EA, IARG_END);
+						INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns2, IARG_INST_PTR,
+								IARG_ADDRINT, INS_OperandImmediate(ins, second), IARG_MEMORYREAD_EA, IARG_END);
 					} else if (INS_OperandIsMemory(ins, second)) {
 						// op2 is memory - should be impossible
 						cout << "MEM * MEM" << endl;
@@ -216,6 +219,23 @@ VOID Instruction(INS ins, VOID *v) {
 				}
 				break;
 		}
+    	break;
+    }
+    case XED_ICLASS_ADD:
+    {
+    	if (INS_OperandIsReg(ins, 0)) {
+    		if (INS_OperandIsReg(ins, 1))
+    			INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 0), IARG_REG_VALUE, INS_OperandReg(ins, 1), IARG_END);
+    		else if (INS_OperandIsImmediate(ins, 1))
+    			INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 0), IARG_ADDRINT, INS_OperandImmediate(ins, 1), IARG_END);
+    		else if (INS_OperandIsMemory(ins, 1))
+    			INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns2, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 0), IARG_MEMORYREAD_EA, IARG_END);
+    	} else if (INS_OperandIsMemory(ins, 0)) {
+    		if (INS_OperandIsReg(ins, 1))
+				INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns2, IARG_INST_PTR, IARG_REG_VALUE, INS_OperandReg(ins, 1), IARG_MEMORYREAD_EA, IARG_END);
+			else if (INS_OperandIsImmediate(ins, 1))
+				INS_InsertCall(ins,IPOINT_BEFORE,(AFUNPTR)recordIns2, IARG_INST_PTR, IARG_ADDRINT, INS_OperandImmediate(ins, 1), IARG_MEMORYREAD_EA, IARG_END);
+    	}
     	break;
     }
 	default:
@@ -226,7 +246,7 @@ VOID Instruction(INS ins, VOID *v) {
 VOID Fini(INT32 code, VOID *v) {
 	*out << "Freeing resources" << endl;
 	Instructions_T::iterator iter;
-	for (iter = mulInstructions.begin(); iter != mulInstructions.end(); ++iter)
+	for (iter = instructions.begin(); iter != instructions.end(); ++iter)
 		delete &iter->second;
 }
 
