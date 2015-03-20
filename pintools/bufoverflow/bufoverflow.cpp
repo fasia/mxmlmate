@@ -8,6 +8,24 @@
 #include <map>
 #include <msgpack.hpp>
 
+/*
+ TODO need mappings
+ allocations = (start,end) -> returnIP
+ accesses = returnIP -> max distance
+
+ try for
+ [..........x...]
+ with
+     start <= x <= end
+ <=> x - start <= size
+ and
+     math::abs(size/2 - x) as big as possible
+
+
+ send out accesses
+ */
+
+
 typedef std::pair<ADDRINT, ADDRINT> Range;
 
 struct RangeCompare {
@@ -93,12 +111,14 @@ void *SendResults(uint32_t id, void *socket) {
 // Analysis callbacks
 /* ===================================================================== */
 
-VOID Arg1Before(CHAR * name, ADDRINT size, ADDRINT retIP) {
+VOID Arg1Before(ADDRINT size, ADDRINT retIP) {
     // record retIP -> size
+	// cout << retIP << " <-- " << size << endl;
 }
 
-VOID MallocAfter(ADDRINT ret) {
-	// how to identify stored size?
+VOID MallocAfter(ADDRINT ret, ADDRINT retIP) {
+	// retrieve stored size to calculate
+	// cout << retIP << " --> " << ret << endl;
 }
 
 VOID RecordMemAccess(VOID *ip, ADDRINT *ea) {
@@ -118,6 +138,25 @@ VOID ImageLoad(IMG img, VOID *v) {
 		imgLow = IMG_LowAddress(img);
 		imgHigh = IMG_HighAddress(img);
 
+	}
+	RTN mallocRtn = RTN_FindByName(img, "malloc");
+	if (RTN_Valid(mallocRtn)) {
+		cout << "malloc found" << endl;
+		RTN_Open(mallocRtn);
+		RTN_InsertCall(mallocRtn, IPOINT_BEFORE, (AFUNPTR)Arg1Before, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_RETURN_IP, IARG_END);
+		RTN_InsertCall(mallocRtn, IPOINT_AFTER, (AFUNPTR)MallocAfter, IARG_FUNCRET_EXITPOINT_VALUE, IARG_RETURN_IP, IARG_END);
+		RTN_Close(mallocRtn);
+	}
+	// TODO add support for calloc
+	// TODO add support for realloc
+
+	// Find the free() function.
+	RTN freeRtn = RTN_FindByName(img, "free");
+	if (RTN_Valid(freeRtn)) {
+		cout << "free found" << endl;
+		RTN_Open(freeRtn);
+		RTN_InsertCall(freeRtn, IPOINT_BEFORE, (AFUNPTR)Arg1Before, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_RETURN_IP, IARG_END);
+		RTN_Close(freeRtn);
 	}
 }
 
