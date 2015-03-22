@@ -103,6 +103,7 @@ public class XMLProperties {
         options.addOption("memCoverage", false, "Use with PIN to maximize memory accesses.");
         options.addOption("div0Fitness", false, "Use with PIN to aim for div by zero.");
         options.addOption("intOverflow", false, "Use with PIN to aim for integer overflows.");
+        options.addOption("bufOverflow", false, "Use with PIN to aim for buffer overflows.");
         options.addOption("r", "root", true, "Root element of the xml tree.");
         options.addOption("a", "samples", true, "Path to samples (file or folder). If given, root must also be given.");
         options.addOption("t", "timeout", true, "Termination time in sec. Default is " + GLOBAL_TIMEOUT);
@@ -187,6 +188,17 @@ public class XMLProperties {
             }
             if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
                 logger.error("intOverflow can only be used with a population of 1!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("bufOverflow")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -bufOverflow option!");
+                return false;
+            }
+            if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
+                logger.error("bufOverflow can only be used with a population of 1!");
                 return false;
             }
             return true;
@@ -368,6 +380,11 @@ public class XMLProperties {
         	RUN_NAME = "intOverflow " + RUN_NAME;
         	assert Properties.POPULATION == 1;
         	return new SingletonPopulationBackendUseCase(factory, new IntegerOverflowFitnessFunction());
+        }
+        if (line.hasOption("bufOverflow")) {
+        	RUN_NAME = "bufOverflow " + RUN_NAME;
+        	assert Properties.POPULATION == 1;
+        	return new SingletonPopulationBackendUseCase(factory, new BufferOverflowFitnessFunction());
         }
         RUN_NAME = "branchCoverage " + RUN_NAME;
         return new EvolveBranchCoverageUseCase(factory);

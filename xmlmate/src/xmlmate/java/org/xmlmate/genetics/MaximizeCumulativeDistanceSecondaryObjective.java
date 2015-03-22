@@ -6,17 +6,15 @@ import org.evosuite.ga.SecondaryObjective;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MinimizeCumulativeZeroDistanceSecondaryObjective extends SecondaryObjective {
-    private static final long serialVersionUID = 7263763416972293234L;
-    private static final Logger logger = LoggerFactory.getLogger(MinimizeCumulativeZeroDistanceSecondaryObjective.class);
+public class MaximizeCumulativeDistanceSecondaryObjective extends SecondaryObjective {
+    private static final Logger logger = LoggerFactory.getLogger(MaximizeCumulativeDistanceSecondaryObjective.class);
 
-    private static class GetMinValue implements TLongProcedure {
-        long min = Long.MAX_VALUE;
+    private static class SumValues implements TLongProcedure {
+        long sum = 0L;
 
         @Override
         public boolean execute(long arg0) {
-            if (arg0 < min)
-                min = arg0;
+            sum += arg0;
             return true;
         }
     }
@@ -24,9 +22,9 @@ public class MinimizeCumulativeZeroDistanceSecondaryObjective extends SecondaryO
     private long getCumulativeFitness(XMLTestSuiteChromosome individual) {
         long sum = 0L;
         for (XMLTestChromosome x : individual.getTestChromosomes()) {
-            GetMinValue minEntry = new GetMinValue();
-            ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances().forEachValue(minEntry);
-            sum += minEntry.min;
+            SumValues sumValues = new SumValues();
+            ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances().forEachValue(sumValues);
+            sum += sumValues.sum;
         }
         return sum;
     }
@@ -38,7 +36,7 @@ public class MinimizeCumulativeZeroDistanceSecondaryObjective extends SecondaryO
             XMLTestSuiteChromosome x2 = (XMLTestSuiteChromosome) chromosome2;
             return (int) (getCumulativeFitness(x1) - getCumulativeFitness(x2));
         }
-        logger.warn("Tried to use MinimizeCumulativeZeroDistanceSecondaryObjective for non XML Suite chromosomes");
+        logger.warn("Tried to use MaximizeCumulativeDistanceSecondaryObjective for non XML Suite chromosomes");
         return 0;
     }
 

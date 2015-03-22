@@ -11,7 +11,7 @@ public class MaximizeDivisionsSecondaryObjective extends SecondaryObjective {
 
 
     private long getCumulativeFitness(XMLTestSuiteChromosome individual) {
-        long sum = 0l;
+        long sum = 0L;
         for (XMLTestChromosome x : individual.getTestChromosomes())
             sum += ((DistanceMapExecutionResult) x.getLastExecutionResult()).getDistances().size();
         return sum;

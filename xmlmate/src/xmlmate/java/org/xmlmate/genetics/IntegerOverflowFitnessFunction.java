@@ -57,7 +57,7 @@ public class IntegerOverflowFitnessFunction extends BinaryBackendFitnessFunction
                     storeCrashChromosome(individual.getTestChromosome(num));
                 } else {
                     int mapSize = unpk.readMapBegin();
-                    logger.trace("Chromosome {} triggered {} mul instructions", num, mapSize);
+                    logger.trace("Chromosome {} triggered {} mul|add instructions", num, mapSize);
                     result = new TLongLongHashMap(mapSize);
                     for (int j = 0; j < mapSize; j++) {
                         long key = unpk.readLong();
