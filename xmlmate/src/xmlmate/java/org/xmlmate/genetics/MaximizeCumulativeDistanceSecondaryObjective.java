@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MaximizeCumulativeDistanceSecondaryObjective extends SecondaryObjective {
+    private static final long serialVersionUID = -8713255327186258170L;
     private static final Logger logger = LoggerFactory.getLogger(MaximizeCumulativeDistanceSecondaryObjective.class);
 
     private static class SumValues implements TLongProcedure {

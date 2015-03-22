@@ -4,8 +4,6 @@ import org.evosuite.Properties;
 import org.msgpack.unpacker.BufferUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmlmate.XMLProperties;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
