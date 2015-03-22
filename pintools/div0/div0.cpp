@@ -108,19 +108,17 @@ VOID ImageLoad(IMG img, VOID *v) {
 		imgLow = IMG_LowAddress(img);
 		imgHigh = IMG_HighAddress(img);
 	}
-}
 
-VOID Routine(RTN rtn, VOID *v) {
-	if (RTN_Name(rtn).find("PIN_SCORE_START") != std::string::npos) {
-		cout << "Detected PIN_SCORE_START" << endl;
-		RTN_Open(rtn);
-		RTN_Replace(rtn, (AFUNPTR) resetCounters);
-		RTN_Close(rtn);
-	} else if (RTN_Name(rtn).find("PIN_SCORE_END") != std::string::npos) {
-		cout << "Detected PIN_SCORE_END" << endl;
-		RTN_Open(rtn);
-		RTN_Replace(rtn, (AFUNPTR) SendResults);
-		RTN_Close(rtn);
+	RTN startRtn = RTN_FindByName(img, "PIN_SCORE_START");
+	if (RTN_Valid(startRtn)) {
+		cout << "PIN_SCORE_START found" << endl;
+		RTN_Replace(startRtn, (AFUNPTR) resetCounters);
+	}
+
+	RTN stopRtn = RTN_FindByName(img, "PIN_SCORE_END");
+	if (RTN_Valid(stopRtn)) {
+		cout << "PIN_SCORE_END found" << endl;
+		RTN_Replace(stopRtn, (AFUNPTR) SendResults);
 	}
 }
 
@@ -224,8 +222,6 @@ int main(int argc, char *argv[]) {
 
 	// Register ImageLoad to be called when an image is loaded
 	IMG_AddInstrumentFunction(ImageLoad, 0);
-
-	RTN_AddInstrumentFunction(Routine, 0);
 
 	INS_AddInstrumentFunction(Instruction, 0);
 

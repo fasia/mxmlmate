@@ -91,6 +91,18 @@ VOID ImageLoad(IMG img, VOID *v) {
 		imgLow = IMG_LowAddress(img);
 		imgHigh = IMG_HighAddress(img);
 	}
+
+	RTN startRtn = RTN_FindByName(img, "PIN_SCORE_START");
+	if (RTN_Valid(startRtn)) {
+		cout << "PIN_SCORE_START found" << endl;
+		RTN_Replace(startRtn, (AFUNPTR) resetCounters);
+	}
+
+	RTN stopRtn = RTN_FindByName(img, "PIN_SCORE_END");
+	if (RTN_Valid(stopRtn)) {
+		cout << "PIN_SCORE_END found" << endl;
+		RTN_Replace(stopRtn, (AFUNPTR) SendResults);
+	}
 }
 
 VOID Trace(TRACE trace, VOID *v) {
@@ -106,21 +118,6 @@ VOID Trace(TRACE trace, VOID *v) {
 				INS_InsertCall(ins, IPOINT_TAKEN_BRANCH, (AFUNPTR)record, IARG_ADDRINT, addr, IARG_BRANCH_TARGET_ADDR, IARG_END);
 			}
 		}
-	}
-}
-
-
-VOID Routine(RTN rtn, VOID *v) {
-	if (RTN_Name(rtn).find("PIN_SCORE_START") != std::string::npos) {
-		cout << "Detected PIN_SCORE_START" << endl;
-		RTN_Open(rtn);
-		RTN_Replace(rtn, (AFUNPTR) resetCounters);
-		RTN_Close(rtn);
-	} else if (RTN_Name(rtn).find("PIN_SCORE_END") != std::string::npos) {
-		cout << "Detected PIN_SCORE_END" << endl;
-		RTN_Open(rtn);
-		RTN_Replace(rtn, (AFUNPTR) SendResults);
-		RTN_Close(rtn);
 	}
 }
 
@@ -159,8 +156,6 @@ int main(int argc, char *argv[]) {
 
 	// Register Routine to be called to instrument trace
 	TRACE_AddInstrumentFunction(Trace, 0);
-
-	RTN_AddInstrumentFunction(Routine, 0);
 
 	// Start the program, never returns
 	PIN_StartProgram();
