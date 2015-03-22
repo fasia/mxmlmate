@@ -6,48 +6,36 @@
 #include <stdlib.h>
 #include <set>
 #include <map>
+#include <tr1/tuple>
 #include <msgpack.hpp>
 
 /*
- TODO need mappings
- allocations = (start,end) -> returnIP
- accesses = returnIP -> max distance
+ allocations = set {(rip,start,size)}
+ accesses = map {returnIP -> max distance}
 
  try for
- [..........x...]
+     [..........x...]
  with
-     start <= x <= end
- <=> x - start <= size
+     start <= x <= start + size
  and
-     math::abs(size/2 - x) as big as possible
+     std::abs(start + size/2 - x) as big as possible
 
-
- send out accesses
  */
 
+// (rip, start, size)
+typedef std::tr1::tuple<ADDRINT, ADDRINT, ADDRINT> Allocation_T;
 
-typedef std::pair<ADDRINT, ADDRINT> Range;
-
-struct RangeCompare {
+struct AllocationCompare {
     //overlapping ranges are considered equivalent
-    bool operator()(const Range& lhv, const Range& rhv) const {
-        return lhv.second < rhv.first;
+    bool operator()(const Allocation_T& lhv, const Allocation_T& rhv) const {
+    	// start1+size1 < start2
+        return std::tr1::get<1>(lhv) + std::tr1::get<2>(lhv) < std::tr1::get<1>(rhv);
     }
 };
-typedef std::set<Range, RangeCompare> Allocations_T;
+typedef std::set<Allocation_T, AllocationCompare> Allocations_T;
 
 // ^ adapted from http://stackoverflow.com/a/8561876
 
-Range *find_range(const Allocations_T& ranges, ADDRINT value) {
-    Allocations_T::const_iterator it = ranges.find(Range(value, value));
-    if (it == ranges.end())
-    	return NULL;
-    return (Range*)&(*it);
-}
-
-bool in_range(const Allocations_T& ranges, ADDRINT value) {
-	return find_range(ranges, value) != NULL;
-}
 typedef std::map<ADDRINT, ADDRINT> Acessess_T;
 
 /* ================================================================== */
@@ -59,6 +47,13 @@ static ADDRINT imgHigh = 0;		//low end of target image
 static ADDRINT imgLow = 0;			//high end of binary image
 static Allocations_T allocations; // stores all currently allocated memory ranges
 static Acessess_T accesses; // maps return site of a malloc call to maximum distance from its buffer
+
+static Allocation_T *find_allocation(ADDRINT addr) {
+    Allocations_T::const_iterator it = allocations.find(Allocation_T(0, addr, addr));
+    if (it == allocations.end())
+    	return NULL;
+    return (Allocation_T*)&(*it);
+}
 
 /* ===================================================================== */
 // Command line switches
@@ -88,7 +83,7 @@ INT32 Usage() {
 
 VOID resetCounters(void *ptr) {
 	free(ptr);
-	allocations.clear();
+	accesses.clear();
 }
 
 void *SendResults(uint32_t id, void *socket) {
@@ -111,18 +106,62 @@ void *SendResults(uint32_t id, void *socket) {
 // Analysis callbacks
 /* ===================================================================== */
 
-VOID Arg1Before(ADDRINT size, ADDRINT retIP) {
-    // record retIP -> size
-	// cout << retIP << " <-- " << size << endl;
+VOID FreeBefore(ADDRINT start) {
+	Allocations_T::iterator it = allocations.find(Allocation_T(0, start, 0));
+	if (it != allocations.end()) {
+		// cout << "Freeing buffer at " << start << endl;
+		allocations.erase(it);
+	}
 }
 
-VOID MallocAfter(ADDRINT ret, ADDRINT retIP) {
-	// retrieve stored size to calculate
-	// cout << retIP << " --> " << ret << endl;
+VOID *MallocWrapper(CONTEXT * ctxt, AFUNPTR pf_malloc, size_t size, ADDRINT rip) {
+	ADDRINT start;
+	PIN_CallApplicationFunction(ctxt, PIN_ThreadId(), CALLINGSTD_DEFAULT, pf_malloc, PIN_PARG(ADDRINT), &start, PIN_PARG(size_t), size, PIN_PARG_END());
+	if (rip >= imgLow || rip <= imgHigh) {
+		// cout << "malloc(" << size << ") => " << start << endl;
+		//if (NULL == start) count towards fitness;
+		allocations.insert(Allocation_T(rip, start, size));
+	}
+	return (VOID *) start;
 }
 
-VOID RecordMemAccess(VOID *ip, ADDRINT *ea) {
-	// TODO
+VOID *CallocWrapper(CONTEXT * ctxt, AFUNPTR pf_calloc, size_t nmemb, size_t size, ADDRINT rip) {
+	ADDRINT start;
+	PIN_CallApplicationFunction(ctxt, PIN_ThreadId(), CALLINGSTD_DEFAULT, pf_calloc, PIN_PARG(ADDRINT), &start, PIN_PARG(size_t), nmemb, PIN_PARG(size_t), size, PIN_PARG_END());
+	if (rip >= imgLow || rip <= imgHigh) {
+		//if (NULL == start) count towards fitness;
+		allocations.insert(Allocation_T(rip, start, nmemb * size));
+	}
+	return (VOID *)start;
+}
+
+VOID *ReallocWrapper(CONTEXT * ctxt, AFUNPTR pf_realloc, ADDRINT p, size_t size, ADDRINT rip) {
+	ADDRINT start;
+	PIN_CallApplicationFunction(ctxt, PIN_ThreadId(), CALLINGSTD_DEFAULT, pf_realloc, PIN_PARG(ADDRINT), &start, PIN_PARG(ADDRINT), p, PIN_PARG(size_t), size, PIN_PARG_END());
+	if (rip >= imgLow || rip <= imgHigh) {
+			//if (NULL == start) count towards fitness;
+			Allocations_T::iterator it = allocations.find(Allocation_T(rip, p, size));
+			if (it != allocations.end())
+				allocations.erase(it);
+			if (size > 0)
+				allocations.insert(Allocation_T(rip, start, size));
+	}
+	return (VOID *)start;
+}
+
+VOID RecordMemAccess(ADDRINT ea) {
+	Allocation_T *alloc = find_allocation(ea);
+	// alloc cannot be NULL because find_allocation(ea) was used as a precondition
+
+	INT64 middle = (INT64)(std::tr1::get<1>(*alloc) + std::tr1::get<2>(*alloc)/2);
+	ADDRINT dist = std::abs(middle - (INT64)ea);
+
+	ADDRINT rip = std::tr1::get<0>(*alloc);
+	Acessess_T::const_iterator itr = accesses.find(rip);
+	if (itr == accesses.end() || itr->second < dist) {
+		// cout << rip << " +> " << dist << endl;
+		accesses[rip] = dist;
+	}
 }
 
 /* ===================================================================== */
@@ -132,32 +171,61 @@ VOID RecordMemAccess(VOID *ip, ADDRINT *ea) {
 // Pin calls this function every time a new img is loaded
 // Note that imgs (including shared libraries) are loaded lazily
 VOID ImageLoad(IMG img, VOID *v) {
-	cout << "Loading image " << IMG_Name(img) << endl;
-	if (IMG_Name(img).find(targetImage) != std::string::npos) {
+	std::string img_name = IMG_Name(img);
+	cout << "Loading image " << img_name << endl;
+
+	if (img_name.find(targetImage) != std::string::npos) {
 		cout << "Loaded target image " << IMG_Name(img) << endl;
 		imgLow = IMG_LowAddress(img);
 		imgHigh = IMG_HighAddress(img);
+	} else if (img_name.find("ld-linux") != std::string::npos)
+		return;
 
+	RTN startRtn = RTN_FindByName(img, "PIN_SCORE_START");
+	if (RTN_Valid(startRtn)) {
+		cout << "PIN_SCORE_START found" << endl;
+		RTN_Replace(startRtn, (AFUNPTR) resetCounters);
 	}
-	RTN mallocRtn = RTN_FindByName(img, "malloc");
-	if (RTN_Valid(mallocRtn)) {
-		cout << "malloc found" << endl;
-		RTN_Open(mallocRtn);
-		RTN_InsertCall(mallocRtn, IPOINT_BEFORE, (AFUNPTR)Arg1Before, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_RETURN_IP, IARG_END);
-		RTN_InsertCall(mallocRtn, IPOINT_AFTER, (AFUNPTR)MallocAfter, IARG_FUNCRET_EXITPOINT_VALUE, IARG_RETURN_IP, IARG_END);
-		RTN_Close(mallocRtn);
+
+	RTN stopRtn = RTN_FindByName(img, "PIN_SCORE_END");
+	if (RTN_Valid(stopRtn)) {
+		cout << "PIN_SCORE_END found" << endl;
+		RTN_Replace(stopRtn, (AFUNPTR) SendResults);
 	}
-	// TODO add support for calloc
-	// TODO add support for realloc
 
 	// Find the free() function.
 	RTN freeRtn = RTN_FindByName(img, "free");
 	if (RTN_Valid(freeRtn)) {
 		cout << "free found" << endl;
 		RTN_Open(freeRtn);
-		RTN_InsertCall(freeRtn, IPOINT_BEFORE, (AFUNPTR)Arg1Before, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_RETURN_IP, IARG_END);
+		RTN_InsertCall(freeRtn, IPOINT_BEFORE, (AFUNPTR)FreeBefore, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_RETURN_IP, IARG_END);
 		RTN_Close(freeRtn);
 	}
+
+	// Patch malloc (wrapper)
+	RTN mallocRtn = RTN_FindByName(img, "malloc");
+	if (RTN_Valid(mallocRtn)) {
+		cout << "malloc found" << endl;
+		PROTO protoMalloc = PROTO_Allocate(PIN_PARG(void *), CALLINGSTD_DEFAULT, "malloc", PIN_PARG(size_t), PIN_PARG(ADDRINT), PIN_PARG_END());
+		RTN_ReplaceSignature(mallocRtn, (AFUNPTR)MallocWrapper, IARG_PROTOTYPE, protoMalloc, IARG_CONST_CONTEXT, IARG_ORIG_FUNCPTR, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_RETURN_IP, IARG_END);
+	}
+
+	// Patch calloc (wrapper)
+	RTN callocRtn = RTN_FindByName(img, "calloc");
+	if (RTN_Valid(callocRtn)) {
+		cout << "calloc found" << endl;
+		PROTO protoCalloc = PROTO_Allocate(PIN_PARG(void *), CALLINGSTD_DEFAULT, "calloc", PIN_PARG(size_t), PIN_PARG(size_t), PIN_PARG(ADDRINT), PIN_PARG_END());
+		RTN_ReplaceSignature(callocRtn, AFUNPTR(CallocWrapper), IARG_PROTOTYPE, protoCalloc, IARG_CONST_CONTEXT, IARG_ORIG_FUNCPTR, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_FUNCARG_ENTRYPOINT_VALUE, 1, IARG_RETURN_IP, IARG_END);
+	}
+
+	// Patch realloc (wrapper)
+	RTN reallocRtn = RTN_FindByName(img, "realloc");
+	if (RTN_Valid(reallocRtn)) {
+		cout << "realloc found" << endl;
+		PROTO protoRealloc = PROTO_Allocate(PIN_PARG(void *), CALLINGSTD_DEFAULT, "realloc", PIN_PARG(void *), PIN_PARG(size_t), PIN_PARG(ADDRINT), PIN_PARG_END());
+		RTN_ReplaceSignature(reallocRtn, AFUNPTR(ReallocWrapper), IARG_PROTOTYPE, protoRealloc, IARG_CONST_CONTEXT, IARG_ORIG_FUNCPTR, IARG_FUNCARG_ENTRYPOINT_VALUE, 0, IARG_FUNCARG_ENTRYPOINT_VALUE, 1, IARG_RETURN_IP, IARG_END);
+	}
+
 }
 
 VOID Trace(TRACE trace, VOID *v) {
@@ -171,24 +239,11 @@ VOID Trace(TRACE trace, VOID *v) {
 			if (INS_IsMemoryRead(ins) || INS_IsMemoryWrite(ins)) {
 				UINT32 memoryOperands = INS_MemoryOperandCount(ins);
 				for (UINT32 memOp = 0; memOp < memoryOperands; memOp++) {
-						INS_InsertPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemAccess, IARG_INST_PTR, IARG_MEMORYOP_EA, memOp, IARG_END);
+					INS_InsertIfPredicatedCall(ins, IPOINT_BEFORE, (AFUNPTR) find_allocation, IARG_MEMORYOP_EA, memOp, IARG_END);
+					INS_InsertThenCall(ins, IPOINT_BEFORE, (AFUNPTR) RecordMemAccess, IARG_MEMORYOP_EA, memOp, IARG_END);
 				}
 			}
 		}
-	}
-}
-
-VOID Routine(RTN rtn, VOID *v) {
-	if (RTN_Name(rtn).find("PIN_SCORE_START") != std::string::npos) {
-		cout << "Detected PIN_SCORE_START" << endl;
-		RTN_Open(rtn);
-		RTN_Replace(rtn, (AFUNPTR) resetCounters);
-		RTN_Close(rtn);
-	} else if (RTN_Name(rtn).find("PIN_SCORE_END") != std::string::npos) {
-		cout << "Detected PIN_SCORE_END" << endl;
-		RTN_Open(rtn);
-		RTN_Replace(rtn, (AFUNPTR) SendResults);
-		RTN_Close(rtn);
 	}
 }
 
@@ -221,8 +276,6 @@ int main(int argc, char *argv[]) {
 
 // Register Routine to be called to instrument trace
 	TRACE_AddInstrumentFunction(Trace, 0);
-
-	RTN_AddInstrumentFunction(Routine, 0);
 
 // Start the program, never returns
 	PIN_StartProgram();
