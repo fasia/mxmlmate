@@ -313,6 +313,9 @@ In order to achieve its goal the \texttt{Integer Overflow} fitness function\ldot
 \change[inline]{complete}
 % motivation
 % method and relation to memory access fitness function
+% mention implementation difficulties:
+% 	multithreading issues -> interleaving -> solution additionally map by thread_id / use thread local storage
+% 	however point_after is unreliable (https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/#Invocation) and so a replacement must be used
 % singleton population
 % secondary objectives
 % local search
