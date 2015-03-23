@@ -102,7 +102,7 @@ public abstract class BinaryBackendFitnessFunction extends FitnessFunction<XMLTe
     protected final void storeCrashChromosome(XMLTestChromosome x) {
         logger.info("A worker has crashed!");
         File projectDir = new File(XMLProperties.OUTPUT_PATH, XMLProperties.RUN_NAME);
-        if (!projectDir.mkdirs()) {
+        if (!projectDir.exists() && !projectDir.mkdirs()) {
             logger.error("Could not create output directory '{}'", projectDir.getAbsolutePath());
             return;
         }
