@@ -183,7 +183,7 @@ fitness of the entire suite. The fitness value is then calculated as the number 
 \improvement[inline]{Add graph example (+merging)}
 
 %### 
-\subsubsection{Memory Access}
+\subsubsection{Memory Access Fitness Function}
 %###
 \label{sec:memcov}
 All previously described fitness functions are aimed at increasing a coverage of one sort or another; however,
@@ -300,19 +300,68 @@ guide the evolution of inputs towards causing an unhandled integer overflow. Int
 suitable as vessels for denial of service attacks as well as access control attacks, and therefore of
 critical severity. 
 
-In order to achieve its goal the \texttt{Integer Overflow} fitness function\ldots
-\change[inline]{complete}
-% method - multiplications (and additions)
-% need for local search
-% singleton population
-% standard secondary objectives?
+In order to achieve its goal, the \texttt{Integer Overflow} fitness function uses its pintool component to
+monitor all invocations of \texttt{MUL}, \texttt{IMUL} and \texttt{ADD} x86 instructions in the targeted
+program and examine their arguments. Because overflows arise when two large integers are multiplied or added
+such that the resulting value no longer fits in the size of an integer, this fitness function quite simply
+favors larger arguments for those arithmetic operations. Quite similarly to the \texttt{Division by Zero}
+fitness function, for each individual instruction a list of argument pairs is kept, from which the largest pair
+is selected when reporting fitness to the \java master process. Once again, this is done for performance
+reasons.
+ 
+As this fitness function is also vulnerability-oriented, it is restricted to the singleton population usage
+scenario; additionally, it is very advisable to employ the local search mechanism to encourage values
+well outside the normal range of legal domains to increase the chance of triggering overflows.
+
+This fitness function employs additional secondary objectives that are analogous to those of the
+\texttt{Division by Zero} fitness function in that they also aim to increase the number of distinct
+potential exploitation sites by favoring suites with a larger number of unique instructions, while limiting the
+number of files in the suites to within a reasonable magnitude.
 
 %### 
 \subsubsection{Buffer Overflow Fitness Function}
 %###
-\change[inline]{complete}
-% motivation
-% method and relation to memory access fitness function
+Yet another fitness function mainly aimed at its own specific class of vulnerabilities, the \texttt{Buffer
+Overflow Fitness Function} seeks to identify potential buffer overflows and underflows, which can be highly
+exploitable. This fitness function is very roughly based on the \texttt{Memory Access} fitness function,
+however, it is somewhat more technically involved. 
+
+The main idea behind aiming towards buffer overflows and underflows is deceptively simple: all one has to do
+is monitor allocations, reallocations, and deallocations of buffers, record all memory accesses to them, and
+favor those that are either at the beginning or end regions over those near the middle.
+
+Unfortunately, the technical implementation of the prototypical pintool for use on Linux operating systems
+turns out to be not as straightforward as the idea itself because, for the first time, an instrumentation on
+function level is required. This is different from instrumenting applications on the level of individual
+instructions or loading and unloading of binary images mainly because there exists a distinct possibility of
+interleaved execution in multi-threaded applications. At least the technique for monitoring memory accesses
+can be inherited from the \texttt{Memory Access} fitness function, so the focus of the problem at hand rests
+with the potentially interleaved execution of \texttt{malloc}, \texttt{calloc} and \texttt{realloc} functions,
+which are responsible for allocating buffers. 
+
+Before considering concrete solutions, a data model for containing all relevant information must be designed.
+For currently allocated buffers a set of \texttt{(rip, start, size)} triples will be kept, where \texttt{start}
+and \texttt{size} are the beginning address and the size of the buffer, respectively, and \texttt{rip} is the
+address of the instruction executed immediately after the return from the buffer allocating function, which is
+used to provide both a distinction between different allocation sites, as well as a grouping criterion for
+buffers that serve the same purpose at different times (think of buffer allocations in a loop for processing
+subsequent chunks of an input). Logging of \texttt{rip}s arose from the need to uniquely identify different
+allocation calls; unfortunately, \pin offers no easy possibility to identify the call site, but it provides
+access to the \texttt{rip} out of the box. Whenever a buffer is freed by a call to \texttt{free}, the
+corresponding allocation is removed from the set of allocations. 
+
+This set is just an auxiliary data structure that does not provide any useful information in terms of the
+planned fitness score. Therefore, a second data structure is necessary for capturing the actual memory accesses
+- an associative mapping from \texttt{rip}s to the maximum access distance from the center of a buffer
+pertaining to an allocation before the \texttt{rip}. By maximizing the distance from the middle as a metric it
+is possible to aim for accesses at both extremes of a buffer, thus giving preference to both overflows and
+underflows at the same time. \improvement{Add illustration [...$|$.x...]}
+
+Having established the desired data model and coming back to the problem of capturing buffer allocations as they
+happen in a possibly multi-threaded application, a solution is to use {\small Pin's} support for
+instrumentation point control and have two callbacks - one at the entry of the allocation function, and the
+other at the exit. With this setup the \texttt{rip} and the \texttt{size} values are accessible to the first
+callback and \texttt{rip} and \texttt{start} to the second. 
 % mention implementation difficulties:
 % 	multithreading issues -> interleaving -> solution additionally map by thread_id / use thread local storage
 % 	however point_after is unreliable (https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/#Invocation) and so a replacement must be used
