@@ -51,7 +51,7 @@ If the element, attribute and transition coverages are designated as $c_e$, $c_a
 are numbers between zero and one, the overall schema coverage fitness value can be computed as $1 -
 \frac{c_e+c_a+c_t}{3}$, which makes this a \emph{minimization} fitness function, meaning that the genetic
 algorithm of \evosuite will try to get the value as close to zero as possible, which is its default behavior.
-    
+
 Contrary to the initial expectations, \improvement{mention in the Evaluation section} the results do not 
 necessarily show a strong correlation between high schema coverage and some kinds of code coverage like 
 branch or basic block coverage. This can be explained by the fact that it is not the abundance of different 
@@ -150,7 +150,8 @@ entire test suite, each time a new set must be created which consists of the uni
 the individual arrays belonging to all \xml files in the suite. At this point the very efficient
 \texttt{TLongHashSet} implementation from the \emph{GNU Trove} collections mentioned in \cref{sec:trove} 
 is very useful - especially so because it stores the \java primitive values directly instead of \emph{boxing}
-them in wrapper objects like the standard \java collections do. This way Trove saves space and is faster.
+them in wrapper objects like the standard \java collections do. Because Trove saves space and is faster, it is
+used in all following fitness functions as a standard container provider.
 
 The actual fitness value of a test suite according to the \texttt{Basic Block Coverage} fitness function 
 is the number of unique basic blocks executed by all \xml files in the suite. Due to the dynamic nature 
@@ -179,8 +180,28 @@ immediately after it - be it by fall-through, call, return, or conditional jump.
 
 The \java part of the \texttt{Basic Block Succession} fitness function receives this map data for each file in
 the suite, and collates and merges it into a single basic block successor graph in order to determine the
-fitness of the entire suite. The fitness value is then calculated as the number of edges of this graph. 
-\improvement[inline]{Add graph example (+merging)}
+fitness of the entire suite. The fitness value is then calculated as the number of edges in this graph. 
+\change[inline]{add graphs (+merging)}
+
+\begin{figure}[htp]
+\centering
+	\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=3cm,
+	  thick,main node/.style={rectangle,draw}]
+	
+	  \node[main node] (1) {0x164848};
+	  \node[main node] (2) [right of=1] {0x164849};
+	  \node[main node] (3) [below right of=2] {0x164952};
+	  \node[main node] (4) [below of=2] {0x1648864};
+	
+	  \path[every node/.style={font=\sffamily\small}]
+	    (1) edge [right]node {} (2)
+	    	edge [right]node {} (4)
+	    (2) edge [right]node {} (3);
+	\end{tikzpicture}
+    \caption{Example Block Succession}
+  \label{fig:bblsuc}
+
+\end{figure}
 
 %### 
 \subsubsection{Memory Access Fitness Function}
@@ -347,24 +368,137 @@ used to provide both a distinction between different allocation sites, as well a
 buffers that serve the same purpose at different times (think of buffer allocations in a loop for processing
 subsequent chunks of an input). Logging of \texttt{rip}s arose from the need to uniquely identify different
 allocation calls; unfortunately, \pin offers no easy possibility to identify the call site, but it provides
-access to the \texttt{rip} out of the box. Whenever a buffer is freed by a call to \texttt{free}, the
-corresponding allocation is removed from the set of allocations. 
+access to the \texttt{rip} out of the box. To ensure that only currently allocated buffers are stored, whenever
+a buffer is freed by a call to \texttt{free}, the corresponding allocation is removed from the set of
+recorded allocations.
 
 This set is just an auxiliary data structure that does not provide any useful information in terms of the
-planned fitness score. Therefore, a second data structure is necessary for capturing the actual memory accesses
+planned fitness score. Therefore, another data structure is necessary for capturing the actual memory accesses
 - an associative mapping from \texttt{rip}s to the maximum access distance from the center of a buffer
-pertaining to an allocation before the \texttt{rip}. By maximizing the distance from the middle as a metric it
-is possible to aim for accesses at both extremes of a buffer, thus giving preference to both overflows and
-underflows at the same time. \improvement{Add illustration [...$|$.x...]}
+pertaining to an allocation before the \texttt{rip}. By using the distance from the center as a metric it
+is possible to aim for accesses at both extremes of a buffer, thus giving equal preference to both overflows
+and underflows at the same time. More specifically, the \texttt{access distance} of an access at address
+\texttt{addr} to a buffer corresponding to the triple \texttt{(rip, start, size)} is calculated as $dist =
+|start + \lfloor\frac{size}{2}\rfloor - addr|$. For an example consider \cref{fig:memaccess}: there is a buffer
+corresponding to the triple \texttt{(any\_rip, 22, 27)} and two accesses \texttt{x} and \texttt{y} at
+addresses 24 and 42 respectively. The center of this buffer is at address $22 + \lfloor\frac{27}{2}\rfloor =
+35$. Thus, the access distance of \texttt{x} is $|35 - 24| = 11$ and that of \texttt{y} is $|35 - 42| = 7$.
+
+\begin{figure}[H]
+\centering
+	\vspace{.5cm}
+	\begin{bytefield}{32}
+		\bitbox[]{6}{} & 
+		\bitlabel{1}{\texttt{start}} &
+		\bitbox[]{1}{} &  
+		\bitlabel{1}{\texttt{x (dist = 11)}} &
+		\bitbox[]{10}{} &  
+		\bitlabel{1}{\texttt{center}} &
+		\bitbox[]{6}{} &  
+		\bitlabel{1}{\texttt{y (dist = 7)}} & 
+		\bitbox[]{6}{} &  
+		\bitlabel{1}{\texttt{start + size}} \\
+		\bitheader[lsb=16]{22,24,35,42,49} \\
+		\bitbox[tbr]{6}{\tiny ambient \\ \tiny variables} &
+		\bitbox[tb]{2}{} &
+		\bitbox[tb]{1}{\color{lightgray}\rule{\width}{\height}} &
+		\bitbox[bt]{17}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ buffer} &
+		\bitbox[tb]{1}{\color{lightgray}\rule{\width}{\height}} &
+		\bitbox[tbr]{6}{} &
+		\bitbox[tbl]{6}{\tiny ambient \\ \tiny variables}
+	\end{bytefield}
+	\caption{Memory Access Distance}
+	\label{fig:memaccess}
+\end{figure}
 
 Having established the desired data model and coming back to the problem of capturing buffer allocations as they
-happen in a possibly multi-threaded application, a solution is to use {\small Pin's} support for
-instrumentation point control and have two callbacks - one at the entry of the allocation function, and the
-other at the exit. With this setup the \texttt{rip} and the \texttt{size} values are accessible to the first
-callback and \texttt{rip} and \texttt{start} to the second. 
-% mention implementation difficulties:
-% 	multithreading issues -> interleaving -> solution additionally map by thread_id / use thread local storage
-% 	however point_after is unreliable (https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/#Invocation) and so a replacement must be used
-% singleton population
-% secondary objectives
-% local search
+happen in a possibly multi-threaded application, a solution is to use {\small Pin's} API for instrumentation
+at procedure level and have two callbacks - one at the entry of the allocation function, and the other at the
+exit. With this setup the \texttt{rip} and the \texttt{size} values are accessible to the first callback and
+\texttt{rip} and \texttt{start} to the second. So the idea is to reserve a triple \texttt{(rip, unknown, size)}
+in the first callback, and later find it and fill in the \texttt{start} value in the second. Unfortunately, due
+to interleaved execution, it is possible for two threads to enter an allocation function with the same
+\texttt{rip} at the same time, so that when one of them returns activating the second callback, it has no way
+of assigning the \texttt{start} value to the correct reserved entry. The obvious way to fix this is to
+additionally keep the \texttt{thread\_id}, which, luckily, \pin also provides. This would somewhat bloat the
+auxiliary data structure to a set of \texttt{(thread\_id, rip, start, size)} with probably very little
+variation in the first value, so it seems like a waste of space. An optimization can be achieved by using
+thread local storage facilities provided by \pin and reserve preliminary triples there, which requires
+additional synchronization when moving the completed triples into the common auxiliary data structure. This
+solution would be perfectly acceptable, if it wasn't for a small comment in the examples section of {\small
+Pin's}
+documentation\footnote{\url{https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/\#Invocation}}:
+\begin{quote}
+{\small IPOINT\_AFTER} is implemented by instrumenting each return instruction in a routine. \pin tries to find
+all return instructions, but success is not guaranteed.
+\end{quote}
+Unfortunately, {\small IPOINT\_AFTER} is exactly the instrumentation point needed to implement the second
+callback, which makes the entire contraption unreliable at best and simply wrong at worst.
+
+Luckily, a better solution presented itself - it is possible to replace the allocating functions with variants
+that additionally perform the record keeping task.
+This is actually exactly what is already used for communicating between the test drivers and their pintools, as
+mentioned in \cref{sec:components}, when the pintool replaces the well known functions in the test driver with
+its own versions. Except in this case an additional feature of procedure replacement was used: the signature
+change. This is best explained on a simple example of the \texttt{malloc} function. 
+
+The original version has the signature \mintinline{cpp}{void *malloc(size_t size)}. In order to be able to
+record the \texttt{rip} of an invocation, the malloc wrapper function has to have a signature of 
+\mintinline{cpp}{void *mallocWrapper(size_t size, void *rip)}, whereby \pin would fill in the second argument
+at the moment of invocation. The code of this wrapper function is roughly sketched in \cref{lst:mallocwrapper}.
+
+\begin{listing}[h]
+\centering
+\begin{cppcode}
+void *MallocWrapper(size_t size, void *rip) {
+	void *start = malloc(size); // call original malloc
+	allocations.insert(Allocation_T(rip, start, size)); // store triple
+	return start; // return original value
+}
+\end{cppcode}
+\caption{MallocWrapper Code Sketch}
+\label{lst:mallocwrapper}
+\end{listing}
+
+The wrapper function first invokes the original \texttt{malloc} and stores its return value. At this point the
+wrapper has access to all three necessary values at once and stores the triple \texttt{(rip, start, size)}
+before returning the original return value. Please regard the presented code as pseudocode because the actual
+code is somewhat more involved.
+
+Firstly, calling the original \texttt{malloc} function is not as straightforward because \pin has its own
+implementation of malloc that uses its own allocator and thus is not compatible with the intended
+\texttt{malloc} call as any attempt to free the returned buffer from inside the instrumented program using a
+call to its \texttt{free} function will result in a segmentation error. Additionally, the space reserved for
+\pin allocations is rather limited, which also makes it infeasible to patch the \texttt{free} calls
+accordingly. Even if \pin did not override \texttt{malloc}, simply inserting a call to it would result in an
+infinite loop as \pin would try to replace this call by the wrapper as well. Therefore the invocation is
+actually a call to a special method in {\small Pin's} API that allows execution of the original function
+without it being instrumented.
+
+Secondly, additional checks are performed inside the wrapper, such as ensuring that only calls pertaining to
+the targeted binary image are recorded or testing the return value for being \texttt{NULL} and treating this
+case specially.
+
+The allocation functions \texttt{calloc} and \texttt{realloc} are treated analogously to \texttt{malloc}, but
+\texttt{free} is actually not replaced at all because it is sufficient to add a callback at its entry site
+(which, luckily, \pin guarantees to work) that will simply remove a triple with the \texttt{start} value equal
+to the argument of \texttt{free} if one is found.
+
+As mentioned previously, the fitness related information the pintool of the \texttt{Buffer Overflow Fitness
+Function} sends to its \java counterpart is the memory access map, which, in contrast to the \texttt{Division
+by Zero} and \texttt{Integer Overflow} fitness functions is updated in-place and not only after the processing
+of an input file. Because memory accesses are much more numerous than e.g. \texttt{DIV} or \texttt{MUL}
+instruction invocations, the reasonable choice in the memory-speed trade off is somewhat offset.
+
+The \java part of this fitness function tries to maximize the maximum distance of the accesses from their
+respective buffer's centers, and by employing additional secondary objectives, it also aims to enlarge the
+number of accessed buffers as well as the cumulative access distance in a suite, while preventing the suites
+from bloating by favoring smaller ones if all their previously mentioned characteristics are equal.
+
+As is the case with several previous fitness functions, this fitness function is also geared towards finding
+vulnerabilities and employs the singleton population paradigm and benefits greatly from enabling local search -
+in this case especially so. It would be infeasible to count memory accesses outside allocated buffer ranges as
+out-of-bounds accesses to the buffers themselves because they may well be just accesses to ambient variables.
+Therefore this fitness function assigns maximum values to accesses just at the legal bounds of the buffers and
+the small mutations caused by the local search mechanism make it possible to break out of this restriction
+by a small amount and thus possibly trigger a sought-after vulnerability.

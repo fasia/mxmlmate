@@ -9,16 +9,22 @@
 \usepackage{textcomp}
 \usepackage{float}
 \usepackage{xspace}
+\usepackage{rotating}
+\usepackage{bytefield}
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
 
 \usepackage[hidelinks]{hyperref}
 \usepackage[compatibility=false]{caption}
 
-\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
 \usepackage{minted}
 \usemintedstyle{autumn}
 % \usemintedstyle{bw} % use for black and white
 \newminted{java}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
 \newminted{c}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
+\newminted{cpp}{frame=lines,tabsize=4}
 
 \usepackage[nameinlink]{cleveref}
 
@@ -45,6 +51,14 @@
 \newcommand{\zmq}{{\small ØMQ}\xspace}
 \newcommand{\msgpack}{{\small MessagePack}\xspace}
 \newcommand{\xerces}{{\small Xerces2}\xspace}
+
+\newcommand{\bitlabel}[2]{%
+\bitbox[]{#1}{%
+\raisebox{0pt}[4ex][0pt]{%
+\turnbox{45}{\fontsize{7}{7}\selectfont#2}%
+}%
+}%
+}
 
 \begin{document}
 \input{./title.tex}
