@@ -35,12 +35,14 @@ More concretely the schema coverage fitness value is computed as the average of 
   attribute by means of a regular expression (that has a different grammar than that of \java, \python or 
   {\small Perl} regular expression languages, which, as an aside, presented another whole technical challenge). 
   In order to be able to provide values conforming to those regular expressions an automaton based representation 
-  has been put in place for the types of the elements and attributes. In fact, it worked so well, that there 
-  was longer any need in representing any type in a way other than by means of a deterministic finite
-  automaton. This means that all types, including \texttt{string}, \texttt{int}, \texttt{short}, \texttt{hexBinary},
-  have a corresponding automaton, which is cached in memory for performance reasons. Furthermore, with this representation 
-  it is very easy to apply additional facets like restrictions on length or number of fractional digits just by 
-  performing automaton based operations like union and intersection. 
+  has been put in place for the types of the elements and attributes by using the automaton
+  library\cite{automaton} for \java.
+  In fact, it worked so well, that there was longer any need in representing any type in a way other than by
+  means of a deterministic finite automaton. This means that all types, including \texttt{string},
+  \texttt{int}, \texttt{short}, \texttt{hexBinary}, have a corresponding automaton, which is cached in memory
+  for performance reasons. Furthermore, with this representation it is very easy to apply additional facets
+  like restrictions on length or number of fractional digits just by performing automaton based operations
+  like union and intersection.
   Coming back to the topic of schema coverage, the transitions in these automata are the subject of its 
   transition coverage component which describes how many of the transitions of all the automata are being 
   used in the generated \xml files. This measure is indicative of the overall proportion of covered value space 
@@ -181,23 +183,62 @@ immediately after it - be it by fall-through, call, return, or conditional jump.
 The \java part of the \texttt{Basic Block Succession} fitness function receives this map data for each file in
 the suite, and collates and merges it into a single basic block successor graph in order to determine the
 fitness of the entire suite. The fitness value is then calculated as the number of edges in this graph. 
-\change[inline]{add graphs (+merging)}
+\Cref{fig:bblsuc} gives a small example for this process. The vertices represent basic blocks and the edges
+indicate succession of control between them. Subfigures (a) and (b) represent succession maps corresponding to
+two input files - each of them has a score of 3 because each has 3 edges. The merged graph has a score of 5 as
+it contains 5 unique successions.
 
-\begin{figure}[htp]
-\centering
-	\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=3cm,
-	  thick,main node/.style={rectangle,draw}]
-	
-	  \node[main node] (1) {0x164848};
-	  \node[main node] (2) [right of=1] {0x164849};
-	  \node[main node] (3) [below right of=2] {0x164952};
-	  \node[main node] (4) [below of=2] {0x1648864};
-	
-	  \path[every node/.style={font=\sffamily\small}]
-	    (1) edge [right]node {} (2)
-	    	edge [right]node {} (4)
-	    (2) edge [right]node {} (3);
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+	\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,thin,
+	bbl/.style={rectangle, draw, font=\sffamily\small}]
+		\node[bbl] (1) {1};
+		\node[bbl] (2) [right of=1] {2};
+		\node[bbl] (4) [below of=2] {4};
+		\node[bbl] (3) [right = 1.5cm of {$(2)!0.5!(4)$}] {3};
+		
+		\path[every node/.style={font=\sffamily\small}]
+		(1) edge [right]node {} (2)
+			edge [right]node {} (4)
+		(2) edge [right]node {} (3);
 	\end{tikzpicture}
+	\caption{First Graph}
+	\end{subfigure} %
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+	\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm, thin,
+	bbl/.style={rectangle, draw, font=\sffamily\small}]
+		\node[bbl] (1) {1};
+		\node[bbl] (2) [right of=1] {2};
+		\node[bbl] (4) [below of=2] {4};
+		\node[bbl] (3) [right = 1.5cm of {$(2)!0.5!(4)$}] {3};
+		
+		\path[every node/.style={font=\sffamily\small}]
+		(1) edge [right]node {} (2)
+		(2) edge [right]node {} (4)
+		(4) edge [right]node {} (3);
+	\end{tikzpicture}
+	\caption{Second Graph}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[b]{0.3\textwidth}
+	\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm, thin,
+	bbl/.style={rectangle, draw, font=\sffamily\small}]	
+		\node[bbl] (1) {1};
+		\node[bbl] (2) [right of=1] {2};
+		\node[bbl] (4) [below of=2] {4};
+		\node[bbl] (3) [right = 1.5cm of {$(2)!0.5!(4)$}] {3};
+		
+		\path[every node/.style={font=\sffamily\small}]
+		(1) edge [right]node {} (2)
+			edge [right]node {} (4)
+		(2) edge [right]node {} (3)
+			edge [right]node {} (4)
+		(4) edge [right]node {} (3);
+	\end{tikzpicture}
+	\caption{Merged Graph}
+	\end{subfigure}
     \caption{Example Block Succession}
   \label{fig:bblsuc}
 
@@ -307,11 +348,6 @@ test. It is therefore recommended to use the local search feature described in \
 capable of producing values beyond the range of validity, in order to increase the chances of actually
 triggering arithmetic exceptions.
 
-%### 
-%\subsubsection{Context Switches Fitness Function}
-%### 
-% TODO mention in future work section
- 
 %### 
 \subsubsection{Integer Overflow Fitness Function}
 %### 

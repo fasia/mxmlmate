@@ -14,10 +14,11 @@
 \usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
 
 \usepackage{tikz}
-\usetikzlibrary{arrows}
+\usetikzlibrary{arrows,positioning,calc}
 
 \usepackage[hidelinks]{hyperref}
 \usepackage[compatibility=false]{caption}
+\usepackage{subcaption}
 
 \usepackage{minted}
 \usemintedstyle{autumn}
@@ -37,6 +38,17 @@
 \newcommandx{\info}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
 %
 
+\newcommand{\bitlabel}[2]{%
+\bitbox[]{#1}{%
+\raisebox{0pt}[4ex][0pt]{%
+\turnbox{45}{\fontsize{7}{7}\selectfont#2}%
+}%
+}%
+}
+
+\newcommand{\nocontentsline}[3]{}%
+\newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}%
+
 % Abbreviations
 \newcommand{\java}{{\small Java}\xspace}
 \newcommand{\python}{{\small Python}\xspace}
@@ -52,13 +64,6 @@
 \newcommand{\msgpack}{{\small MessagePack}\xspace}
 \newcommand{\xerces}{{\small Xerces2}\xspace}
 
-\newcommand{\bitlabel}[2]{%
-\bitbox[]{#1}{%
-\raisebox{0pt}[4ex][0pt]{%
-\turnbox{45}{\fontsize{7}{7}\selectfont#2}%
-}%
-}%
-}
 
 \begin{document}
 \input{./title.tex}
@@ -71,12 +76,24 @@
 \newpage
 \tableofcontents
 \newpage
-\section{Introduction}
-% 
+\input{./intro.tex}
 \section{Related Work}
-% Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
-% oXygen
+\label{sec:relwork}
+% search-based system testing
+% 	evosuite \cite{fraser2013whole}
+% 	exsyst \cite{gross-issta2012}
+% fuzzers
+%	blackbox
+% 		Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
+% 		oXygen
+% 	whitebox
+% 		afl \cite{afl}
+%		SAGE \cite{godefroid-sage}
+% 	language specific
+%		LangFuzz \cite{holler2012}
+%		SAGE+ \cite{godefroid-whitefuzz}
 \section{Approach}
+\label{sec:approach}
 % goals:
 %  add formats
 %  support for binary backends
@@ -89,12 +106,18 @@
 \input{./fitness.tex} 
 \input{./eval.tex}
 \section{Conclusion}
+\label{sec:conclusion}
 \section{Future Work}
+\label{sec:future}
 % complete parallel rewrite
-% more fitness functions
-% more subjects
-% more formats
+% implement meta-heuristics - varying number of converters / workers
+% more fitness functions - ctx switch, branch coverage
+% more subjects - libflac, tcpdump, tshark
+% more formats - flac, jpeg, gif
 % both java and binary coverages combined (JNI)
+% hardware performance counters - problem: concurrent execution, solution - distinct machines (vagrant?)
+% upgrade from \msgpack to something better (see 3.1.5), especially if system becomes truly distributed -
+% 	minimize network traffic overhead / trade-off with cpu-cost / streaming read-write?
 \newpage
 \section*{References}
 \renewcommand\refname{}
