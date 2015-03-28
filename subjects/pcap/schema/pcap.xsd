@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.xmlmate.org/pcap"
-        xmlns:tns="http://www.xmlmate.org/pcap" elementFormDefault="qualified">
-
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.xmlmate.org/pcap"
+        xmlns:tns="http://www.xmlmate.org/pcap"
+        elementFormDefault="qualified">
 
     <simpleType name="positiveInt">
         <restriction base="unsignedInt">
@@ -11,8 +12,9 @@
 
     <complexType name="GlobalHeaderType">
         <sequence>
-        	<!-- Will be set by the converter -->
-        	<!-- <element name="magic_number" type="hexBinary" fixed="a1b2c3d4"/> -->
+            <!-- Will be set by the converter
+            <element name="magic_number" type="hexBinary" fixed="a1b2c3d4"/>
+            -->
             <element name="version_major" type="tns:positiveInt" fixed="2"/>
             <element name="version_minor" type="tns:positiveInt" fixed="4"/>
             <element name="thiszone" type="int"/>
@@ -27,15 +29,17 @@
             <element name="ts_sec" type="tns:positiveInt"/>
             <element name="ts_usec" type="tns:positiveInt"/>
             <element name="incl_len" type="tns:positiveInt"/>
-            <!--this will be set when converting-->
-            <!--<element name="orig_len" type="positiveInteger"/>-->
+            <!--this will be set when converting
+            <element name="orig_len" type="positiveInteger"/>
+            -->
         </sequence>
     </complexType>
 
     <complexType name="PCAPType">
         <sequence>
             <element name="header" type="tns:GlobalHeaderType"/>
-            <element name="packet" type="tns:PacketHeaderType" maxOccurs="unbounded"/>
+            <element name="packet" type="tns:PacketHeaderType"
+                     maxOccurs="unbounded"/>
         </sequence>
     </complexType>
 

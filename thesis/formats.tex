@@ -23,7 +23,54 @@ widely used as the foundation of an entire multitude of parser implementations.
 %### 
 \subsubsection{Pcap}
 %###
- 
+\label{sec:formats:pcap}
+\begin{listing}[H]
+\centering
+\begin{tabular}{|m{4.5cm}m{8cm}|}
+\begin{xmlcode}
+<pcap xmlns="http://www.xmlmate.org/pcap">
+	<header>
+		<version_major>2</version_major>
+		<version_minor>4</version_minor>
+		<thiszone>0</thiszone>
+		<sigfigs>40</sigfigs>
+		<snaplen>80</snaplen>
+		<network>1</network>
+	</header>
+	<packet>
+		<ts_sec>49</ts_sec>
+		<ts_usec>4</ts_usec>
+		<incl_len>80</incl_len>
+	</packet>
+	<packet>
+		<ts_sec>64</ts_sec>
+		<ts_usec>9</ts_usec>
+		<incl_len>80</incl_len>
+	</packet>
+</pcap>
+\end{xmlcode}
+&
+\begin{tikzpicture}[grow=right]
+\tikzset{level distance=68pt,sibling distance=0pt}
+\tikzset{execute at begin node=\strut}
+	\Tree [.pcap 
+[.packet [.incl\_len 80 ] [.ts\_usec 9 ] [.ts\_sec 64 ] ]
+[.packet [.incl\_len 80 ] [.ts\_usec 4 ] [.ts\_sec 49 ] ]
+[.header [.network 1 ] [.snaplen 80 ] [.sigfigs 40 ] [.thiszone 0 ] [.version\_minor 4 ] [.version\_major 2 ] ]
+]
+\end{tikzpicture}
+\end{tabular}
+\caption{Example \xml for \texttt{pcap} as Text and Tree}
+\label{lst:xmlexample}
+\end{listing}
+% This listing can probably be made as long as needed to increase the number of pages by adding packets ;)
+
+\begin{listing}[H]
+\centering
+\inputminted[frame=lines,fontsize=\small]{xml}{../subjects/pcap/schema/pcap.xsd}
+\caption{\xsd for the \texttt{pcap} File Format}
+\end{listing}
+
 %### 
 % \subsubsection{Flac}
 %###

@@ -1,10 +1,9 @@
-\documentclass[a4paper]{scrartcl}
+\documentclass[a4paper,parskip=half]{scrartcl}
 \usepackage[english]{babel}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-% \usepackage[T1]{fontenc}
 \usepackage[pdftex]{graphicx}
 \usepackage{mdwlist}
-\usepackage{parskip}
 \usepackage{array}
 \usepackage{textcomp}
 \usepackage{float}
@@ -14,17 +13,20 @@
 \usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
 
 \usepackage{tikz}
-\usetikzlibrary{arrows,positioning,calc}
+\usetikzlibrary{babel,arrows,positioning,calc}
+\usepackage{tikz-qtree}
 
 \usepackage[hidelinks]{hyperref}
 \usepackage[compatibility=false]{caption}
 \usepackage{subcaption}
+
 
 \usepackage{minted}
 \usemintedstyle{autumn}
 % \usemintedstyle{bw} % use for black and white
 \newminted{java}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
 \newminted{c}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
+\newminted{xml}{frame=none,tabsize=1,fontsize=\small}
 \newminted{cpp}{frame=lines,tabsize=4}
 
 \usepackage[nameinlink]{cleveref}

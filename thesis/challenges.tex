@@ -13,28 +13,27 @@ the most noteworthy of them.
 %###
 \label{sec:repr}
 \xmlmate is implemented on top of the genetic algorithm framework that is part of 
-\evosuite\cite{fraser2013whole} and as such must adhere to its specifications and structures 
+\evosuite{}\cite{fraser2013whole} and as such must adhere to its specifications and structures 
 of genetic representations. 
 Because \evosuite as a whole is aimed at generating {\small JUnit} tests for \java applications, 
 the entities that comprise the population  (i.e. the \emph{chromosomes} or \emph{individuals}) 
 are called \emph{test suites}. The test suites are what evolves from generation to generation.
 In turn, the test suites consist of \emph{tests}. Similarly, \xmlmate has adopted the concepts of 
-test suite and test they correspond to a set of \xml trees and a single \xml tree, respectively. 
-They are sometimes referred to as \emph{test suite chromosomes} and \emph{test chromosomes}, resp.
-
+test suite and test - they correspond to a set of \xml trees and a single \xml tree, respectively. 
+They are also sometimes referred to as \emph{test suite chromosomes} and \emph{test chromosomes}, resp.
 
 In \xmlmate all \xml trees are governed by a single \xsd that is given as a parameter at program start.
 In order to implement the genetic operation \emph{mutation} for test chromosomes more or less 
-efficiently each node in a test's \xml tree should have a reference to its corresponding definition 
+efficiently, each node in a test's \xml tree should have a reference to its corresponding definition 
 in the schema. This is accomplished by extending some of the \java classes provided by \xom to include the 
 references in question as well as methods that maintain their relevance and correctness. This alone, 
-however, is not sufficient for implementing an effective \emph{crossover} of two \xml trees.
+however, is not sufficient for implementing an efficient \emph{crossover} of two \xml trees.
 
-To quickly find sites suitable for crossover in two test chromosomes an additional mapping is needed: 
-one that maps definitions in the global schema to nodes that are actually present in the \xml tree, so 
+To quickly find sites suitable for crossover in two test chromosomes, an additional mapping is needed: 
+one that associates definitions in the global schema with nodes that are actually present in the \xml tree, so 
 as to be able to find compatible intersections.
-Since I am using \xerces for storing and accessing the schema information, and it is only exposed via 
-a \java interface, it was not possible to add this mapping to local copies of the schema  
+Since I am using \xerces for storing and accessing the schema information, and it is only exposed by means of 
+\java interfaces, it was not possible to add this mapping to local copies of the schema  
 enhanced with the needed references to test chromosomes. However, what could be added were local 
 maps referencing the global definition instances as keys and local nodes as values. A disadvantage 
 is that additional methods had to be added to ensure the relevance of these mappings, 
@@ -101,10 +100,10 @@ execution of the system under test to the monitoring pintool, whereafter it pass
 the sut for execution. When the sut finishes and control returns to the test driver, it calls
 \texttt{PIN\_SCORE\_END(number)} with the number stored from the message earlier.
 
-When a test driver calls \texttt{PIN\_SCORE\_START()}, the call gets replaced with a call to a method in the 
-pintool that clears its internal information buffers, thereby resetting all currently gathered fitness related 
-information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets replaced with 
-one that packs and sends out a message containing the identifying number and any fitness information via
+When a test driver invokes \texttt{PIN\_SCORE\_START()}, this invocation gets replaced with a call to a method
+in the pintool that clears its internal information buffers, thereby resetting all currently gathered fitness
+related information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets replaced
+with one that packs and sends out a message containing the identifying number and any fitness information via
 the same \zmq \texttt{DEALER} socket the test driver received the original message on. This is possible
 because the pintool and the test driver run in the same process, which means they both have access to the same
 memory, and so a pointer can be easily shared between the two components.
@@ -118,20 +117,6 @@ message to the load balancer. Afterwards, it destroys the socket and restarts th
 Please note that all ports mentioned above are customizable and even the individual message carriers for
 each leg of the communication pathway can be changed from tcp to any other protocol supported by \zmq, of which
 there are plenty.
-
-% Also, at first, the role of the broker component might seem unclear, or the broker itself might make the
-% impression of being largely unnecessary, as it seems logical that converters could be directly connected to
-% the test drivers without it. However, as mentioned in \cref{sec:zmq}, \zmq has two concepts of linking its
-% sockets: connecting for dynamic components, whose number is unknown a priori, and binding for static ones.
-% Also, sockets sitting on opposite ends of a transport channel must use different linking modes.
-% One of the design goals for the new \xmlmate extension was that it should be able to work with a variable
-% number of converter and driver processes as a measure of adequate resource allocation adapting for different
-% workloads (e.g. output file formats). To make the converters and drivers pluggable, they must be
-% \emph{connecting}, and since the other side must \emph{bind}, they cannot be directly linked to each other.
-% The solution is to add a permanent component which binds the other ends of their respective connections and
-% forwards the messages. So yes, for now the existence of the broker is due to a technicality, but in the future
-% it may be enhanced with actual load balancing functionality, which could have a huge positive impact on the
-% overall performance.
 
 The described system contains quite a number of components and it is at least somewhat important to start them
 up in a manner that does not exhibit the slow joiner syndrome - a condition, when a worker which is slow to

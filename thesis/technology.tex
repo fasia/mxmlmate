@@ -8,7 +8,7 @@ In the following sections I would like to give a brief overview of the technolog
 %###  
 \subsubsection{Xom}
 %### 
-\xom\cite{xom} is a \java library for handling \xml documents at the core of \xmlmate. 
+\xom{}\cite{xom} is a \java library for handling \xml documents at the core of \xmlmate. 
 It offers in-memory representation of \xml tree structures as well as support for Namespaces in \xml, {\small XPath 1.0}, {\small XSLT 1.0}, 
 {\small XInclude}, {\small xml:id}, {\small xml:base}, Canonical \xml, and Exclusive Canonical \xml.
 I decided for it in favor of {\small SAX}, {\small StAX}, {\small DOM4j} and {\small jDOM} because of its simplicity and efficiency.
@@ -16,16 +16,20 @@ It is also the only \xml API that ensures correctness very strictly - \xom only 
 which coincides with one of the underlying principles of \xmlmate{} - generating valid and well-formed data.
 Furthermore, \xom is open to extension, which allows for easy enhancements and adaptations to make it suitable 
 for building the basis of genetic representations of \xml trees (further described in \cref{sec:repr}).
-\improvement[inline]{Add some xml specification and example}
+
+If needed, you can skip ahead and take a look at \cref{lst:xmlexample} in \cref{sec:formats:pcap}
+to gain a better understanding of the kinds of file formats \xom offers support for.
 %### 
 \subsubsection{Xerces2}
 %### 
-\xerces\cite{xerces} is a \java library for parsing, validating and manipulating XML documents, which most importantly to \xmlmate, has support for W3C XML Schema 1.1 (Working Drafts, December 2009). 
-At the heart of \xmlmate lies a representation of an \xsd, which is used as a blueprint for generating new \xml instances and modifying existing ones. 
-This representation is implemented with \xerces, as at the time of conception it was really the only available \xsd implementation for \java. 
-\xerces mainly provides access to the definitions of a schema as well as a mechanism for validating \xml instances.
-Unfortunately, it only exposes its functionality via \java interfaces, which makes enhancements and adaptations rather hard, but not impossible, as you will see in \cref{sec:repr}.
-\improvement[inline]{Add some xsd specs and example}
+\xerces{}\cite{xerces} is a \java library for parsing, validating and manipulating XML documents, which most
+importantly to \xmlmate, has support for W3C XML Schema 1.1 (Working Drafts, December 2009).
+At the heart of \xmlmate lies a representation of an \xsd, which is used as a blueprint for generating new
+\xml instances and modifying existing ones. This representation is implemented with \xerces, as at the time of
+conception it was really the only available \xsd implementation for \java. \xerces mainly provides access to
+the definitions of a schema as well as a mechanism for validating \xml instances. Unfortunately, it only
+exposes its functionality via \java interfaces, which makes enhancements and adaptations rather hard, but not
+impossible, as you will see in \cref{sec:repr}. \improvement[inline]{Add some xsd specs and example}
 %### 
 \subsubsection{PIN}
 %### 

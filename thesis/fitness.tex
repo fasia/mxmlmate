@@ -166,10 +166,11 @@ mostly had to do with hard-coded assumptions about the fitness function always b
 %### 
 \subsubsection{Basic Block Succession Fitness Function}
 %### 
-The \texttt{Basic Block Succession} fitness function is an extension of the \texttt{Basic Block Coverage}
-fitness function in that it is also heavily based on observing the execution of basic blocks. However, this
-extension also considers the order in which the blocks are executed. More specifically, for each basic block
-this fitness function aims to maximize the number of unique basic blocks that are executed immediately after.
+The \texttt{Basic Block Succession} fitness function is a spiritual successor and an extension of the
+\texttt{Basic Block Coverage} fitness function in that it is also heavily based on observing the execution of
+basic blocks. However, this extension also considers the order in which the blocks are executed. More
+specifically, for each basic block this fitness function aims to maximize the number of unique basic blocks
+that are executed immediately after.
 Put differently, the \texttt{Basic Block Succession} fitness function provides guidance for maximizing the
 number of control paths of length two taken by the program under test. According to the
 author\footnote{http://lcamtuf.blogspot.de/2014/08/a-bit-more-about-american-fuzzy-lop.html} of the
@@ -520,11 +521,11 @@ The allocation functions \texttt{calloc} and \texttt{realloc} are treated analog
 (which, luckily, \pin guarantees to work) that will simply remove a triple with the \texttt{start} value equal
 to the argument of \texttt{free} if one is found.
 
-As mentioned previously, the fitness related information the pintool of the \texttt{Buffer Overflow Fitness
-Function} sends to its \java counterpart is the memory access map, which, in contrast to the \texttt{Division
-by Zero} and \texttt{Integer Overflow} fitness functions is updated in-place and not only after the processing
-of an input file. Because memory accesses are much more numerous than e.g. \texttt{DIV} or \texttt{MUL}
-instruction invocations, the reasonable choice in the memory-speed trade off is somewhat offset.
+As mentioned previously, the fitness information the pintool of the \texttt{Buffer Overflow
+Fitness Function} sends to its \java counterpart is the memory access map, which, in contrast to the
+\texttt{Division by Zero} and \texttt{Integer Overflow} fitness functions is updated in-place and not only
+after the processing of an input file. Because memory accesses are much more numerous than e.g. \texttt{DIV}
+or \texttt{MUL} instruction invocations, the reasonable choice in the memory-speed trade off is somewhat offset.
 
 The \java part of this fitness function tries to maximize the maximum distance of the accesses from their
 respective buffer's centers, and by employing additional secondary objectives, it also aims to enlarge the

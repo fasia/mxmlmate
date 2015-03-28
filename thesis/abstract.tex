@@ -1,25 +1,15 @@
 \section*{Abstract}
-\change[inline]{Rewrite abstract}
-%Motivation 
-The e{\bfseries X}tensible {\bfseries M}arkup {\bfseries L}anguage (XML) is 
-a universal data interchange format for a wide variety of applications. 
-One of the challenges that comprise automated testing of such applications is the generation of meaningful inputs that 
-can advance deep into the program flow; 
-%Problem
-however, this is a hard task for most format-agnostic test generation tools. 
-Because XML files are complexly structured, simple guessing techniques are insufficient for producing valid and realistic inputs. 
-One can leverage XML schemas, which describe the structure of XML files, for generating valid inputs, and 
-using a guided search technique can further increase their effectiveness. 
-Also, unit-level testing tools are usually unaware of certain preconditions that hold when 
-the tested application is run normally, thus they produce unrealistic tests that expose false positives as they 
-violate those preconditions. System-level testing, however, does not have this problem because system tests follow the 
-natural execution order of the tested application. 
-%Methodology
-This thesis presents an approach for performing automated search-based system testing of 
-applications that process XML inputs that are governed by XML schemas. 
-I have implemented a prototype, applied it to three java applications, and compared its performance with 
-that of a state of the art search-based unit testing tool. 
-%Results
-By utilizing search-based system-level testing in conjunction with the structural information from 
-XML schemas my approach was able to generate meaningful and realistic tests, which have uncovered real defects in the 
-tested applications.  
+%%%Motivation - want find vulns when autotesting
+When generating test inputs with the goal of revealing failures and vulnerabilities in a program, 
+%%%Problem - inputs must be well-formed
+the inputs must adhere to a format specific to this program, otherwise they are 
+quickly discarded without getting anywhere near executing important logic code.
+%%%Methodology - grammars + search-based + specific criteria
+Several techniques can be used to profitably apply automated test input generation in this usage scenario -
+they include leveraging format description grammars, employing search-based instance development algorithms,
+and utilizing guidance criteria specifically designed for individual vulnerability classes.
+%%%Results - prototype, subjects, failures
+A prototypical implementation extending the search-based input generator \emph{XMLMate} with the suggested
+techniques has been applied to several file formats and their corresponding libraries and has shown promise as
+it detected failures, which have been confirmed as vulnerabilities.
+%%%Optional - more details on subjects and their vulnerabilities
