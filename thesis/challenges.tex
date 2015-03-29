@@ -41,7 +41,59 @@ as the node composition of an \xml tree is constantly changing.
 One benefit of this approach is the reduced memory consumption as the schema
 definition must only be stored once globally, and the local mappings are nothing but sets of references 
 internally and thus very lightweight.
-\improvement[inline]{Add a picture of chromosome representation}
+
+\begin{listing}[H]
+\centering
+\begin{tikzpicture}
+\tikzset{execute at begin node=\strut}
+%\begin{scope}[level distance=90pt,sibling distance=0pt,frontier/.style={distance from root=270pt},]
+\begin{scope}[level distance=90pt,sibling distance=0pt,grow=right]
+\Tree [.\node(schema){schema}; 
+[.\node(posint){positiveInt}; ]
+[.\node(pcap){pcap}; ]
+[.\node(header){GlobalHeader};
+	[.\node(network){network}; positiveInt ]
+	[.\node(snaplen){snaplen}; positiveInt ]
+	[.\node(sigfigs){sigfigs}; \node(unsint){unsignedInt}; ] 
+	[.\node(thiszone){thiszone}; int ] 
+	[.\node(vmi){version\_minor}; \node(vmival){fixed(4)}; ] 
+	[.\node(vma){version\_major}; \node(vmaval){fixed(2)}; ] 
+] 
+[.\node(pheader){PacketHeader}; \node(packetval){$\ldots$}; ]
+]
+\node[draw,fit=(schema)(posint)(packetval)(unsint)]{};
+\end{scope}
+%
+\begin{scope}[shift={(0in,-2.5in)},frontier/.style={distance from root=290pt},level distance=70pt,sibling
+distance=0pt,grow'=right] 
+\Tree [.\node(inspcap){pcap}; 
+[.\node(inspacket){packet}; \node(inspacketval){$\ldots$}; ]
+[.\node(insheader){header}; 
+[.\node(insnetwork){network}; \node(insnetworkval){1}; ] 
+[.\node(inssnaplen){snaplen}; \node(inssnaplenval){80}; ] 
+[.\node(inssigfigs){sigfigs}; 40 ] 
+[.\node(insthiszone){thiszone}; 0 ] 
+[.\node(insvmi){version\_minor}; \node(insvmival){4}; ] 
+[.\node(insvma){version\_major}; \node(insvmaval){2}; ] ] ]
+\node[draw,fit=(inspcap)(insvmaval)(inspacketval)]{};
+\end{scope}
+\draw[dotted,semithick,->] (inspcap)..controls +(north:3) and +(west:4)..(pcap);
+\draw[dotted,semithick,->] (inspacket)..controls +(north west:4) and +(south west:4)..(pheader);
+\draw[dotted,semithick,->] (insheader)..controls +(north west:4) and +(south west:4)..(header);
+\draw[dotted,semithick,->] (insnetworkval)..controls +(north west:4) and +(east:4)..(posint);
+\draw[dotted,semithick,->] (inssnaplenval)..controls +(north west:4) and +(east:4)..(posint);
+\draw[dotted,semithick,->] (insvmival)..controls +(east:2) and +(east:2)..(vmival);
+\draw[dotted,semithick,->] (insvmaval)..controls +(east:3) and +(east:3)..(vmaval);
+\draw[dotted,semithick,->] (insnetwork)..controls +(north:3) and +(south:3)..(network);
+\draw[dotted,semithick,->] (inssnaplen)..controls +(west:1.5) and +(west:1.5)..(snaplen);
+\draw[dotted,semithick,->] (inssigfigs)..controls +(west:2) and +(west:2)..(sigfigs);
+\draw[dotted,semithick,->] (insthiszone)..controls +(east:2.5) and +(east:2)..(thiszone);
+\draw[dotted,semithick,->] (insvmi)..controls +(east:3) and +(east:2)..(vmi);
+\draw[dotted,semithick,->] (insvma)..controls +(east:3.5) and +(east:2.5)..(vma);
+\end{tikzpicture}
+\caption{Chromosome Representation}
+\end{listing}
+
 %### 
 \subsubsection{Communication Protocol}
 %###
