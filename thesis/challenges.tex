@@ -46,7 +46,6 @@ internally and thus very lightweight.
 \centering
 \begin{tikzpicture}
 \tikzset{execute at begin node=\strut}
-%\begin{scope}[level distance=90pt,sibling distance=0pt,frontier/.style={distance from root=270pt},]
 \begin{scope}[level distance=90pt,sibling distance=0pt,grow=right]
 \Tree [.\node(schema){schema}; 
 [.\node(posint){positiveInt}; ]
@@ -62,6 +61,7 @@ internally and thus very lightweight.
 [.\node(pheader){PacketHeader}; \node(packetval){$\ldots$}; ]
 ]
 \node[draw,fit=(schema)(posint)(packetval)(unsint)]{};
+\node[above =3cm of schema]{XML Schema};
 \end{scope}
 %
 \begin{scope}[shift={(0in,-2.5in)},frontier/.style={distance from root=290pt},level distance=70pt,sibling
@@ -76,20 +76,43 @@ distance=0pt,grow'=right]
 [.\node(insvmi){version\_minor}; \node(insvmival){4}; ] 
 [.\node(insvma){version\_major}; \node(insvmaval){2}; ] ] ]
 \node[draw,fit=(inspcap)(insvmaval)(inspacketval)]{};
+\node[above =1.5cm of inspcap]{XML Instance};
 \end{scope}
-\draw[dotted,semithick,->] (inspcap)..controls +(north:3) and +(west:4)..(pcap);
-\draw[dotted,semithick,->] (inspacket)..controls +(north west:4) and +(south west:4)..(pheader);
-\draw[dotted,semithick,->] (insheader)..controls +(north west:4) and +(south west:4)..(header);
-\draw[dotted,semithick,->] (insnetworkval)..controls +(north west:4) and +(east:4)..(posint);
-\draw[dotted,semithick,->] (inssnaplenval)..controls +(north west:4) and +(east:4)..(posint);
-\draw[dotted,semithick,->] (insvmival)..controls +(east:2) and +(east:2)..(vmival);
-\draw[dotted,semithick,->] (insvmaval)..controls +(east:3) and +(east:3)..(vmaval);
-\draw[dotted,semithick,->] (insnetwork)..controls +(north:3) and +(south:3)..(network);
-\draw[dotted,semithick,->] (inssnaplen)..controls +(west:1.5) and +(west:1.5)..(snaplen);
-\draw[dotted,semithick,->] (inssigfigs)..controls +(west:2) and +(west:2)..(sigfigs);
-\draw[dotted,semithick,->] (insthiszone)..controls +(east:2.5) and +(east:2)..(thiszone);
-\draw[dotted,semithick,->] (insvmi)..controls +(east:3) and +(east:2)..(vmi);
-\draw[dotted,semithick,->] (insvma)..controls +(east:3.5) and +(east:2.5)..(vma);
+%
+\begin{scope}[node distance=1.6cm, auto, shift={(0in,-4.5in)}]
+\node[draw](decl1){pcap};
+\node[draw,right = of decl1](decl2){GlobalHeader};
+\node[right = of decl2](decl3){$\ldots$};
+\node[draw,right = of decl3](decl4){positiveInt};
+\node[draw,fit=(decl1)(decl4)]{};
+\node[above =0.3cm of decl1](dummy2){Element Map};
+\end{scope}
+\draw[blue,dotted,thick,->] (inspcap)..controls +(north:2) and +(west:4.7)..(pcap);
+\draw[blue,dotted,thick,->] (inspacket)..controls +(north west:4) and +(south west:4)..(pheader);
+\draw[blue,dotted,thick,->] (insheader)..controls +(north west:4) and +(south west:4)..(header);
+\draw[blue,dotted,thick,->] (insnetworkval)..controls +(north west:4) and +(east:4)..(posint);
+\draw[blue,dotted,thick,->] (inssnaplenval)..controls +(north west:4) and +(east:4)..(posint);
+\draw[blue,dotted,thick,->] (insvmival)..controls +(north east:1) and +(south east:4)..(vmival);
+\draw[blue,dotted,thick,->] (insvmaval)..controls +(north east:1.5) and +(south east:4)..(vmaval);
+\draw[blue,dotted,thick,->] (insnetwork)..controls +(north:3) and +(south:3)..(network);
+\draw[blue,dotted,thick,->] (inssnaplen)..controls +(west:1.5) and +(west:1.5)..(snaplen);
+\draw[blue,dotted,thick,->] (inssigfigs)..controls +(west:2) and +(west:2)..(sigfigs);
+\draw[blue,dotted,thick,->] (insthiszone)..controls +(east:2.5) and +(east:2)..(thiszone);
+\draw[blue,dotted,thick,->] (insvmi)..controls +(east:3) and +(east:2)..(vmi);
+\draw[blue,dotted,thick,->] (insvma)..controls +(east:3.5) and +(east:2.5)..(vma);
+
+\draw[orange,dashdotted,thick,->] (decl1)..controls +(north:3.5) and +(south:2.5)..(inspcap)
+\draw[orange,dashdotted,thick,->] (decl2)..controls +(north:3.5) and +(south:2.5)..(insheader);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1) and +(east:5)..(insnetwork);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1) and +(east:4.5)..(inssnaplen);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1) and +(east:4)..(inssigfigs);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1) and +(east:3.5)..(insthiszone);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1) and +(east:3)..(insvmi);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1) and +(east:2.5)..(insvma);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:1.5) and +(west:2)..(insvmival);
+\draw[orange,dashdotted,thick,->] (decl3)..controls +(north:2) and +(west:1.5)..(insvmaval);
+\draw[orange,dashdotted,thick,->] (decl4)..controls +(north:3.5) and +(south west:1.5)..(insnetworkval);
+\draw[orange,dashdotted,thick,->] (decl4)..controls +(north:2) and +(south west:1)..(inssnaplenval);
 \end{tikzpicture}
 \caption{Chromosome Representation}
 \end{listing}
