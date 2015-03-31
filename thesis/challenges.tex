@@ -204,6 +204,10 @@ Please note that all ports mentioned above are customizable and even the individ
 each leg of the communication pathway can be changed from tcp to any other protocol supported by \zmq, of which
 there are plenty.
 
+\Cref{fig:components} in \cref{sec:components} illustrates the described setup along with their 
+\zmq sockets - the convex protrusions in the shapes signify binding sockets, while the concave notches
+correspond to connecting sockets.
+
 The described system contains quite a number of components and it is at least somewhat important to start them
 up in a manner that does not exhibit the slow joiner syndrome - a condition, when a worker which is slow to
 join the system, does not receive its fair share of work items because all of them were already distributed
@@ -213,7 +217,6 @@ processes have formed the necessary connections, the default behavior of \xmlmat
 thirty seconds for a user input confirming the readiness of all other system components. After this timeout the
 process will be started automatically, thus making it well suited for unsupervised use.
 
-\change[inline]{make pretty communication graph}
 %###
 \subsubsection{Format Converters}
 %###
@@ -224,7 +227,6 @@ converter has been introduced. The main goal of a converter for a specific forma
 of this converter. For an example consider a converter from \xml to the packet capture format \pcap. 
 This converter expects \xml files in the format corresponding to the \pcap{} \xsd as shown in
 \cref{lst:xsdexample} and produces a valid \pcap file. \info{make a section reference}
-
 
 \xmlmate also has support for starting out its evolution process from a given set of inputs. If the   
 inputs are not available in the \xml format, they must first be converted so as to be genetically 

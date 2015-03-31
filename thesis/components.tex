@@ -82,7 +82,20 @@ of the components involved in the new extended \xmlmate work process.
   the worst fitness score to be removed from the population in order not to continuously keep crashing the test
   drivers, and the input file itself shall be kept permanently.
 \end{itemize}
-\improvement[inline]{Add illustration of system components}
+
+\Cref{fig:components} provides a schematic overview of the aforementioned components and which other components 
+they interact with inside the system. The visualization also shows that the system scales out to \texttt{n}
+format converters and \texttt{m} \emph{workers} (a collective noun summarizing a test driver, its
+pintool, the program under test, and their lifeguard instance). The arrows demonstrate the flow of data between
+the system components. Orange arrows denote the work items in \xml format sent out by \xmlmate itself, the blue arrows show
+the flow of converted files, and the green arrows signify the way the fitness information takes.
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=\columnwidth]{system.pdf} 
+  \caption{The Components of \xmlmate}
+  \label{fig:components}
+\end{figure}
 
 When developing such a diverse ecosystem it is important to be able to inspect and test each component
 individually, so as not to lose track of important details, and be able to isolate faults efficiently without
