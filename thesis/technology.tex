@@ -6,7 +6,7 @@ Over the time of its development \xmlmate has amassed quite a technology stack,
 which has grown to include not only a number of \xml processing libraries, but also communication, instrumentation, and serialization frameworks. 
 In the following sections I would like to give a brief overview of the technologies used.
 %###  
-\subsubsection{Xom}
+\tocless\subsubsection{Xom}
 %### 
 \xom{}\cite{xom} is a \java library for handling \xml documents at the core of \xmlmate. 
 It offers in-memory representation of \xml tree structures as well as support for Namespaces in \xml, {\small XPath 1.0}, {\small XSLT 1.0}, 
@@ -20,7 +20,7 @@ for building the basis of genetic representations of \xml trees (further describ
 If needed, you can skip ahead and take a look at \cref{lst:xmlexample} in \cref{sec:formats:pcap}
 to gain a better understanding of the kinds of file formats \xom offers support for.
 %### 
-\subsubsection{Xerces2}
+\tocless\subsubsection{Xerces2}
 %### 
 \xerces{}\cite{xerces} is a \java library for parsing, validating and manipulating XML documents, which most
 importantly to \xmlmate, has support for W3C XML Schema 1.1 (Working Drafts, December 2009).
@@ -34,7 +34,7 @@ impossible, as you will see in \cref{sec:repr}.
 For an impression of what an \xsd looks like in its textual form, feel free to consider \cref{lst:xsdexample},
 as well as \cref{lst:repr} for its role in the genetic representation of an \xml chromosome.
 %### 
-\subsubsection{PIN}
+\tocless\subsubsection{PIN}
 %### 
 {\small Intel} \pin\cite{Luk05pin:building} is a dynamic binary instrumentation framework for the IA-32 and x86-64 instruction-set architectures 
 that enables the creation of program analysis tools, which perform the instrumentation at run time on  
@@ -67,7 +67,7 @@ thus is severely lacking in features.
 There was also a consideration to use \texttt{Valgrind}\cite{Nethercote03valgrind:a} instead of \pin, but \pin
 won this case as well, though mostly due to its more easily accessible and example-rich documentation. 
 %### 
-\subsubsection{ZeroMQ}
+\tocless\subsubsection{ZeroMQ}
 %###
 \label{sec:zmq}
 {\small ZeroMQ}\cite{zmq} (or \zmq as it as actually called) is an extremely efficient messaging library, 
@@ -109,7 +109,7 @@ It is similarly brokerless, more lightweight and efficient than \zmq, and has an
 for example does not burden its users with the concept of a context; however, it is still in beta and lacks
 the gigantic community support like that of \zmq, which ultimately lead me to not choosing it either.
 %### 
-\subsubsection{MessagePack}
+\tocless\subsubsection{MessagePack}
 %### 
 Because a messaging library only solves the problem of getting \emph{arbitrary data} between peers, it 
 alone does not suffice for creating a fully fledged communication protocol - this is where
@@ -137,7 +137,7 @@ After some additional research more serialization/deserialization formats and li
 {\small FlatBuffers}\footnote{\url{https://google.github.io/flatbuffers/}} with some more promising than
 others. Finding a more suitable replacement for \msgpack might be a subject of some future enhancement.
 %### 
-\subsubsection{GNU Trove}
+\tocless\subsubsection{GNU Trove}
 %### 
 \label{sec:trove}
 The GNU Trove \java library provides performant and memory efficient alternative implementations of the

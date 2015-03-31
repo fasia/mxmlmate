@@ -1,0 +1,25 @@
+\section{Related Work}
+\label{sec:relwork}
+\subsection{Search-Based Testing}
+In the category of search-based approaches, i.e. those that employ any form of guidance criteria to steer the
+generation of test data in the desired direction, there are approaches spiritually very close to \xmlmate.
+
+\evosuite{}\cite{fraser2013whole} is an entire independent unit test generator aimed at \java programs. By
+dynamically observing the execution of the application under test and aiming for a maximum code coverage, it
+utilizes a genetic algorithm to generate entire JUnit test suites. It provides multiple code coverage
+criteria as search goals, which makes it a very versatile tool. In fact, the implementation of \xmlmate is
+in part based on \evosuite.
+
+Exsyst \cite{gross-issta2012} is also based on \evosuite, however, it specializes in testing of \java GUI
+applications by evolving series of interactions that aim to explore and test as many of the program's features
+as possible. % -> system testing
+\subsection{Fuzzers}
+%	blackbox
+% 		Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
+% 		oXygen
+% 	whitebox
+% 		afl \cite{afl}
+%		SAGE \cite{godefroid-sage}
+% 	language specific
+%		LangFuzz \cite{holler2012}
+%		SAGE+ \cite{godefroid-whitefuzz}
