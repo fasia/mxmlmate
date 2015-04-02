@@ -10,16 +10,71 @@ utilizes a genetic algorithm to generate entire JUnit test suites. It provides m
 criteria as search goals, which makes it a very versatile tool. In fact, the implementation of \xmlmate is
 in part based on \evosuite.
 
-Exsyst \cite{gross-issta2012} is also based on \evosuite, however, it specializes in testing of \java GUI
-applications by evolving series of interactions that aim to explore and test as many of the program's features
-as possible. % -> system testing
+\textsc{Exsyst}\cite{gross-issta2012} is also based on \evosuite, however, it specializes in testing of \java
+GUI applications by generating series of interactions that aim to explore and test as many of the program's
+features as possible. The result is not a test suite, but rather a set of executable GUI interactions that
+provide considerable code coverage, or even reveal failures. In contrast to pure \evosuite, this approach
+performs testing on the system level by exercising the tested application via the same interface as its
+intended users, this means that any failure found by \textsc{Exsyst} is a real failure and not a false
+positive. \xmlmate, also being a system level tool, has this property as well.
+
 \subsection{Fuzzers}
-%	blackbox
-% 		Codenomicon XML fuzzing framework (http://www.codenomicon.com/labs/xml/) 
-% 		oXygen
-% 	whitebox
-% 		afl \cite{afl}
-%		SAGE \cite{godefroid-sage}
-% 	language specific
-%		LangFuzz \cite{holler2012}
-%		SAGE+ \cite{godefroid-whitefuzz}
+There is an entire class of approaches which put an emphasis on the diversity of the produced inputs and the
+efficiency of their generation over guidance towards any certain criterion. These are collectively known as
+\emph{fuzzers}, their primary goal is usually to find failures and vulnerabilities, and they can be categorized
+as follows.
+\tocless\subsubsection{Blackbox Fuzzers}
+Blackbox fuzzers have no knowledge of the application they are testing whatsoever - they simply generate random
+inputs that can be fed into the program under test to see if it can handle it or if it crashes.
+There are many tools that can be at least partially classified as blackbox fuzzers. For \xml-based formats
+there are integrated development environments Eclipse\cite{eclipse} and Visual Studio\cite{visual} which are
+both capable of generating simple instances for a given \xsd. The oXygen\cite{oxygen} tool is a stand-alone
+\xml instance generator, which makes it, in contrast to the previous examples, a true fuzzer.
+ 		 
+The TAXI\cite{Bertolino:2007:ATD:1270230.1270257} approach presents a variation on the same principle, but
+offers an improvement by making use of partition testing: the number of instances to be generated
+and tested can be significantly reduced under the assumption that the ranges of values specified in the \xsd
+can be divided into partitions, such that if the application under test can accept and handle one input from a
+partition, it can do so with all the other values from the same partition.
+
+Wuzhi Xu et al.\cite{1544740} have applied a blackbox fuzzing on web services and extended the approach by
+performing perturbations on the \xsd before generating instances in order to additionally test the resilience
+of the validation mechanism.
+
+Codenomicon Labs have developed a proprietary XML fuzzing framework\cite{codenomicon} as part of their
+\textsc{cross} initiative (Codenomicon Robust Open Source Software). According to their own description their
+fuzzer is capable of introducing various kinds of malformities into the generated inputs - breaking the
+encoding, repetition of tags and elements, dropping of tags and elements, recursive structures, overflows,
+special characters, and many others.
+
+\tocless\subsubsection{Whitebox Fuzzers}
+In contrast to blackbox fuzzers, the whitebox fuzzers have some knowledge of the application under
+test, which they use to get some degree of feedback for the inputs they generate. They mostly use this feedback
+in order to avoid generating duplicates, or inputs which induce the same behavior in the tested program, thus
+avoiding useless work effort and making the testing more efficient.
+
+Named after the rabbit breed ``American Fuzzy Lop", \emph{afl-fuzz}\cite{afl} is a whitebox fuzzer
+primarily aimed at testing applications that take a binary file as input. Not very unlike \xmlmate it uses a
+combination of genetic algorithm and a lightweight form of dynamic instrumentation. Its main focus is on
+efficiency, which means that it can generate inputs for simple formats like jpeg reasonably
+well\footnote{\url{http://lcamtuf.blogspot.de/2014/11/pulling-jpegs-out-of-thin-air.html}}, however, it lacks
+the intelligence necessary to produce more sophisticated ones like png, which is riddled with internal
+consistency checksums.
+
+The SAGE\cite{godefroid-sage} tool employs dynamic symbolic analysis of x86 binary code of the program under
+test to determine information about the inputs to be generated: while the program is executing, constraints on
+the input format are gathered, whereafter a constraint solver is used to generate new inputs. SAGE requires
+existing files as a seed because path explosion and shortcomings of symbolic execution can make starting with
+empty inputs infeasible.
+
+\tocless\subsubsection{Language-Specific Fuzzers}
+As the probability to generate valid inputs that penetrate deep into the application logic without considerable
+format specification efforts is usually infinitesimally small, it is sometimes preferable to constrain the
+range of generated inputs by means of a grammar not very unlike an \xsd, for example.
+
+LangFuzz\cite{holler2012} is a typical blackbox fuzzer that leverages this principle and offers a possibility
+to provide input fragments, which it will then attempt to make use of in the process of input generation.
+
+In their later work \cite{Godefroid:2008:GWF:1375581.1375607} the authors of SAGE have extended the approach to
+take a grammar for input generation; however, their extension does not leverage any existing inputs for
+grammar-based test generation seeding.

@@ -31,7 +31,7 @@
 
 \usepackage[nameinlink]{cleveref}
 
-\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage{xargs}  % Use more than one optional parameter in a new commands
 %
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 \newcommandx{\change}[2][1=]{\todo[linecolor=Bittersweet,backgroundcolor=Bittersweet!25,bordercolor=Bittersweet,#1]{#2}}
@@ -82,30 +82,30 @@
 \input{./relwork.tex}
 \section{Approach}
 \label{sec:approach}
-% goals:
-%  add formats
-%  support for binary backends
-%  pluggable fitness functions
-%  case study: security testing libpng
+The work presented in this document mainly consists of adding new features and areas of application to the
+prototypical \xmlmate implementation, thus increasing its value for automatic test generation use cases. The
+most significant extensions include 
+\begin{description}
+\item[]adding support for applications not running on the \java virtual machine by using an x86 binary code
+dynamic instrumentation to be able to analyze any x86-based programs including popular libraries and rendering
+engines.
+\item[]extending support for pluggable fitness functions to allow for narrow-scope application contexts such as
+scanning the targeted program for specific classes of defects or vulnerabilities.
+\item[]adding more output formats to both demonstrate the versatility of the original approach as well as
+increase the set of applications compatible to be tested with \xmlmate.
+\end{description}
+
+Yet another goal of this work is performing a case study on the libpng image file rendering library to evaluate
+the efficacy and efficiency of the presented extensions.
 \input{./technology.tex}
 \input{./components.tex}
 \input{./challenges.tex}
-\input{./formats.tex} 
-\input{./fitness.tex} 
+\input{./formats.tex}
+\input{./fitness.tex}
 \input{./eval.tex}
 \section{Conclusion}
 \label{sec:conclusion}
-\section{Future Work}
-\label{sec:future}
-% complete parallel rewrite
-% implement meta-heuristics - varying number of converters / workers
-% more fitness functions - ctx switch, branch coverage
-% more subjects - libflac, tcpdump, tshark
-% more formats - flac, jpeg, gif
-% both java and binary coverages combined (JNI)
-% hardware performance counters - problem: concurrent execution, solution - distinct machines (vagrant?)
-% upgrade from \msgpack to something better (see 3.1.5), especially if system becomes truly distributed -
-% 	minimize network traffic overhead / trade-off with cpu-cost / streaming read-write?
+\input{./future.tex}
 \newpage
 \section*{References}
 \renewcommand\refname{}

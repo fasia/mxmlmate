@@ -462,7 +462,7 @@ auxiliary data structure to a set of \texttt{(thread\_id, rip, start, size)} wit
 variation in the first value, so it seems like a waste of space. An optimization can be achieved by using
 thread local storage facilities provided by \pin and reserve preliminary triples there, which requires
 additional synchronization when moving the completed triples into the common auxiliary data structure. This
-solution would be perfectly acceptable, if it wasn't for a small comment in the examples section of {\small
+solution would be perfectly acceptable, if it weren't for a small comment in the examples section of {\small
 Pin's}
 documentation\footnote{\url{https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/\#Invocation}}:
 \begin{quote}
