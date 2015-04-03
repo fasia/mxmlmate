@@ -37,8 +37,8 @@ allows to deserialize messages before they have reached their destination comple
 good use as well. Some candidate replacements can be found in \cref{sec:msgpack}.
 \item[]With more fitness functions come more test subjects that can be explored. For formats, for which the
 corresponding schemas and converters already exist in the current version, such applications as \emph{tcpdump}
-and \emph{tshark} for the \texttt{pcap} format and a whole
-lot\footnote{\url{http://www.libpng.org/pub/png/pngapcv.html}} of programs for \texttt{png} are available.
+and \emph{tshark} for the \pcap format and a whole
+lot\footnote{\url{http://www.libpng.org/pub/png/pngapcv.html}} of programs for {\small png} are available.
 \item[]Adding test subjects that process other file formats requires adding new schemas and converters that
 support them. Some envisioned targets are \emph{libjpeg}, \emph{giflib} and \emph{libflac} libraries for
 processing image, animation and sound files, respectively.
@@ -49,3 +49,6 @@ easier for the user to find the actual cause of the failure in question.
 to support testing of \java applications that use native code by performing instrumentation on both \java
 byte code and the native binary code.
 \end{itemize}
+
+% add electric fence? (maybe to the same item as PAPI)
+% add multiplatform support? (windows?)

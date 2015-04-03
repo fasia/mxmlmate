@@ -16,7 +16,7 @@
 \usepackage{tikz-qtree}
 \usetikzlibrary{babel,arrows,positioning,calc,fit}
 
-\usepackage[hidelinks]{hyperref}
+\PassOptionsToPackage{hyphens}{url}\usepackage[hidelinks]{hyperref}
 \usepackage[compatibility=false]{caption}
 \usepackage{subcaption}
 
@@ -47,6 +47,15 @@
 }%
 }%
 }
+
+\newcommand{\colorbitbox}[4]{%
+\rlap{\bitbox[]{#2}{\color{#1}\rule{\width}{\height}}}%
+\bitbox[#4]{#2}{#3}}
+
+\definecolor{mygreen}{HTML}{097054}
+\definecolor{myyellow}{HTML}{FFDE00}
+\definecolor{myblue}{HTML}{6599FF}
+\definecolor{myorange}{HTML}{FF9900}
 
 \newcommand{\nocontentsline}[3]{}%
 \newcommand{\tocless}[2]{\bgroup\let\addcontentsline=\nocontentsline#1{#2}\egroup}%

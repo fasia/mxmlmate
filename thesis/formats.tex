@@ -1,31 +1,151 @@
 %### 
-\subsection{Formats and Subjects}
+\subsection{File Formats}
 %###
 \xmlmate now supports producing inputs in almost any format, provided there is an \xsd and a converter
 available. Let me describe some formats that were experimented with along with their schemas, converters, and
 subject programs in the next sections.
 %### 
-\subsubsection{XML}
+\subsubsection{xhtml}
 %###
 Before I proceed with describing other exciting formats, I want to emphasize that by being extended to an all
 new multi-component distributed system \xmlmate has by no means lost its ability to interact with subject
-programs that actually process inputs in the \xml format. As a matter of fact, \xml as such is not exactly a
-full-fledged format in and of itself, it is rather a meta format, which many other formats are subsumed by. One
-such example is the ubiquitous \texttt{html} format, which, coincidentally, I have chosen as the basis format
-for testing \texttt{libxml} - a library for processing generic \xml documents written in \texttt{C}, which is
-\unsure{add examples, e.g. python's lxml}
-widely used as the foundation of an entire multitude of parser implementations. 
-\texttt{html} has a very complex specification, which exhibits almost all of \xml's feature set.
-\change{Rework this text before proceeding}
-%### 
-\subsubsection{PNG}
-%###
+programs that actually process inputs in the \xml format. Technically, \xml as such is not exactly a
+full-fledged format, it is rather a meta format, which many other formats are subsumed by. One
+such example is the E\textbf{x}tensible \textbf{H}ypertext \textbf{M}arkup \textbf{L}anguage format
+\texttt{xhtml}, which was created in an effort to force strict consistency rules onto web pages designed for
+rendering on \emph{thin clients} - devices with weak computational resources, for which it would be infeasible
+to implement graceful handling of inconsistent web page code (e.g. mismatched or missing tags, etc.). 
  
+Because \texttt{xhtml} is in essence a simple \xml wrapper around \texttt{html}, it is possible to use standard
+and computationally lightweight \xml parsers instead of specialized lenient html parsers. It is further
+possible to use \xml validation techniques to discard inconsistent web pages without wasting resources trying
+to render them.
+
+The main differences of \texttt{xhtml} from \texttt{html} include the mandatory presence of the
+\texttt{<html>}, \texttt{<head>}, \texttt{<title>} and \texttt{<body>} elements, as well as the {\small
+<!DOCTYPE \ldots>} document type declaration, in addition to the \texttt{xmlns} default namespace declaration
+attribute on the root \texttt{<html>} element, of which there must be exactly one. Furthermore, all element
+tags must be properly nested and always closed. Element and attribute names must be lowercase, and the
+latter's values must always be quoted.
+
+The World Wide Web Consortium provides an official \xsd for
+\texttt{xhtml}\footnote{http://www.w3.org/TR/xhtml1-schema/} which is used in the \xmlmate experiments
+described in \cref{sec:evaluation}. Unfortunately, with its 2211 lines this schema is too long to be included
+in this document; feel free, however, to visit the listed address for a quick glance.
+
 %### 
-\subsubsection{Pcap}
+\subsubsection{pcap}
 %###
 \label{sec:formats:pcap}
+The \textbf{p}acket \textbf{cap}ture file format is rather simple in that it has no deeply nested structures or
+overly strict rules on placement and integrity of its contents. \Cref{lst:pcapfile} shows the layout of a
+typical pcap file - it consists of a global header containing some global information followed by records for
+each captured packet, consisting of a packet header and data.
+
+\begin{listing}[h]
+\centering
+\begin{bytefield}[boxformatting={\centering\tiny}]{32}
+\colorbitbox{mygreen}{8}{Global Header}{tbr} &
+\colorbitbox{myorange}{8}{Packet Header}{tbr} &
+\colorbitbox{myorange}{8}{Packet Data}{tbr} &
+\colorbitbox{myblue}{8}{Packet Header}{tbr} &
+\colorbitbox{myblue}{8}{Packet Data}{tbr} &
+\bitbox[tb]{2}{\ldots}
+\end{bytefield}
+\caption{Pcap File Structure}
+\label{lst:pcapfile}
+\end{listing}
+
+Technical specifications of the individual headers are presented in \cref{lst:pcapformat}. 
+Briefly, the global header consists of the following elements:
+\texttt{magic\_number} is hexadecimal \texttt{a1b2c3d4} for determining the endianness of the file,
+\texttt{version\_major} and \texttt{version\_minor} denote the format version (currently 2.4),
+\texttt{thiszone} is the correction time in seconds between GMT and the current timezone (this value is
+usually set to 0); \texttt{sigfigs} is the accuracy of time stamps (also usually set to 0), \texttt{snaplen} is
+the snapshot length - i.e. the maximum number of bytes per captured packet; and finally \texttt{network}
+specifies link-layer header type of the captured packets (e.g. Ethernet, 802.11, PPP, etc.).
+
+The individual packet headers are also very simple and structured as follows:
+\texttt{ts\_sec} and \texttt{ts\_usec} provide timing information about when the packet was captured,
+\texttt{incl\_len} is the number of bytes of data actually included in the capture file (possibly
+limited by \texttt{snaplen} from the global header), while \texttt{orig\_len} is the
+real length of the packet as it appeared on the network.
+The packet data immediately follows the packet header as a blob of \texttt{incl\_len} bytes.
+
+
 \begin{listing}[H]
+\centering
+\begin{cppcode}
+typedef struct pcap_hdr_s {
+        guint32 magic_number;   /* magic number */
+        guint16 version_major;  /* major version number */
+        guint16 version_minor;  /* minor version number */
+        gint32  thiszone;       /* GMT to local correction */
+        guint32 sigfigs;        /* accuracy of timestamps */
+        guint32 snaplen;        /* max length of captured packets, in octets */
+        guint32 network;        /* data link type */
+} pcap_hdr_t;
+
+typedef struct pcaprec_hdr_s {
+        guint32 ts_sec;         /* timestamp seconds */
+        guint32 ts_usec;        /* timestamp microseconds */
+        guint32 incl_len;       /* number of octets of packet saved in file */
+        guint32 orig_len;       /* actual length of packet */
+} pcaprec_hdr_t;
+\end{cppcode}
+\caption{Pcap File Format}
+\label{lst:pcapformat}
+\end{listing}
+
+This format seems to be rather straightforward to write a corresponding \xsd for. \Cref{lst:xsdexample} shows
+this schema. The root element of the \xml representation of \pcap is the \texttt{pcap} element, which has the
+type PCAPType. This type defines its contents as a \texttt{header} element of the type GlobalHeaderType
+followed by zero or more \texttt{packet} elements of the type PacketHeaderType. 
+
+Don't be confused by the ``tns:'' prefix found throughout the schema - it is just a marker assigning the
+declared entities to the target namespace \url{http://www.xmlmate.org/pcap}, this is a mechanism for
+disambiguating equally named declarations across multiple schema definitions; it is of no particular
+importance to the format description, so feel free to ignore it. 
+
+The GlobalHeaderType is almost identical in its contents to the format definition from \cref{lst:pcapformat}
+with the exception of the missing declaration of \texttt{magic\_number}, which will be automatically inserted
+by the corresponding format converter because the endianness of the final \pcap file will depend entirely on
+the one used by the converter anyway.
+
+The PacketHeaderType similarly leaves the \texttt{orig\_len} value to be filled in by the converter because, as
+per format definition, it must not be smaller than \texttt{incl\_len}, which is generated randomly when
+instantiating the \xml. The converter additionally ensures that the value of \texttt{incl\_len} does not exceed
+the one of \texttt{snaplen} from the global header, which is impossible to do by means of the schema
+definition alone.
+\improvement[inline]{rework positioning of the following listing}
+
+\begin{listing}[H]
+\centering
+\inputminted[frame=lines,fontsize=\small]{xml}{../subjects/pcap/schema/pcap.xsd}
+\caption{\xsd for the \texttt{pcap} File Format}
+\label{lst:xsdexample}
+\end{listing}
+
+The schema further lacks the definition for the data blob that represents the actual packet data itself, once
+again it is the converter's job to fill that in according to the (now possibly trimmed) \texttt{incl\_len}
+value. Besides, it would be somewhat wasteful to first generate a blob of data in string form only to 
+convert it to a binary format.
+
+The above shows pretty well that the schema definition and the code of the corresponding converter must be well
+coordinated. It also shows that a considerable amount of intelligence can be placed into the converter
+component, although this is not necessary as the design of \xmlmate allows to plug transformer entities
+of arbitrary nature into the processing pipeline, so it might be favorable to have separate components
+responsible for correcting inconsistent values between \xmlmate and the converters to have more of a separation
+of concerns - in the end it's all about trade-offs.
+
+The schema also introduces the type positiveInt as unsignedInt with the minimal possible value of 1 because
+there is no corresponding type among the \xsd built-ins.
+
+\Cref{lst:xmlexample} shows a possible instantiation of the described schema - the left side depicts the
+textual representation that gets sent out to the converter, and the right side represents the instance as an
+in-memory \xml tree as operated upon by \xmlmate internally.
+
+\begin{listing}[h]
 \centering
 \begin{tabular}{|m{4.5cm}m{8cm}|}
 \begin{xmlcode}
@@ -66,14 +186,25 @@ widely used as the foundation of an entire multitude of parser implementations.
 \end{listing}
 % This listing can probably be made as long as needed to increase the number of pages by adding packets ;)
 
-\begin{listing}[H]
-\centering
-\inputminted[frame=lines,fontsize=\small]{xml}{../subjects/pcap/schema/pcap.xsd}
-\caption{\xsd for the \texttt{pcap} File Format}
-\label{lst:xsdexample}
-\end{listing}
+%### 
+\subsubsection{png}
+%###
+The \textbf{p}ortable \textbf{n}etwork \textbf{g}raphics format is, as its name suggests, a graphics file
+format often abbreviated \texttt{png}.
+% TODO continue from https://en.wikipedia.org/wiki/Portable_Network_Graphics
+
+% designed for web 
+% -> is losslessly compressed (with filter and then DEFLATE)
+% -> riddled with CRCs
+% => very complex format
+
+% structure: header, chunks (use bytefield), critical, ancillary, public, reserved, copiable
+% example chunks: IHDR (introduce color type), PLTE, IDAT, IEND
+% conditions on PLTE: essential with 3, optional with 2 and 6, illegal with 0 and 4
+% mention schema explosion to model those kinds of dependencies
+% mention 3106 LOC of the entire schema
+
 
 %### 
 % \subsubsection{Flac}
 %###
- 
