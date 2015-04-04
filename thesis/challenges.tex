@@ -135,13 +135,10 @@ distance=0pt,grow'=right]
 Since \xmlmate now comprises several processes, a communication protocol must be put in place to 
 interconnect the individual components. The communication channels themselves are built on top of
 the \zmq messaging library with \msgpack as the serialization/deserialization engine. The current
-implementation uses tcp\footnote{TCP loopback is used because the pure \java implementation 
-of \zmq does not support \texttt{ipc} on the Windows platform, which I do most of the development on.
-Using a JNI based Java wrapper as a drop-in replacement would alleviate this problem, 
-but it is not considered to be worth the effort.} 
-as a carrier for the messages; however, it is entirely possible
-to change this to inter-process communication just by changing a configuration option, should it 
-become necessary. As yet, it is very far from being a bottleneck.
+implementation uses tcp\footnote{TCP loopback is used because \zmq does not support \texttt{ipc} on the
+Windows platform, which I do most of the development on.} as a carrier for the messages; however, it is
+entirely possible to change this to inter-process communication just by changing a configuration option,
+should it become necessary. As yet, it is very far from being a bottleneck.
 
 
 After each evolution step a test suite usually contains several tests that changed due to mutation and

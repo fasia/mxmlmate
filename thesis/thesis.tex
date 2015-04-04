@@ -1,3 +1,4 @@
+\RequirePackage[l2tabu, orthodox]{nag}
 \documentclass[a4paper,parskip=half]{scrartcl}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
@@ -11,6 +12,7 @@
 \usepackage{rotating}
 \usepackage{bytefield}
 \usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+\usepackage[activate={true,nocompatibility},stretch=10,shrink=10,factor=1100,babel=true]{microtype}
 
 \usepackage{tikz}
 \usepackage{tikz-qtree}
@@ -20,7 +22,6 @@
 \usepackage[compatibility=false]{caption}
 \usepackage{subcaption}
 
-
 \usepackage{minted}
 \usemintedstyle{autumn}
 % \usemintedstyle{bw} % use for black and white
@@ -28,6 +29,11 @@
 \newminted{c}{gobble=1,linenos,numberblanklines=false,frame=lines,tabsize=4}
 \newminted{xml}{frame=none,tabsize=1,fontsize=\small}
 \newminted{cpp}{frame=lines,tabsize=4}
+
+\usepackage{xpatch,letltxmacro}
+\LetLtxMacro{\cminted}{\minted}
+\let\endcminted\endminted
+\xpretocmd{\cminted}{\RecustomVerbatimEnvironment{Verbatim}{BVerbatim}{}}{}{}
 
 \usepackage[nameinlink]{cleveref}
 
@@ -71,6 +77,7 @@
 \newcommand{\xom}{{\small XOM}\xspace}
 \newcommand{\pin}{{\small Pin}\xspace}
 \newcommand{\pcap}{{\small pcap}\xspace}
+\newcommand{\png}{{\small png}\xspace}
 \newcommand{\zmq}{{\small ØMQ}\xspace}
 \newcommand{\msgpack}{{\small MessagePack}\xspace}
 \newcommand{\xerces}{{\small Xerces2}\xspace}

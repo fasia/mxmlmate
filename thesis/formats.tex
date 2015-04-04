@@ -117,19 +117,18 @@ per format definition, it must not be smaller than \texttt{incl\_len}, which is 
 instantiating the \xml. The converter additionally ensures that the value of \texttt{incl\_len} does not exceed
 the one of \texttt{snaplen} from the global header, which is impossible to do by means of the schema
 definition alone.
-\improvement[inline]{rework positioning of the following listing}
-
-\begin{listing}[H]
-\centering
-\inputminted[frame=lines,fontsize=\small]{xml}{../subjects/pcap/schema/pcap.xsd}
-\caption{\xsd for the \texttt{pcap} File Format}
-\label{lst:xsdexample}
-\end{listing}
 
 The schema further lacks the definition for the data blob that represents the actual packet data itself, once
 again it is the converter's job to fill that in according to the (now possibly trimmed) \texttt{incl\_len}
 value. Besides, it would be somewhat wasteful to first generate a blob of data in string form only to 
 convert it to a binary format.
+
+\begin{listing}[htp]
+\centering
+\inputminted[frame=lines,fontsize=\small]{xml}{../subjects/pcap/schema/pcap.xsd}
+\caption{\xsd for the \texttt{pcap} File Format}
+\label{lst:xsdexample}
+\end{listing}
 
 The above shows pretty well that the schema definition and the code of the corresponding converter must be well
 coordinated. It also shows that a considerable amount of intelligence can be placed into the converter
@@ -145,7 +144,8 @@ there is no corresponding type among the \xsd built-ins.
 textual representation that gets sent out to the converter, and the right side represents the instance as an
 in-memory \xml tree as operated upon by \xmlmate internally.
 
-\begin{listing}[h]
+
+\begin{listing}[H]
 \centering
 \begin{tabular}{|m{4.5cm}m{8cm}|}
 \begin{xmlcode}
@@ -190,20 +190,139 @@ in-memory \xml tree as operated upon by \xmlmate internally.
 \subsubsection{png}
 %###
 The \textbf{p}ortable \textbf{n}etwork \textbf{g}raphics format is, as its name suggests, a graphics file
-format often abbreviated \texttt{png}.
-% TODO continue from https://en.wikipedia.org/wiki/Portable_Network_Graphics
+format often abbreviated \png. It was mainly designed for use in sharing of images over the Internet,
+which is why it also supports lossless data compression and is riddles with internal consistency checks by
+means of CRC-32 checksums. Compared to the previously presented \pcap format, \png is very complex; it bears,
+however, some similarity to \pcap in that \png files are also divided into smaller entities called
+\emph{chunks}. There are many kinds of chunks defined in the \png standard, but \cref{lst:pngfile} shows only
+the most basic ones. 
 
-% designed for web 
-% -> is losslessly compressed (with filter and then DEFLATE)
-% -> riddled with CRCs
-% => very complex format
+\begin{listing}[H]
+\centering
+\begin{bytefield}[bitheight=\widthof{~{\tiny MAGIC}~},boxformatting={\centering}]{32}
+\bitbox{1}{\rotatebox{90}{{\tiny MAGIC}}} &
+\bitbox{6}{IHDR} &
+\bitbox[tbr]{6}{PLTE} &
+\bitbox[tb]{8}{} &
+\bitbox[tb]{4}{IDAT} &
+\bitbox[]{3}{\ldots} &
+\bitbox[tbr]{5}{} &
+\bitbox[tbr]{6}{IEND}
+\end{bytefield}
+\caption{Simple Example of PNG File Structure}
+\label{lst:pngfile}
+\end{listing}
 
-% structure: header, chunks (use bytefield), critical, ancillary, public, reserved, copiable
-% example chunks: IHDR (introduce color type), PLTE, IDAT, IEND
-% conditions on PLTE: essential with 3, optional with 2 and 6, illegal with 0 and 4
-% mention schema explosion to model those kinds of dependencies
-% mention 3106 LOC of the entire schema
+A \png file always starts with the magic byte sequence \texttt{89 50 4e 47 0d 0a 1a 0a}, which, in contrast to
+\pcap, is not part of the first chunk. All chunks have a common structure as shown in \cref{lst:pngchunks},
+whereby the CRC-32 checksum is computed over the chunk type and chunk data, but not the length. The chunk type
+is identified with four ASCII letters and the case of each letter has a specific meaning for the decoder.
+The chunk is recognized as \emph{critical} if the first letter is uppercase and \emph{ancillary} otherwise.
+Critical chunks must be understood by the decoder program as they contain information indispensable for
+rendering the file, if a decoder does not recognize a critical chunk, it is required to abort the processing or
+supply an appropriate warning. Ancillary chunks contain information optional to overall processing of the file.
 
+The meaning of the case of other letters is not considered important enough to take up space in this document
+- if you wish to actually learn the format it is far more advisable to visit an appropriate specification
+page\footnote{For example \url{http://www.w3.org/TR/PNG/}}.
+
+\begin{listing}[H]
+\centering
+\begin{bytefield}[boxformatting={\centering\small}]{32}
+\colorbitbox{lightgray}{7}{Length}{tlr} &
+\colorbitbox{lightgray}{7}{Chunk Type}{tlr} &
+\colorbitbox{lightgray}{18}{Chunk Data}{tlr} &
+\colorbitbox{lightgray}{7}{CRC-32}{tlr} \\
+\bitbox{7}{4 bytes} &
+\bitbox{7}{4 bytes} &
+\bitbox{18}{\emph{Length} bytes} &
+\bitbox{7}{4 bytes}
+\end{bytefield}
+\caption{PNG Chunk Structure}
+\label{lst:pngchunks}
+\end{listing}
+
+To give you an impression as to the nature of some chunks defined in the format specification, the following
+listing offers a small selection of chunk types and their descriptions.
+\begin{description}
+	\item[\texttt{IHDR}] is the header chunk, it must be the first one in the \png file. It contains important
+	global information about the image: its width, height, bit depth, color type, as well as compression, filter,
+	and interlace methods.
+	\item[\texttt{PLTE}] contains a list of colors also known as a palette. The palette contains up to 256 color
+	entries, each of which consists of three bytes denoting values of RGB, respectively.
+	\item[\texttt{IDAT}] carries the data of the image filtered and compressed according to the specification
+	found in the \texttt{IHDR} chunk of this image. There can be several contiguous \texttt{IDAT} chunks sharing
+	the image data payload, which is especially useful when loading images over a slow Internet connection, so
+	that rendering can be started while the image is still partially in transit.
+	\item[\texttt{IEND}] marks the end of the image.
+	\item[\texttt{tRNS}] conveys transparency information for datastreams that do not include a so called alpha
+	channel.
+	\item[\texttt{gAMA}] specifies gamma correction for the given image file.
+\end{description}
+
+There are many more chunk types, but unfortunately they cannot be placed randomly all over a \png file as the
+documentation specifies some rules regarding this, which causes a lot of complexity to writing an \xsd to
+reflect the \png format properly. For a short demonstration of some of the problem sources consider the
+following rules:
+
+\begin{itemize}
+\item[] The \emph{color type} in the \texttt{IHDR} chunk can have values of 0, 2, 3, 4, and 6, which place
+specific restrictions on several other elements e.g. the allowed bit depth value, as well as the presence of
+the \texttt{PLTE} chunk.
+
+\item[] The \texttt{PLTE} chunk must be present with the color type set to 3, it is optional with color types 2
+and 6, and it is illegal with the types 0 and 4.
+
+\item[] If the \texttt{PLTE} chunk appears, it must do so before any \texttt{IDAT} chunk.
+
+\item[] The only chunks allowed to appear multiple times are \texttt{IDAT}, \texttt{sPLT}, \texttt{iTXt},
+\texttt{tEXt}, and \texttt{zTXt}.
+
+\item[] The \texttt{cHRM}, \texttt{gAMA}, \texttt{iCCP}, \texttt{sBIT}, and \texttt{sRGB} chunks must appear
+before the \texttt{PLTE} and \texttt{IDAT} chunks.
+
+\item[] The \texttt{bKGD}, \texttt{hIST}, and \texttt{tRNS} chunks must appear after the \texttt{PLTE} chunk,
+but before any \texttt{IDAT} chunk.
+\end{itemize}
+
+These are only some of the constraints defined in the \png format. Unfortunately the mechanisms provided by
+the \xsd language are insufficient to express all the constrains easily. However, there is a possibility to
+capture partial ordering constraints and restrict legal value combinations by ``exploding'' the schema. This
+means that every combination is declared as its own element and then all of the possible applications of the
+decision as to which combination to instantiate are expressed by means of a \texttt{choice} particle.
+For an example consider \cref{lst:schemaexplosion}, which depicts the different legal combinations of color
+type and bit depth expressed as an exploded \texttt{choice} particle. Each listed element declaration includes
+a slightly different \texttt{IHDR} subtype with values for color type and bit depth set accordingly; also the
+presence of a \texttt{PLTE} chunk is governed by this \texttt{choice} because it depends on the color type as
+mentioned in the rules above. These explosions have lead the schema document to grow to 3106 lines in size
+distributed over 21 files. More complicated format requirements like checksum correctness and conformity of
+the width and height of an image and the amount of data in \texttt{IDAT} chunks had to be moved into the format
+converter.
+
+\begin{listing}[H]
+\centering
+\begin{cminted}[frame=lines,tabsize=2,fontsize=\small]{xml}
+<choice>
+	<element ref="tns:ChunksCT0BD1" />
+	<element ref="tns:ChunksCT0BD2" />
+	<element ref="tns:ChunksCT0BD4" />
+	<element ref="tns:ChunksCT0BD8" />
+	<element ref="tns:ChunksCT0BD16"/>
+	<element ref="tns:ChunksCT2BD8" />
+	<element ref="tns:ChunksCT2BD16"/>
+	<element ref="tns:ChunksCT3BD1" />
+	<element ref="tns:ChunksCT3BD2" />
+	<element ref="tns:ChunksCT3BD4" />
+	<element ref="tns:ChunksCT3BD8" />
+	<element ref="tns:ChunksCT4BD8" />
+	<element ref="tns:ChunksCT4BD16"/>
+	<element ref="tns:ChunksCT6BD8" />
+	<element ref="tns:ChunksCT6BD16"/>
+</choice>
+\end{cminted}
+\caption{XML Schema Explosion Fragment}
+\label{lst:schemaexplosion}
+\end{listing}
 
 %### 
 % \subsubsection{Flac}
