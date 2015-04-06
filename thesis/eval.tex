@@ -1,17 +1,131 @@
 \section{Evaluation}
 \label{sec:evaluation}
+From the previous sections you should be familiar with the main ideas and even some technical details behind
+the approach that is the main focus of this document. However, every approach is only worth as much as it can
+offer. To determine this for the presented implementation - \xmlmate, an empirical evaluation on several test
+subjects has been carried out, and the results are documented in this section.
+\subsection{Evaluation Setup}
+
+Due to the random nature of the genetic algorithm that is at the heart of \xmlmate, it is necessary to perform
+multiple runs of each experiment in order to properly ascertain its effectiveness and efficiency statistically
+by considering the average values. At this point it is of particular importance to define what efficiency and
+effectiveness mean in the context of this document. 
+
+In terms of found defects, let \emph{efficiency} be the overall number of defects found in a given time frame.
+Similarly, \emph{effectiveness} is the number of \emph{unique} defects revealed within a given time frame.
+
+One \emph{experiment} consists of running \xmlmate for one hour with a limit of 2200 elements per \xml instance
+as well as a maximum recursion depth of 12 for optional elements meaning that no optional elements are generated
+for subtrees of depth 13 or more. Additionally, the maximum number of \xml files in the population being
+evolved is limited to 500 which is kept consistent across the normal and the singleton population (see
+\cref{sec:memcov}) modes as follows: in the singleton population usage scenario, where single files are the
+main focus of the evolution process, the limit is expressed simply as a single suite with a maximum of 500
+individual files in it, while in the normal use case, where the result of an evolution is a suite of files, the
+limit is enforced as a population of 25 suites with a maximum of 20 files in each.
+
+To produce statistically significant average result values, for each fitness function and for each test
+subject an experiment was run 10 times. This setup was replicated for the two modes of testing: with and
+without local search - the mechanism for producing schema-invalid values.
+
+The experiments were carried out on a virtual machine equipped with 8 CPU cores running at 2.60GHz and 64 Gb
+main memory, which, however, was far more than needed because the \java part of \xmlmate - the process taking
+up the most memory by far - only needed 2Gb to handle the in-memory \xml instances. The deployment
+configuration of the \xmlmate system consisted of the following:
+\begin{itemize*}
+  \item 1 instance of the \java \xmlmate core component
+  \item 1 load balancer between the core component and converter instances
+  \item 8 format converter instances
+  \item 1 load balancer between the converters and the workers
+  \item 8 worker instances (a worker consists of a test driver, a test subject instance, and a pintool)
+  \item 8 lifeguards for their respective workers
+\end{itemize*}
+
+It must be noted that no converters were used for testing \texttt{libxml2} as it consumes inputs as generated
+by the \xmlmate core component directly.
+
+
+
+
 \subsection{Subjects}
-% todo add sources for test subjects
+While \cref{sec:formats} has introduced you to the file formats used in this document, the following sections
+will give you a short description of programs that were used during the evaluation, which work with those
+formats.
 \subsubsection{libxml2}
-\texttt{libxml2} is a library for processing generic \xml documents, which is written in
-{\small C}. It is widely used and provides bindings to many programming languages including \cpp, 
-{\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. The popular \texttt{libxslt} library
-for processing \xml stylesheet transformations is also largely based on \texttt{libxml2}.
+\texttt{libxml2}\footnote{\url{http://www.xmlsoft.org/}} is a library for processing generic \xml documents,
+which is written in {\small C}. It is widely used and provides bindings to many programming languages
+including \cpp, {\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. Furthermore it was
+designed for utmost portability, such that it works on a wide variety of operating systems such as
+Linux, Windows, CygWin, MacOS, RISC Os, OS/2, and some other, less common ones.
+
+The library is extremely well tested, and in its current version 2.9.2 it passes all tests from the very large
+OASIS XML Test Suite\footnote{\url{https://www.oasis-open.org/committees/xml-conformance/xml-test-suite.shtml}}
+consisting of more than 1800 tests. It is, therefore, very unlikely for \xmlmate to find any vulnerabilities
+or even defects, especially because it specializes in generating \emph{valid} XML files, and even more so in
+this case, where only \texttt{xhtml} files, which do not represent the entirety of the \xml specification,
+were used for testing.
+
 \subsubsection{libpcap}
+\texttt{libpcap}\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format. It
+is used among others in the tcpdump and wireshark tools.
+
 \subsubsection{libpng}
+\texttt{libpng}\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating and rendering
+\png files.
 % mention generating only 2x2 pixels
+
 %\subsubsection{libflac}
 \subsection{Results}
+
+% mention segfault found in gimp due to empty PLTE
+% mention problem of failure masking -> one crash makes another undetectable
+% mention singleton pop mode for the last 4 fit funcs
+% mention in table tbl:fitness downarrow means div0 fitness function is minimization function
+
+\begin{table}[H]
+\small
+\centering
+\begin{tabular}{|r|c|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c|}{Subject}  & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Local\\ Search\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}$\downarrow$ Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline \hline
+                               & -                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     ?                                                        & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
+\multirow{-2}{*}{png}          & \cellcolor[HTML]{C0C0C0}+                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}                                                     & \cellcolor[HTML]{C0C0C0}              ?                                         & \cellcolor[HTML]{C0C0C0}    ?                                                  \\ \hline \hline
+                               & -                                                                           &              ?                                                              &                             ?                                                 &                                ?                                             &                                         ?                                    &                                        ?                                        &                                 ?                                              \\ \cline{2-8} 
+\multirow{-2}{*}{pcap}         & \cellcolor[HTML]{C0C0C0}+                                                   & \cellcolor[HTML]{C0C0C0} ?                                                  & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.22337E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
+                               & -                                                                           &       ?                                                                     &                              ?                                                &                                 ?                                            &                                        ?                                     &                                         ?                                       &                                      ?                                         \\ \cline{2-8} 
+\multirow{-2}{*}{xhtml}        & \cellcolor[HTML]{C0C0C0}+                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}  ?                                                  & \cellcolor[HTML]{C0C0C0}    ?                                                & \cellcolor[HTML]{C0C0C0}  ?                                                     & \cellcolor[HTML]{C0C0C0}   ?                                                   \\ \hline
+\end{tabular}
+\caption{Fitness Score Results}
+\label{tbl:fitness}
+\end{table}
+
+
+\begin{table}[H]
+\small
+\centering
+\begin{tabular}{|c|r|r|r|r|r|r|}
+\hline
+\begin{tabular}[c]{@{}c@{}}Local\\ Search\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
+- & ? & ? & ? & ? & 9.2 (?) & 12.9 (?) \\ \hline
++ & 1.7 (?) & 1.6 (?) & 1.2 (?) & ? & ? & ? \\ \hline
+\end{tabular}
+\caption{Average Crashes Found in \texttt{libpng}}
+\label{tbl:png:crashes:avg}
+\end{table}
+
+
+\begin{table}[H]
+\small
+\centering
+\begin{tabular}{|c|r|r|r|r|r|r|}
+\hline
+\begin{tabular}[c]{@{}c@{}}Local\\ Search\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
+- & ? & ? & ? & ? & 92 (?) & 129 (?) \\ \hline
++ & 17 (?) & 16 (?) & 12 (?) & ? & ? & ? \\ \hline
+\end{tabular}
+\caption{Cumulative Crashes Found in \texttt{libpng}}
+\label{tbl:png:crashes:cum}
+\end{table}
+
 \subsection{Threats to Validity}
 As any empirical study, this evaluation is subject to several threats to validity.
 First, as regards \emph{external validity}, the subjects used in this study may be far from representative of
