@@ -25,23 +25,25 @@ limit is enforced as a population of 25 suites with a maximum of 20 files in eac
 
 To produce statistically significant average result values, for each fitness function and for each test
 subject an experiment was run 10 times. This setup was replicated for the two modes of testing: with and
-without local search - the mechanism for producing schema-invalid values.
+without the mechanism for producing schema-invalid values.
 
 The experiments were carried out on a virtual machine equipped with 8 CPU cores running at 2.60GHz and 64 Gb
-main memory, which, however, was far more than needed because the \java part of \xmlmate - the process taking
-up the most memory by far - only needed 2Gb to handle the in-memory \xml instances. The deployment
-configuration of the \xmlmate system consisted of the following:
-\begin{itemize*}
+main memory, which, however, was far more than needed because the \java part of \xmlmate{} - the process taking
+up the most memory by far - only needed 2Gb for in-memory \xml instance handling. The deployment configuration
+of the \xmlmate system consisted of the following:
+\begin{itemize}
   \item 1 instance of the \java \xmlmate core component
   \item 1 load balancer between the core component and converter instances
   \item 8 format converter instances
   \item 1 load balancer between the converters and the workers
-  \item 8 worker instances (a worker consists of a test driver, a test subject instance, and a pintool)
+  \item 8 worker instances (worker = test driver + test subject instance + pintool)
   \item 8 lifeguards for their respective workers
-\end{itemize*}
+\end{itemize}
 
+The setup can be imagined as in \cref{fig:components} with $n = m = 8$.
 It must be noted that no converters were used for testing \texttt{libxml2} as it consumes inputs as generated
-by the \xmlmate core component directly.
+by the \xmlmate core component directly, therefore only one load balancer was needed between it and
+the worker instances.
 
 
 
@@ -53,20 +55,34 @@ formats.
 \subsubsection{libxml2}
 \texttt{libxml2}\footnote{\url{http://www.xmlsoft.org/}} is a library for processing generic \xml documents,
 which is written in {\small C}. It is widely used and provides bindings to many programming languages
-including \cpp, {\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. Furthermore it was
+including \cpp, {\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. Furthermore, it was
 designed for utmost portability, such that it works on a wide variety of operating systems such as
 Linux, Windows, CygWin, MacOS, RISC Os, OS/2, and some other, less common ones.
 
 The library is extremely well tested, and in its current version 2.9.2 it passes all tests from the very large
 OASIS XML Test Suite\footnote{\url{https://www.oasis-open.org/committees/xml-conformance/xml-test-suite.shtml}}
-consisting of more than 1800 tests. It is, therefore, very unlikely for \xmlmate to find any vulnerabilities
-or even defects, especially because it specializes in generating \emph{valid} XML files, and even more so in
-this case, where only \texttt{xhtml} files, which do not represent the entirety of the \xml specification,
-were used for testing.
+consisting of more than 1800 individual tests. It is, therefore, very unlikely for \xmlmate to find any
+vulnerabilities or even defects, especially because it specializes in generating \emph{valid} XML files, and
+even more so in this case, where only \texttt{xhtml} files, which do not represent the entirety of the \xml
+specification, were used for testing.
 
 \subsubsection{libpcap}
-\texttt{libpcap}\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format. It
-is used among others in the tcpdump and wireshark tools.
+\texttt{libpcap}\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format
+maintained by the \emph{Tcpdump Group}. It is used in the popular tools tcpdump, ngrep, Wireshark, Snort and
+nmap, among other less known ones. The main objective of \texttt{libpcap} is to provide its users with a
+platform-independent API for network packet capturing. The API is designed to work with {\small C} and \cpp
+programming languages, but there exists a number of binding to other languages as well such as \python, \java,
+{\small C\#}, or {\small Ruby}.
+
+While it first and foremost provides a nice abstraction layer above the operating system-specific live packet
+capturing mechanism (which every operating system vendor seems to have designed differently), \texttt{libpcap}
+also provides an interface for manipulating packets already captured and available in the \pcap file format.
+This is the interface through which testing with \xmlmate is performed as it seems otherwise rather
+infeasible to simulate a network card interface in order to engage \texttt{libpng} on the live capturing
+interface. One consequence to choosing the offline  file reading interface is, however, that only a relatively
+small portion of the program code of \texttt{libpcap} can be possibly engaged. This limitation has to be kept
+in mind when assessing the results of the empirical evaluation presented in this section.
+% mention that there are no CVEs directly in libpcap, but rather in the derivative works
 
 \subsubsection{libpng}
 \texttt{libpng}\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating and rendering
@@ -86,13 +102,13 @@ is used among others in the tcpdump and wireshark tools.
 \centering
 \begin{tabular}{|r|c|r|r|r|r|r|r|}
 \hline
-\multicolumn{1}{|c|}{Subject}  & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Local\\ Search\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}$\downarrow$ Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline \hline
-                               & -                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     ?                                                        & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
-\multirow{-2}{*}{png}          & \cellcolor[HTML]{C0C0C0}+                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}                                                     & \cellcolor[HTML]{C0C0C0}              ?                                         & \cellcolor[HTML]{C0C0C0}    ?                                                  \\ \hline \hline
-                               & -                                                                           &              ?                                                              &                             ?                                                 &                                ?                                             &                                         ?                                    &                                        ?                                        &                                 ?                                              \\ \cline{2-8} 
-\multirow{-2}{*}{pcap}         & \cellcolor[HTML]{C0C0C0}+                                                   & \cellcolor[HTML]{C0C0C0} ?                                                  & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.22337E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
-                               & -                                                                           &       ?                                                                     &                              ?                                                &                                 ?                                            &                                        ?                                     &                                         ?                                       &                                      ?                                         \\ \cline{2-8} 
-\multirow{-2}{*}{xhtml}        & \cellcolor[HTML]{C0C0C0}+                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}  ?                                                  & \cellcolor[HTML]{C0C0C0}    ?                                                & \cellcolor[HTML]{C0C0C0}  ?                                                     & \cellcolor[HTML]{C0C0C0}   ?                                                   \\ \hline
+\multicolumn{1}{|c|}{Subject}  & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}$\downarrow$ Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline \hline
+                               & +                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     ?                                                        & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
+\multirow{-2}{*}{png}          & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}                                                     & \cellcolor[HTML]{C0C0C0}              ?                                         & \cellcolor[HTML]{C0C0C0}    ?                                                  \\ \hline \hline
+                               & +                                                                           &              ?                                                              &                             ?                                                 &                                ?                                             &                                         ?                                    &                                        ?                                        &                                 ?                                              \\ \cline{2-8} 
+\multirow{-2}{*}{pcap}         & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} ?                                                  & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.22337E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
+                               & +                                                                           &       ?                                                                     &                              ?                                                &                                 ?                                            &                                        ?                                     &                                         ?                                       &                                      ?                                         \\ \cline{2-8} 
+\multirow{-2}{*}{xhtml}        & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}  ?                                                  & \cellcolor[HTML]{C0C0C0}    ?                                                & \cellcolor[HTML]{C0C0C0}  ?                                                     & \cellcolor[HTML]{C0C0C0}   ?                                                   \\ \hline
 \end{tabular}
 \caption{Fitness Score Results}
 \label{tbl:fitness}
@@ -102,11 +118,11 @@ is used among others in the tcpdump and wireshark tools.
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|c|r|r|r|r|r|r|}
+\begin{tabular}{|c||r|r|r|r|r|r|}
 \hline
-\begin{tabular}[c]{@{}c@{}}Local\\ Search\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
-- & ? & ? & ? & ? & 9.2 (?) & 12.9 (?) \\ \hline
-+ & 1.7 (?) & 1.6 (?) & 1.2 (?) & ? & ? & ? \\ \hline
+\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
++ & ? & ? & ? & ? & 9.2 (0.1) & 12.9 (0.1) \\ \hline
+- & 1.8 (0.1) & 1.6 (0.1) & 1.2 (0.1) & ? & ? & ? \\ \hline
 \end{tabular}
 \caption{Average Crashes Found in \texttt{libpng}}
 \label{tbl:png:crashes:avg}
@@ -116,15 +132,35 @@ is used among others in the tcpdump and wireshark tools.
 \begin{table}[H]
 \small
 \centering
-\begin{tabular}{|c|r|r|r|r|r|r|}
+\begin{tabular}{|c||r|r|r|r|r|r|}
 \hline
-\begin{tabular}[c]{@{}c@{}}Local\\ Search\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
-- & ? & ? & ? & ? & 92 (?) & 129 (?) \\ \hline
-+ & 17 (?) & 16 (?) & 12 (?) & ? & ? & ? \\ \hline
+\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
++ & ? & ? & ? & ? & 92 (1) & 129 (1) \\ \hline
+- & 18 (1) & 16 (1) & 12 (1) & ? & ? & ? \\ \hline
 \end{tabular}
 \caption{Cumulative Crashes Found in \texttt{libpng}}
 \label{tbl:png:crashes:cum}
 \end{table}
+
+% as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|l|c|}
+\hline
+Vulnerability & Type & Version \\ \hline
+CVE-2013-6954 & *Null & ? \\ \hline
+CVE-2011-3328 & DivBy0 & 1.5.4 \\ \hline
+CVE-2008-1382 & Segfault & 1.2.25 \\ \hline
+CVE-2011-3048 & malloc fails & ? (need mem limit) \\ \hline % might have to lift 2x2 pixel limit
+CVE-2011-2691 & *Null & ? (PNG\_ERROR\_TEXT\_SUPPORTED must be undefined) \\ \hline
+\end{tabular}
+\caption{Vulnerabilities and \texttt{libpng} Versions}
+\label{tbl:png:vulns}
+\end{table}
+
+% ideas for final talk:
+% 1. roadmap of library development: bug --> (fix|add new) --> (fix|add new) --> (fix|add new) --> ...
+% 2. alternative model: make lib veeeeery small, so all errors are in the apps using it instead (trollface)
 
 \subsection{Threats to Validity}
 As any empirical study, this evaluation is subject to several threats to validity.
