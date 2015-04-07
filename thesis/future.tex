@@ -28,13 +28,19 @@ means of special APIs like the one provided by the {\small PAPI}\cite{Mucci99pap
 this would impose a limitation on the concurrent use of \xmlmate on a single machine; however, this limitation
 can probably be solved by using virtualization techniques like {\small Docker}\cite{docker} and {\small
 Vagrant}\cite{vagrant} - especially since \xmlmate is now a distributed system capable of running across
-multiple heterogeneous nodes.
+multiple distinct hardware nodes. This arrangement can also be of special benefit to creating a fitness
+function specialized in detecting buffer overflows by means of advanced operating system features like memory
+page marking and eviction. One library specializing in such techniques of memory debugging is {\small
+DUMA}\footnote{\url{http://sourceforge.net/projects/duma/}}, which is a spiritual heir to the discontinued Electric Fence project.
 \item[]If \xmlmate is going to be used in truly distributed systems, it is probably a good idea to replace
 the currently employed \msgpack message serialization and deserialization engine by another, more efficient and
 sophisticated library. When real network traffic is involved, it seems like a good idea to minimize the amount
 of traffic that has to pass through the network, and having a library with a streaming interface that also
 allows to deserialize messages before they have reached their destination completely is certainly also of
 good use as well. Some candidate replacements can be found in \cref{sec:msgpack}.
+\item[]Further elaborating the idea of distributed execution environments in the presence of unreliable
+nodes, it seems wise to invest some effort into extending the inter-component communication protocol for
+reliability and message delivery guarantees.
 \item[]With more fitness functions come more test subjects that can be explored. For formats, for which the
 corresponding schemas and converters already exist in the current version, such applications as \emph{tcpdump}
 and \emph{tshark} for the \pcap format and a whole
@@ -50,6 +56,4 @@ to support testing of \java applications that use native code by performing inst
 byte code and the native binary code.
 \end{itemize}
 
-% add electric fence? (maybe to the same item as PAPI)
 % add multiplatform support? (windows?)
-% add reliability protocol? (on top of zmq)

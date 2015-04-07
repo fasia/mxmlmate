@@ -31,6 +31,7 @@ The experiments were carried out on a virtual machine equipped with 8 CPU cores 
 main memory, which, however, was far more than needed because the \java part of \xmlmate{} - the process taking
 up the most memory by far - only needed 2Gb for in-memory \xml instance handling. The deployment configuration
 of the \xmlmate system consisted of the following:
+
 \begin{itemize}
   \item 1 instance of the \java \xmlmate core component
   \item 1 load balancer between the core component and converter instances
@@ -45,9 +46,6 @@ It must be noted that no converters were used for testing \texttt{libxml2} as it
 by the \xmlmate core component directly, therefore only one load balancer was needed between it and
 the worker instances.
 
-
-
-
 \subsection{Subjects}
 While \cref{sec:formats} has introduced you to the file formats used in this document, the following sections
 will give you a short description of programs that were used during the evaluation, which work with those
@@ -57,7 +55,8 @@ formats.
 which is written in {\small C}. It is widely used and provides bindings to many programming languages
 including \cpp, {\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. Furthermore, it was
 designed for utmost portability, such that it works on a wide variety of operating systems such as
-Linux, Windows, CygWin, MacOS, RISC Os, OS/2, and some other, less common ones.
+Linux, Windows, CygWin, MacOS, RISC Os, OS/2, and some other, less common ones. Notably, the Google Chrome
+browser uses \texttt{libxml2} internally, which further shows the library's popularity.
 
 The library is extremely well tested, and in its current version 2.9.2 it passes all tests from the very large
 OASIS XML Test Suite\footnote{\url{https://www.oasis-open.org/committees/xml-conformance/xml-test-suite.shtml}}
@@ -66,12 +65,20 @@ vulnerabilities or even defects, especially because it specializes in generating
 even more so in this case, where only \texttt{xhtml} files, which do not represent the entirety of the \xml
 specification, were used for testing.
 
+Since in its main functionality this library acts like a parser, the interface for performing testing with
+\xmlmate is correspondingly simple: the test driver engages the library under test by passing it a file to be
+parsed and loaded into memory, whereafter the file is unloaded. No additional walks are performed, which
+sacrifices a lot im terms of achieved fitness scores, but wins out multiple times over in the
+overall execution speed.
+
+% download from https://git.gnome.org/browse/libxml2/refs/tags
+
 \subsubsection{libpcap}
 \texttt{libpcap}\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format
 maintained by the \emph{Tcpdump Group}. It is used in the popular tools tcpdump, ngrep, Wireshark, Snort and
 nmap, among other less known ones. The main objective of \texttt{libpcap} is to provide its users with a
-platform-independent API for network packet capturing. The API is designed to work with {\small C} and \cpp
-programming languages, but there exists a number of binding to other languages as well such as \python, \java,
+platform-independent API for network packet capturing. The API is designed to work with the {\small C} and \cpp
+programming languages, but there exists a number of bindings to other languages as well such as \python, \java,
 {\small C\#}, or {\small Ruby}.
 
 While it first and foremost provides a nice abstraction layer above the operating system-specific live packet
@@ -81,13 +88,30 @@ This is the interface through which testing with \xmlmate is performed as it see
 infeasible to simulate a network card interface in order to engage \texttt{libpng} on the live capturing
 interface. One consequence to choosing the offline  file reading interface is, however, that only a relatively
 small portion of the program code of \texttt{libpcap} can be possibly engaged. This limitation has to be kept
-in mind when assessing the results of the empirical evaluation presented in this section.
-% mention that there are no CVEs directly in libpcap, but rather in the derivative works
+in mind when assessing the results of the empirical evaluation presented in this section. It is also noteworthy
+to mention that to date there are no known vulnerabilities in \texttt{libpcap} itself, while both tcpdump and
+Wireshark seem to have corresponding CVE entries in internet vulnerability databases e.g.
+\url{http://www.cvedetails.com}.
 
 \subsubsection{libpng}
-\texttt{libpng}\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating and rendering
-\png files.
-% mention generating only 2x2 pixels
+\texttt{libpng}\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating, reading,
+writing and generally handling \png files. It is available freely under a permissive license, and thus very
+widely used in a wast number of both free and proprietary software products. The \texttt{libpng} library is
+written in the {\small C} programming language with a dependency on the \texttt{zlib} library, on which it
+relies for data compression. It is considered to be the reference implementation for all possible interactions
+one can have with a \png file, perhaps with the exception of steganography - the practice of concealing
+messages inconspicuously inside image files.
+
+In its 18 years of existence, the library was extensively tested as it evolved and matured. Ever since the very
+early versions it provides \emph{pngtest} - a utility that allows to test a \png file for conformance with the
+\png file format. This process involves reading and parsing the file, storing it in memory, performing some
+transformations on it, writing it out to disk again, and comparing the result with the original input file.
+This seems like a good representation of the usual use case for this library, which is why it was chosen as
+the interface at which testing with \xmlmate was performed. The test driver for \texttt{libpng} basically
+consists of pngtest itself only slightly modified to enable communication with \xmlmate via \zmq. In order not
+to waste computational resources, one limitation was imposed on the images generated by \xmlmate: their size
+was limited to two by two pixels because most defects found in \texttt{libpng} originated from specific values
+in the metadata rather than image data itself.
 
 %\subsubsection{libflac}
 \subsection{Results}
@@ -150,17 +174,13 @@ in mind when assessing the results of the empirical evaluation presented in this
 Vulnerability & Type & Version \\ \hline
 CVE-2013-6954 & *Null & ? \\ \hline
 CVE-2011-3328 & DivBy0 & 1.5.4 \\ \hline
-CVE-2008-1382 & Segfault & 1.2.25 \\ \hline
 CVE-2011-3048 & malloc fails & ? (need mem limit) \\ \hline % might have to lift 2x2 pixel limit
 CVE-2011-2691 & *Null & ? (PNG\_ERROR\_TEXT\_SUPPORTED must be undefined) \\ \hline
+CVE-2008-1382 & Segfault & 1.2.25 \\ \hline
 \end{tabular}
 \caption{Vulnerabilities and \texttt{libpng} Versions}
 \label{tbl:png:vulns}
 \end{table}
-
-% ideas for final talk:
-% 1. roadmap of library development: bug --> (fix|add new) --> (fix|add new) --> (fix|add new) --> ...
-% 2. alternative model: make lib veeeeery small, so all errors are in the apps using it instead (trollface)
 
 \subsection{Threats to Validity}
 As any empirical study, this evaluation is subject to several threats to validity.
