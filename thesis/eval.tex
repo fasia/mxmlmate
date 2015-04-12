@@ -113,12 +113,37 @@ to waste computational resources, one limitation was imposed on the images gener
 was limited to two by two pixels because most defects found in \texttt{libpng} originated from specific values
 in the metadata rather than image data itself.
 
+\Cref{tbl:png:vulns} shows a selection of vulnerabilities in \texttt{libpng} alongside versions affected by
+them.
+
+% as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
+\begin{table}[H]
+\centering
+\begin{tabular}{|r|r|l|}
+\hline
+Vulnerability   & Version 	 	 & Short Description \\ \hline \hline
+CVE-2013-6954   & 1.6.6          & Null pointer dereference on empty palette \\ \hline
+CVE-2011-3328   & 1.5.4 		 & Arithmetic exception: division by zero   \\ \hline
+CVE-2011-3048   & 1.5.9			 & Unchecked failing malloc in constrained memory \\ \hline 
+% TODO remember to change schema - unrestict 2x2
+CVE-2011-2691   & 1.5.2			 & Null pointer dereference in error message \\ \hline
+CVE-2008-1382   & 1.2.25 		 & Segmentation fault on size 0 unknown chunks \\ \hline 
+% TODO remember to change schema - allow unknown chunks
+\end{tabular}
+\caption{Vulnerabilities and \texttt{libpng} Versions}
+\label{tbl:png:vulns}
+
+\end{table}
 %\subsubsection{libflac}
 \subsection{Results}
 
 % mention segfault found in gimp due to empty PLTE
+% mention wireshark 1.8.2 (on debian stable) Unhandled exception 
+% 		("Null pointer passed to bytes_to_hexstr_punct()", group=1, code=4) in file to_str-unt.h
+% 		same error confirmed on Windows 7 (also version 1.8.2)
+%		also mention it crashed libpcap 1.3.0, but irreproducible (probably side conditions -> future work)
 % mention problem of failure masking -> one crash makes another undetectable
-% mention singleton pop mode for the last 4 fit funcs
+% mention that singleton pop mode was used for the last 4 fit funcs
 % mention in table tbl:fitness downarrow means div0 fitness function is minimization function
 
 \begin{table}[H]
@@ -127,14 +152,14 @@ in the metadata rather than image data itself.
 \begin{tabular}{|r|c|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{Subject}  & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}$\downarrow$ Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline \hline
-                               & +                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     ?                                                        & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
-\multirow{-2}{*}{png}          & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}                                                     & \cellcolor[HTML]{C0C0C0}              ?                                         & \cellcolor[HTML]{C0C0C0}    ?                                                  \\ \hline \hline
-                               & +                                                                           &              ?                                                              &                             ?                                                 &                                ?                                             &                                         ?                                    &                                        ?                                        &                                 ?                                              \\ \cline{2-8} 
-\multirow{-2}{*}{pcap}         & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} ?                                                  & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.22337E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
+                               & +                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     1.0                                                      & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
+\multirow{-2}{*}{png}          & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}      1.0                                            & \cellcolor[HTML]{C0C0C0}              ?                                         & \cellcolor[HTML]{C0C0C0}    2102329                                            \\ \hline \hline
+                               & +                                                                           &              ?                                                              &                          185.3                                                &                                470                                           &                                         ?                                    &                                        ?                                        &                                 ?                                              \\ \cline{2-8} 
+\multirow{-2}{*}{pcap}         & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 152.8                                              & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.22337E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
                                & +                                                                           &       ?                                                                     &                              ?                                                &                                 ?                                            &                                        ?                                     &                                         ?                                       &                                      ?                                         \\ \cline{2-8} 
 \multirow{-2}{*}{xhtml}        & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}  ?                                                  & \cellcolor[HTML]{C0C0C0}    ?                                                & \cellcolor[HTML]{C0C0C0}  ?                                                     & \cellcolor[HTML]{C0C0C0}   ?                                                   \\ \hline
 \end{tabular}
-\caption{Fitness Score Results}
+\caption{Average Fitness Scores}
 \label{tbl:fitness}
 \end{table}
 
@@ -145,42 +170,17 @@ in the metadata rather than image data itself.
 \begin{tabular}{|c||r|r|r|r|r|r|}
 \hline
 \begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
-+ & ? & ? & ? & ? & 9.2 (0.1) & 12.9 (0.1) \\ \hline
-- & 1.8 (0.1) & 1.6 (0.1) & 1.2 (0.1) & ? & ? & ? \\ \hline
++ & ? & ? & ? & 13.2 & 9.2 & 12.9 \\ \hline
+- & 1.8 & 1.6 & 1.2 & 12.0 & ? & 16.1 \\ \hline
 \end{tabular}
-\caption{Average Crashes Found in \texttt{libpng}}
+\caption{Average Division by Zero Defect Count for \texttt{libpng 1.5.4}}
 \label{tbl:png:crashes:avg}
 \end{table}
 
+% Explanation for best score 1.0: it's int and on 0 we already crash
 
-\begin{table}[H]
-\small
-\centering
-\begin{tabular}{|c||r|r|r|r|r|r|}
-\hline
-\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
-+ & ? & ? & ? & ? & 92 (1) & 129 (1) \\ \hline
-- & 18 (1) & 16 (1) & 12 (1) & ? & ? & ? \\ \hline
-\end{tabular}
-\caption{Cumulative Crashes Found in \texttt{libpng}}
-\label{tbl:png:crashes:cum}
-\end{table}
-
-% as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
-\begin{table}[H]
-\centering
-\begin{tabular}{|c|l|c|}
-\hline
-Vulnerability & Type & Version \\ \hline
-CVE-2013-6954 & *Null & ? \\ \hline
-CVE-2011-3328 & DivBy0 & 1.5.4 \\ \hline
-CVE-2011-3048 & malloc fails & ? (need mem limit) \\ \hline % might have to lift 2x2 pixel limit
-CVE-2011-2691 & *Null & ? (PNG\_ERROR\_TEXT\_SUPPORTED must be undefined) \\ \hline
-CVE-2008-1382 & Segfault & 1.2.25 \\ \hline
-\end{tabular}
-\caption{Vulnerabilities and \texttt{libpng} Versions}
-\label{tbl:png:vulns}
-\end{table}
+% TODO Explanation for div0^{ls} < div0: ls uses the time resource, but doesn't provide a benefit because 
+% the zero is already legal
 
 \subsection{Threats to Validity}
 As any empirical study, this evaluation is subject to several threats to validity.
