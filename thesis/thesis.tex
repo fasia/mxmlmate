@@ -38,15 +38,6 @@
 
 \usepackage[nameinlink]{cleveref}
 
-\usepackage{xargs}  % Use more than one optional parameter in a new commands
-%
-\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
-\newcommandx{\change}[2][1=]{\todo[linecolor=Bittersweet,backgroundcolor=Bittersweet!25,bordercolor=Bittersweet,#1]{#2}}
-\newcommandx{\improvement}[2][1=]{\todo[linecolor=Orange,backgroundcolor=Orange!25,bordercolor=Orange,#1]{#2}}
-\newcommandx{\unsure}[2][1=]{\todo[linecolor=Green,backgroundcolor=Green!25,bordercolor=Green,#1]{#2}}
-\newcommandx{\info}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
-%
-
 \newcommand{\bitlabel}[2]{%
 \bitbox[]{#1}{%
 \raisebox{0pt}[4ex][0pt]{%
@@ -82,9 +73,13 @@
 \newcommand{\zmq}{{\small ØMQ}\xspace}
 \newcommand{\msgpack}{{\small MessagePack}\xspace}
 \newcommand{\xerces}{{\small Xerces2}\xspace}
+\newcommand{\libpng}{\texttt{libpng}\xspace}
+\newcommand{\libpcap}{\texttt{libpcap}\xspace}
+\newcommand{\libxml}{\texttt{libxml2}\xspace}
 
 
 \begin{document}
+\pagenumbering{roman} %
 \input{./title.tex}
 \newpage
 \input{./oath.tex}
@@ -93,6 +88,8 @@
 \newpage
 \input{./abstract.tex}
 \newpage
+\pagenumbering{arabic} %
+\setcounter{page}{5} % TODO update page start if < toc content changes!
 \tableofcontents
 \newpage
 \input{./intro.tex}
@@ -130,6 +127,4 @@ the efficacy and efficiency of the presented extensions.
 \addcontentsline{toc}{section}{References}
 \bibliographystyle{plain}
 \bibliography{sources}
-\newpage
-\listoftodos[Notes] % TODO remove ;)
 \end{document}

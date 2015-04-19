@@ -1,6 +1,7 @@
 %### 
 \subsection{Fitness Functions}
 %### 
+\label{sec:fit}
 One requirement of this work was to provide \xmlmate with the concept of pluggable fitness functions and 
 give several examples that demonstrate the versatility of the approach. Luckily, \evosuite already provides 
 a \texttt{FitnessFunction<T extends Chromosome>} generic interface, which can be made use of on multiple 
@@ -54,11 +55,12 @@ are numbers between zero and one, the overall schema coverage fitness value can 
 \frac{c_e+c_a+c_t}{3}$, which makes this a \emph{minimization} fitness function, meaning that the genetic
 algorithm of \evosuite will try to get the value as close to zero as possible, which is its default behavior.
 
-Contrary to the initial expectations, \improvement{mention in the Evaluation section} the results do not 
-necessarily show a strong correlation between high schema coverage and some kinds of code coverage like 
+In contrast with the initial intuition, the results of previous experiments did not 
+show a strong correlation between high schema coverage and some kinds of code coverage like 
 branch or basic block coverage. This can be explained by the fact that it is not the abundance of different 
-input values, but rather some specific values themselves, that are responsible for penetrating deeper into a 
-program's logic and thus increasing the code coverage.
+input values, but rather the specific values themselves, that are responsible for penetrating deeper into a 
+program's logic and thus increasing the code coverage. This is why there is no separate evaluation of this
+fitness function alone.
 
 However, the schema coverage is a good evolution guide for the purpose of creating a diverse starting population
 which can then be further evolved with different purposes - be it code coverage of particular program regions, or
