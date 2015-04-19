@@ -1,29 +1,10 @@
 \section{Related Work}
 \label{sec:relwork}
-\subsection{Search-Based Testing}
-In the category of search-based approaches, i.e. those that employ any form of guidance criteria to steer the
-generation of test data in the desired direction, there are approaches spiritually very close to \xmlmate.
-
-\evosuite{}\cite{fraser2013whole} is an entire independent unit test generator aimed at \java programs. By
-dynamically observing the execution of the application under test and aiming for a maximum code coverage, it
-utilizes a genetic algorithm to generate entire JUnit test suites. It provides multiple code coverage
-criteria as search goals, which makes it a very versatile tool. In fact, the implementation of \xmlmate is
-in part based on \evosuite.
-
-\textsc{Exsyst}\cite{gross-issta2012} is also based on \evosuite, however, it specializes in testing of \java
-GUI applications by generating series of interactions that aim to explore and test as many of the program's
-features as possible. The result is not a test suite, but rather a set of executable GUI interactions that
-provide considerable code coverage, or even reveal failures. In contrast to pure \evosuite, this approach
-performs testing on the system level by exercising the tested application via the same interface as its
-intended users, this means that any failure found by \textsc{Exsyst} is a real failure and not a false
-positive. \xmlmate, also being a system level tool, has this property as well.
-
-\subsection{Fuzzers}
 There is an entire class of approaches which put an emphasis on the diversity of the produced inputs and the
 efficiency of their generation over guidance towards any certain criterion. These are collectively known as
 \emph{fuzzers}, their primary goal is usually to find failures and vulnerabilities, and they can be categorized
 as follows.
-\tocless\subsubsection{Blackbox Fuzzers}
+\subsection{Blackbox Fuzzers}
 Blackbox fuzzers have no knowledge of the application they are testing whatsoever - they simply generate random
 inputs that can be fed into the program under test to see if it can handle it or if it crashes.
 There are many tools that can be at least partially classified as blackbox fuzzers. For \xml-based formats
@@ -47,7 +28,7 @@ fuzzer is capable of introducing various kinds of malformities into the generate
 encoding, repetition of tags and elements, dropping of tags and elements, recursive structures, overflows,
 special characters, and many others.
 
-\tocless\subsubsection{Whitebox Fuzzers}
+\subsection{Whitebox Fuzzers}
 In contrast to blackbox fuzzers, the whitebox fuzzers have some knowledge of the application under
 test, which they use to get some degree of feedback for the inputs they generate. They mostly use this feedback
 in order to avoid generating duplicates, or inputs which induce the same behavior in the tested program, thus
@@ -67,7 +48,7 @@ the input format are gathered, whereafter a constraint solver is used to generat
 existing files as a seed because path explosion and shortcomings of symbolic execution can make starting with
 empty inputs infeasible.
 
-\tocless\subsubsection{Language-Specific Fuzzers}
+\subsection{Language-Specific Fuzzers}
 As the probability to generate valid inputs that penetrate deep into the application logic without considerable
 format specification efforts is usually infinitesimally small, it is sometimes preferable to constrain the
 range of generated inputs by means of a grammar not very unlike an \xsd, for example.
@@ -78,3 +59,21 @@ to provide input fragments, which it will then attempt to make use of in the pro
 In their later work \cite{Godefroid:2008:GWF:1375581.1375607} the authors of SAGE have extended the approach to
 take a grammar for input generation; however, their extension does not leverage any existing inputs for
 grammar-based test generation seeding.
+
+\subsection{Search-Based Testing}
+In the category of search-based approaches, i.e. those that employ some form of guidance criteria to steer the
+generation of test data in the desired direction, there are approaches spiritually very close to \xmlmate.
+
+\evosuite{}\cite{fraser2013whole} is an entire independent unit test generator aimed at \java programs. By
+dynamically observing the execution of the application under test and aiming for a maximum code coverage, it
+utilizes a genetic algorithm to generate entire JUnit test suites. It provides multiple code coverage
+criteria as search goals, which makes it a very versatile tool. In fact, the implementation of \xmlmate is
+in part based on \evosuite.
+
+\textsc{Exsyst}\cite{gross-issta2012} is also based on \evosuite, however, it specializes in testing of \java
+GUI applications by generating series of interactions that aim to explore and test as many of the program's
+features as possible. The result is not a test suite, but rather a set of executable GUI interactions that
+provide considerable code coverage, or even reveal failures. In contrast to pure \evosuite, this approach
+performs testing on the system level by exercising the tested application via the same interface as its
+intended users, this means that any failure found by \textsc{Exsyst} is a real failure and not a false
+positive. \xmlmate, also being a system level tool, has this property as well.
