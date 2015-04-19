@@ -9,18 +9,18 @@ subjects has been carried out, and the results are documented in this section.
 Due to the random nature of the genetic algorithm that is at the heart of \xmlmate, it is necessary to perform
 multiple runs of each experiment in order to properly ascertain its effectiveness and efficiency statistically
 by considering the average values. At this point it is of particular importance to define what efficiency and
-effectiveness mean in the context of this document. 
+effectiveness mean in regards to this evaluation. 
 
-In terms of found defects, let \emph{efficiency} be the overall number of defects found in a given time frame.
-Similarly, \emph{effectiveness} is the number of \emph{unique} defects revealed within a given time frame.
+Let \emph{effectiveness} be the measure of whether or not defects have been found in the time frame allocated
+for an experiment run. Similarly, let \emph{efficiency} be the defect detection count for the same time frame.
 
 One \emph{experiment} consists of running \xmlmate for one hour with a limit of 2200 elements per \xml instance
-as well as a maximum recursion depth of 12 for optional elements meaning that no optional elements are generated
+as well as a maximum recursion depth of 12 for optional elements, meaning that no optional elements are generated
 for subtrees of depth 13 or more. Additionally, the maximum number of \xml files in the population being
 evolved is limited to 500 which is kept consistent across the normal and the singleton population (see
 \cref{sec:memcov}) modes as follows: in the singleton population usage scenario, where single files are the
 main focus of the evolution process, the limit is expressed simply as a single suite with a maximum of 500
-individual files in it, while in the normal use case, where the result of an evolution is a suite of files, the
+individual files in it, while in the other use case, where the result of an evolution is a suite of files, the
 limit is enforced as a population of 25 suites with a maximum of 20 files in each.
 
 To produce statistically significant average result values, for each fitness function and for each test
@@ -30,7 +30,7 @@ without the mechanism for producing schema-invalid values.
 The experiments were carried out on a virtual machine equipped with 8 CPU cores running at 2.60GHz and 64 Gb
 main memory, which, however, was far more than needed because the \java part of \xmlmate{} - the process taking
 up the most memory by far - only needed 2Gb for in-memory \xml instance handling. The deployment configuration
-of the \xmlmate system consisted of the following:
+of the \xmlmate system consisted of the following components:
 
 \begin{itemize}
   \item 1 instance of the \java \xmlmate core component
@@ -42,21 +42,21 @@ of the \xmlmate system consisted of the following:
 \end{itemize}
 
 The setup can be imagined as in \cref{fig:components} with $n = m = 8$.
-It must be noted that no converters were used for testing \texttt{libxml2} as it consumes inputs as generated
-by the \xmlmate core component directly, therefore only one load balancer was needed between it and
-the worker instances.
+It must be noted that no converters were used for testing \libxml as it consumes inputs as generated
+by the \xmlmate core component directly, therefore only one load balancer was needed between the generator
+instance and the worker instances.
 
 \subsection{Subjects}
 While \cref{sec:formats} has introduced you to the file formats used in this document, the following sections
 will give you a short description of programs that were used during the evaluation, which work with those
 formats.
-\subsubsection{libxml2}
-\texttt{libxml2}\footnote{\url{http://www.xmlsoft.org/}} is a library for processing generic \xml documents,
+\tocless\subsubsection{libxml2}
+\libxml\footnote{\url{http://www.xmlsoft.org/}} is a library for processing generic \xml documents,
 which is written in {\small C}. It is widely used and provides bindings to many programming languages
 including \cpp, {\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. Furthermore, it was
 designed for utmost portability, such that it works on a wide variety of operating systems such as
 Linux, Windows, CygWin, MacOS, RISC Os, OS/2, and some other, less common ones. Notably, the Google Chrome
-browser uses \texttt{libxml2} internally, which further shows the library's popularity.
+browser uses \libxml internally, which further shows the library's popularity.
 
 The library is extremely well tested, and in its current version 2.9.2 it passes all tests from the very large
 OASIS XML Test Suite\footnote{\url{https://www.oasis-open.org/committees/xml-conformance/xml-test-suite.shtml}}
@@ -73,114 +73,162 @@ overall execution speed.
 
 % download from https://git.gnome.org/browse/libxml2/refs/tags
 
-\subsubsection{libpcap}
-\texttt{libpcap}\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format
+\tocless\subsubsection{libpcap}
+\libpcap\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format
 maintained by the \emph{Tcpdump Group}. It is used in the popular tools tcpdump, ngrep, Wireshark, Snort and
-nmap, among other less known ones. The main objective of \texttt{libpcap} is to provide its users with a
+nmap, among other less known ones. The main objective of \libpcap is to provide its users with a
 platform-independent API for network packet capturing. The API is designed to work with the {\small C} and \cpp
 programming languages, but there exists a number of bindings to other languages as well such as \python, \java,
 {\small C\#}, or {\small Ruby}.
 
 While it first and foremost provides a nice abstraction layer above the operating system-specific live packet
-capturing mechanism (which every operating system vendor seems to have designed differently), \texttt{libpcap}
+capturing mechanism (which every operating system vendor seems to have designed differently), \libpcap
 also provides an interface for manipulating packets already captured and available in the \pcap file format.
 This is the interface through which testing with \xmlmate is performed as it seems otherwise rather
-infeasible to simulate a network card interface in order to engage \texttt{libpng} on the live capturing
+infeasible to simulate a network card interface in order to engage \libpng on the live capturing
 interface. One consequence to choosing the offline  file reading interface is, however, that only a relatively
-small portion of the program code of \texttt{libpcap} can be possibly engaged. This limitation has to be kept
+small portion of the program code of \libpcap can be possibly engaged. This limitation has to be kept
 in mind when assessing the results of the empirical evaluation presented in this section. It is also noteworthy
-to mention that to date there are no known vulnerabilities in \texttt{libpcap} itself, while both tcpdump and
+to mention that to date there are no known vulnerabilities in \libpcap itself, while both tcpdump and
 Wireshark seem to have corresponding CVE entries in internet vulnerability databases e.g.
 \url{http://www.cvedetails.com}.
 
-\subsubsection{libpng}
-\texttt{libpng}\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating, reading,
+\tocless\subsubsection{libpng}
+\libpng\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating, reading,
 writing and generally handling \png files. It is available freely under a permissive license, and thus very
-widely used in a wast number of both free and proprietary software products. The \texttt{libpng} library is
+widely used in a wast number of both free and proprietary software products. The \libpng library is
 written in the {\small C} programming language with a dependency on the \texttt{zlib} library, on which it
 relies for data compression. It is considered to be the reference implementation for all possible interactions
-one can have with a \png file, perhaps with the exception of steganography - the practice of concealing
-messages inconspicuously inside image files.
+one can have with a \png file.
 
 In its 18 years of existence, the library was extensively tested as it evolved and matured. Ever since the very
 early versions it provides \emph{pngtest} - a utility that allows to test a \png file for conformance with the
 \png file format. This process involves reading and parsing the file, storing it in memory, performing some
 transformations on it, writing it out to disk again, and comparing the result with the original input file.
 This seems like a good representation of the usual use case for this library, which is why it was chosen as
-the interface at which testing with \xmlmate was performed. The test driver for \texttt{libpng} basically
+the interface at which testing with \xmlmate was performed. The test driver for \libpng basically
 consists of pngtest itself only slightly modified to enable communication with \xmlmate via \zmq. In order not
 to waste computational resources, one limitation was imposed on the images generated by \xmlmate: their size
-was limited to two by two pixels because most defects found in \texttt{libpng} originated from specific values
+was limited to two by two pixels because most defects found in \libpng originate from specific values
 in the metadata rather than image data itself.
 
-\Cref{tbl:png:vulns} shows a selection of vulnerabilities in \texttt{libpng} alongside versions affected by
-them.
-
-% as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
-\begin{table}[H]
-\centering
-\begin{tabular}{|r|r|l|}
-\hline
-Vulnerability   & Version 	 	 & Short Description \\ \hline \hline
-CVE-2013-6954   & 1.6.6          & Null pointer dereference on empty palette \\ \hline
-CVE-2011-3328   & 1.5.4 		 & Arithmetic exception: division by zero   \\ \hline
-CVE-2011-3048   & 1.5.9			 & Unchecked failing malloc in constrained memory \\ \hline 
-% TODO remember to change schema - unrestict 2x2
-CVE-2011-2691   & 1.5.2			 & Null pointer dereference in error message \\ \hline
-CVE-2008-1382   & 1.2.25 		 & Segmentation fault on size 0 unknown chunks \\ \hline 
-% TODO remember to change schema - allow unknown chunks
-\end{tabular}
-\caption{Vulnerabilities and \texttt{libpng} Versions}
-\label{tbl:png:vulns}
-
-\end{table}
 %\subsubsection{libflac}
 \subsection{Results}
+In this section the results of the empirical evaluation are presented. \Cref{tbl:fitness} shows an overview of
+the fitness scores achieved by each fitness function. These scores are average values computed over the ten
+experiment runs that were carried out for each fitness function. For each test subject the table has two rows
+for both of the input generation modes: the one that strictly adheres to the format specification and thus
+produces schema valid inputs, and the one that is able to ignore some specification rules. The former mode is
+marked with a ``+'' sign in the \emph{Schema Valid} column and has a white background, while the latter one is
+marked with a ``-'' sign and has a gray background.
 
-% mention segfault found in gimp due to empty PLTE
-% mention wireshark 1.8.2 (on debian stable) Unhandled exception 
-% 		("Null pointer passed to bytes_to_hexstr_punct()", group=1, code=4) in file to_str-unt.h
-% 		same error confirmed on Windows 7 (also version 1.8.2)
-%		also mention it crashed libpcap 1.3.0, but irreproducible (probably side conditions -> future work)
-% mention problem of failure masking -> one crash makes another undetectable
-% mention that singleton pop mode was used for the last 4 fit funcs
-% mention in table tbl:fitness downarrow means div0 fitness function is minimization function
-
+% TODO consider rearranging table rows
 \begin{table}[H]
 \small
 \centering
 \begin{tabular}{|r|c|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{Subject}  & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}$\downarrow$ Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline \hline
-                               & +                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     1.0                                                      & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
-\multirow{-2}{*}{png}          & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}      1.0                                            & \cellcolor[HTML]{C0C0C0}              ?                                         & \cellcolor[HTML]{C0C0C0}    2102329                                            \\ \hline \hline
-                               & +                                                                           &              ?                                                              &                          185.3                                                &                                470                                           &                                         ?                                    &                                        ?                                        &                                 ?                                              \\ \cline{2-8} 
-\multirow{-2}{*}{pcap}         & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 152.8                                              & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.22337E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
-                               & +                                                                           &       ?                                                                     &                              ?                                                &                                 ?                                            &                                        ?                                     &                                         ?                                       &                                      ?                                         \\ \cline{2-8} 
-\multirow{-2}{*}{xhtml}        & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}  ?                                                  & \cellcolor[HTML]{C0C0C0}    ?                                                & \cellcolor[HTML]{C0C0C0}  ?                                                     & \cellcolor[HTML]{C0C0C0}   ?                                                   \\ \hline
+                               & +                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     1                                                      & 4.61146E18                                                                      & 2102329                                                                        \\ \cline{2-8} 
+\multirow{-2}{*}{libpng}       & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}      1                                            & \cellcolor[HTML]{C0C0C0}        ?                                               & \cellcolor[HTML]{C0C0C0}    2102329                                            \\ \hline \hline
+                               & +                                                                           &              ?                                                              &                          185.3                                                &                                470                                           &                          9.223E18                                          &                          7.03685E13                                             &                           2175400                                              \\ \cline{2-8} 
+\multirow{-2}{*}{libpcap}      & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 152.8                                              & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} 9.223E18                                          & \cellcolor[HTML]{C0C0C0} 7.03686E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                               \\ \hline \hline
+                               & +                                                                           &       ?                                                                     &                              ?                                                &                                 ?                                            &                                        ?                                   &                                         ?                                       &                                      ?                                         \\ \cline{2-8} 
+\multirow{-2}{*}{libxml2}      & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}  ?                                                  & \cellcolor[HTML]{C0C0C0}    ?                                              & \cellcolor[HTML]{C0C0C0}  ?                                                     & \cellcolor[HTML]{C0C0C0}   ?                                                   \\ \hline
 \end{tabular}
 \caption{Average Fitness Scores}
 \label{tbl:fitness}
 \end{table}
 
+The subjects used for this comparison of fitness scores were taken from their respective
+official repositories, the versions used were as follows: \libpng \texttt{1.5.4}, \libpcap \texttt{1.3.0}, and
+\libxml \texttt{2.8.0}. While \libpcap and \libxml versions were chosen as the most easily obtainable on the
+current stable branch of the Debian operating system, the version of \libpng was chosen such that both
+fitness values for a general comparison and defect search could be carried out at least in part simultaneously
+and with minimum effort.
 
+The fitness scores differ significantly across the different fitness functions even for the same subject,
+which is understandable because each of the functions has different metrics, which makes their scores
+largely incomparable because the functions are designed to measure different characteristics of a
+program's execution.
+
+What might seem somewhat surprising however, is the great variance in scores for the same fitness function
+across multiple subjects. For example take the difference for the Basic Block Coverage fitness function - it
+has a score of 15330 for \libpng and only 152.8 for \libpcap. 
+A similar difference can also be seen in all fitness functions whose scores are directly related to the
+complexity or richness of the inputs i.e. also the Basic Block Succession and the Memory Access fitness
+functions. Two main reasons can be given to explain this difference:
+
+The first is that even though both libraries provide extensive parsing and data manipulation capabilities,
+the formats they are designed to process differ significantly in complexity themselves. This causes a
+corresponding difference in the part of the code responsible for checking inputs for consistency and keeping
+the data that way during manipulation operations.
+
+The second main reason is in the nature of the test driver used with each subject: while the test driver for
+\libpcap only exercises its parsing capabilities, the test driver used for \libpng additionally engages several
+data consistency checks and transformations as well as writing of output.
+
+To provide further hints on possible idiosyncrasies found in \cref{tbl:fitness} please note that the four
+rightmost fitness functions use the singleton population evolution model, which offers performance benefits,
+which, in turn, might have an effect on the utilization of the time frame allotted for an experiment run and
+thus the resulting fitness scores.
+
+In accordance with their respective descriptions in \cref{sec:fit}, all fitness functions presented in
+\cref{tbl:fitness} are maximization functions with the exception of the Division by Zero fitness
+function, which is a minimization function - it is therefore marked with a downward arrow ($\downarrow$) in the
+table.
+
+% TODO Explanation for best score 1.0: it's int and on 0 we already crash
+
+
+% \begin{table}[H]
+% \small
+% \centering
+% \begin{tabular}{|c||r|r|r|r|r|r|}
+% \hline
+% \begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
+% + & ? & ? & ? & 13.2 & 9.2 & 12.9 \\ \hline
+% - & 1.8 & 1.6 & 1.2 & 12.0 & ? & 16.1 \\ \hline
+% \end{tabular}
+% \caption{Average Division by Zero Defect Count for \texttt{libpng 1.5.4}}
+% \label{tbl:png:crashes:avg}
+% \end{table}
+
+% Explanation for div0^{ls} < div0: ls uses the time resource, but doesn't provide a benefit because the zero is already legal
+
+
+
+
+\Cref{tbl:png:vulns} shows a selection of vulnerabilities in \libpng alongside versions affected by
+them.
+
+% as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
 \begin{table}[H]
-\small
 \centering
-\begin{tabular}{|c||r|r|r|r|r|r|}
-\hline
-\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline
-+ & ? & ? & ? & 13.2 & 9.2 & 12.9 \\ \hline
-- & 1.8 & 1.6 & 1.2 & 12.0 & ? & 16.1 \\ \hline
+\begin{tabular}{|r|r|l|}
+\hline % TODO add CVE score
+Vulnerability   & Version 	 	 & Short Description \\ \hline \hline 
+CVE-2013-6954   & 1.6.6          & Null pointer dereference on empty palette \\ \hline % test with buf(10/157), bbl2, mem
+CVE-2011-3328   & 1.5.4 		 & Arithmetic exception: division by zero   \\ \hline  % tested with div0(10/132)
+CVE-2011-3048   & 1.5.9			 & Unchecked failing malloc in constrained memory \\ \hline % test with mem(127/3449), buf
+% TODO write about restricting memory to 450 MB
+CVE-2011-2691   & 1.5.2			 & Null pointer dereference in error message \\ \hline % test with buf(36/5k), mem
+CVE-2008-1382   & 1.2.25 		 & Segmentation fault on size 0 unknown chunks \\ \hline % test with bbl2(10/0),
+% schemaCov TODO remember to change schema - allow unknown chunks
 \end{tabular}
-\caption{Average Division by Zero Defect Count for \texttt{libpng 1.5.4}}
-\label{tbl:png:crashes:avg}
+\caption{Vulnerabilities and \libpng Versions}
+\label{tbl:png:vulns}
+
 \end{table}
 
-% Explanation for best score 1.0: it's int and on 0 we already crash
+% ??? make this an extra subsubsection?
+% mention segfault found in gimp due to empty PLTE
+% mention wireshark 1.8.2 (on debian stable) Unhandled exception 
+% 		("Null pointer passed to bytes_to_hexstr_punct()", group=1, code=4) in file to_str-unt.h
+% 		same error confirmed on Windows 7 (also version 1.8.2)
+%		also mention it crashed \libpcap 1.3.0, but irreproducible (probably side conditions -> future work)
+% ??? mention problem of failure masking -> one crash makes another undetectable
 
-% TODO Explanation for div0^{ls} < div0: ls uses the time resource, but doesn't provide a benefit because 
-% the zero is already legal
 
 \subsection{Threats to Validity}
 As any empirical study, this evaluation is subject to several threats to validity.
