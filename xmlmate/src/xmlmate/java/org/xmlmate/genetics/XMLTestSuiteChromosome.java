@@ -317,7 +317,8 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
         Collections.sort(tests, xmlCompare);
         List<XMLTestChromosome> newTests = new ArrayList<>(tests.size());
         // elite
-        newTests.add(tests.get(0));
+        if (!tests.isEmpty())
+            newTests.add(tests.get(0));
 
 
         // delete test cases?
@@ -331,7 +332,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             }
         }
 
-        int oldSize = tests.size() - 1; // -1 for elite
+        int oldSize = Math.max(0, tests.size() - 1); // -1 for elite
 
         List<Future<List<XMLTestChromosome>>> taskResults = new LinkedList<>();
         int chosen = 0;
