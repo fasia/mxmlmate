@@ -9,8 +9,8 @@ In the following sections I would like to give a brief overview of the technolog
 \tocless\subsubsection{Xom}
 %### 
 \xom{}\cite{xom} is a \java library for handling \xml documents at the core of \xmlmate. 
-It offers in-memory representation of \xml tree structures as well as support for Namespaces in \xml, {\small XPath 1.0}, {\small XSLT 1.0}, 
-{\small XInclude}, {\small xml:id}, {\small xml:base}, Canonical \xml, and Exclusive Canonical \xml.
+It offers in-memory representation of \xml tree structures as well as support for namespaces in \xml, {\small
+XPath 1.0}, {\small XSLT 1.0}, {\small XInclude}, {\small xml:id}, {\small xml:base}, Canonical \xml, and Exclusive Canonical \xml.
 I decided for it in favor of {\small SAX}, {\small StAX}, {\small DOM4j} and {\small jDOM} because of its simplicity and efficiency.
 It is also the only \xml API that ensures correctness very strictly - \xom only allows to create namespace well-formed XML documents, 
 which coincides with one of the underlying principles of \xmlmate{} - generating valid and well-formed data.
@@ -24,25 +24,26 @@ to gain a better understanding of the kinds of file formats \xom offers support 
 %### 
 \xerces{}\cite{xerces} is a \java library for parsing, validating and manipulating XML documents, which most
 importantly to \xmlmate, has support for W3C XML Schema 1.1 (Working Drafts, December 2009).
-At the heart of \xmlmate lies a representation of an \xsd, which is used as a blueprint for generating new
+A central part of \xmlmate is a representation of an \xsd, which is used as a blueprint for generating new
 \xml instances and modifying existing ones. This representation is implemented with \xerces, as at the time of
-conception it was really the only available \xsd implementation for \java. \xerces mainly provides access to
+conception it was the only freely available \xsd implementation for \java. \xerces mainly provides access to
 the definitions of a schema as well as a mechanism for validating \xml instances. Unfortunately, it only
-exposes its functionality via \java interfaces, which makes enhancements and adaptations rather hard, but not
-impossible, as you will see in \cref{sec:repr}.
+exposes its functionality via interfaces instead of classes, which makes enhancements and adaptations rather
+hard, but not impossible, as you will see in \cref{sec:repr}.
 
-For an impression of what an \xsd looks like in its textual form, feel free to consider \cref{lst:xsdexample},
-as well as \cref{lst:repr} for its role in the genetic representation of an \xml chromosome.
+For an impression of what an \xsd looks like in its textual form, consider \cref{lst:xsdexample},
+as well as \cref{lst:repr} for its role in the genetic representation of an \xml instance.
 %### 
 \tocless\subsubsection{PIN}
 %### 
 {\small Intel} \pin\cite{Luk05pin:building} is a dynamic binary instrumentation framework for the IA-32 and x86-64 instruction-set architectures 
 that enables the creation of program analysis tools, which perform the instrumentation at run time on  
 compiled binary files. Thus, it requires no recompiling of source code and can support instrumenting programs that dynamically generate code.
-\pin allows a tool to insert arbitrary code (written in {\small C} or \cpp) in arbitrary places in the executable, for which it 
-provides an API that abstracts away the underlying instruction-set idiosyncrasies and allows context information 
-such as register contents to be passed to the injected code as parameters. It also automatically saves and restores 
-the registers that are overwritten by the injected code so the application continues to work.
+\pin allows a tool to insert code written in {\small C} or \cpp in arbitrary places in the executable, for which it 
+provides an API that provides an abstraction over the underlying instruction-set idiosyncrasies and allows
+context information such as register content to be passed to the injected code as parameters. It also
+automatically saves and restores the registers that are overwritten by the injected code so the application
+continues to work.
 
 Generally, the instrumentation with \pin consists of two components: a mechanism that decides where and what code to insert, 
 and the code to be executed at insertion points. These two components, called \emph{instrumentation} and \emph{analysis} 
@@ -58,19 +59,20 @@ a high level of detail is necessary, which is why jit mode is used. To somewhat 
 loss, a system has been put in place, which allows to parallelize the execution of processes instrumented with
 \pin. \Cref{sec:par} gives more details about these parallelization efforts.
 
-At one point, the GNU test coverage tool \texttt{gcov}\cite{gcov} was considered as an alternative to using
+At one point, the GNU test coverage tool \texttt{gcov}\cite{gcov} was considered as an alternative to 
 \pin, yet the decision finally rested with \pin because gcov is inferior in many points: it is only
 compatible with code compiled with \texttt{GCC} using debug flags and with optimizations turned off, and it
 lacks the rich API that \pin offers as it is merely capable of indicating lines of code that were executed, and
-thus is severely lacking in features.
+thus is severely lacking in features in comparison with \pin.
 
 There was also a consideration to use \texttt{Valgrind}\cite{Nethercote03valgrind:a} instead of \pin, but \pin
 won this case as well, though mostly due to its more easily accessible and example-rich documentation. 
+% XXX maybe tell a little more about Valgrind
 %### 
 \tocless\subsubsection{ZeroMQ}
 %###
-\label{sec:zmq}
-{\small ZeroMQ}\cite{zmq} (or \zmq as it as actually called) is an extremely efficient messaging library, 
+\label{sec:zmq}c
+\zmq\cite{zmq} (pronounced {\small ZeroMQ}) is an extremely efficient messaging library, 
 which is very well suited for use in concurrent or distributed applications. \zmq regards messages as 
 completely transparent blobs of data which are to be transported across predefined communication channels 
 between sockets. Rather than unnecessarily defining its own transfer protocol, \zmq works on top of already exiting 

@@ -98,19 +98,19 @@
 \label{sec:approach}
 The work presented in this document mainly consists of adding new features and areas of application to the
 prototypical \xmlmate implementation, thus increasing its value for automatic test generation use cases. The
-most significant extensions include 
-\begin{description}
-\item[]adding support for applications not running on the \java virtual machine by using an x86 binary code
+most significant extensions include: 
+\begin{itemize}
+\item[-]providing support for applications not running on the \java virtual machine by using an x86 binary code
 dynamic instrumentation to be able to analyze any x86-based programs including popular libraries and rendering
 engines.
-\item[]extending support for pluggable fitness functions to allow for narrow-scope application contexts such as
-scanning the targeted program for specific classes of defects or vulnerabilities.
-\item[]adding more output formats to both demonstrate the versatility of the original approach as well as
+\item[-]extending support for pluggable fitness functions to allow for narrow-scope application contexts such
+as scanning the targeted program for specific classes of defects or vulnerabilities.
+\item[-]adding more output formats to both demonstrate the versatility of the original approach as well as
 increase the set of applications compatible to be tested with \xmlmate.
-\end{description}
+\end{itemize}
 
-Yet another goal of this work is performing a case study on the libpng image file rendering library to evaluate
-the efficacy and efficiency of the presented extensions.
+Yet another goal of this work is performing a case study on the libpng image file processing library to
+evaluate the effectiveness and efficiency of the presented extensions.
 \input{./technology.tex}
 \input{./components.tex}
 \input{./challenges.tex}
@@ -119,7 +119,14 @@ the efficacy and efficiency of the presented extensions.
 \input{./eval.tex}
 \section{Conclusion}
 \label{sec:conclusion}
-% quality of results (fitness scores and crashes) depends on quality of test drivers
+% xmlmate is a good defect search tool with extensions presented here
+% list extensions: support for binaries, pluggable fitfuncs, additional formats, schema violations
+% equipped with these extensions xmlmate yielded good results in identifying defects
+% its efficiency and effectiveness are justified by it finding known vulns a lot of times over
+% its practical use is strengthened by it finding unknown bugs even when not specifically targeting 
+% overall xmlmate shows potential
+% quality of results (fitness scores and crashes) depends on quality of test drivers and schema and converters
+% 		=> future work items
 \input{./future.tex}
 \newpage
 \section*{References}

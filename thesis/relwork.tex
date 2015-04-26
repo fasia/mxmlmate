@@ -6,10 +6,10 @@ efficiency of their generation over guidance towards any certain criterion. Thes
 as follows.
 \subsection{Blackbox Fuzzers}
 Blackbox fuzzers have no knowledge of the application they are testing whatsoever - they simply generate random
-inputs that can be fed into the program under test to see if it can handle it or if it crashes.
+inputs that can be fed into the program under test to see if it can handle the input or if it crashes.
 There are many tools that can be at least partially classified as blackbox fuzzers. For \xml-based formats
-there are integrated development environments Eclipse\cite{eclipse} and Visual Studio\cite{visual} which are
-both capable of generating simple instances for a given \xsd. The oXygen\cite{oxygen} tool is a stand-alone
+there are the integrated development environments Eclipse\cite{eclipse} and Visual Studio\cite{visual} which
+are both capable of generating simple instances for a given \xsd. The oXygen\cite{oxygen} tool is a stand-alone
 \xml instance generator, which makes it, in contrast to the previous examples, a true fuzzer.
  		 
 The TAXI\cite{Bertolino:2007:ATD:1270230.1270257} approach presents a variation on the same principle, but
@@ -18,7 +18,7 @@ and tested can be significantly reduced under the assumption that the ranges of 
 can be divided into partitions, such that if the application under test can accept and handle one input from a
 partition, it can do so with all the other values from the same partition.
 
-Wuzhi Xu et al.\cite{1544740} have applied a blackbox fuzzing on web services and extended the approach by
+Wuzhi Xu et al.\cite{1544740} have applied blackbox fuzzing on web services and extended the approach by
 performing perturbations on the \xsd before generating instances in order to additionally test the resilience
 of the validation mechanism.
 
@@ -62,7 +62,7 @@ grammar-based test generation seeding.
 
 \subsection{Search-Based Testing}
 In the category of search-based approaches, i.e. those that employ some form of guidance criteria to steer the
-generation of test data in the desired direction, there are approaches spiritually very close to \xmlmate.
+generation of test data in the desired direction, there are approaches conceptually very close to \xmlmate.
 
 \evosuite{}\cite{fraser2013whole} is an entire independent unit test generator aimed at \java programs. By
 dynamically observing the execution of the application under test and aiming for a maximum code coverage, it
@@ -77,3 +77,4 @@ provide considerable code coverage, or even reveal failures. In contrast to pure
 performs testing on the system level by exercising the tested application via the same interface as its
 intended users, this means that any failure found by \textsc{Exsyst} is a real failure and not a false
 positive. \xmlmate, also being a system level tool, has this property as well.
+% XXX maybe expand on xmlmate and what property is meant
