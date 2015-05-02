@@ -32,14 +32,14 @@ main memory, which, however, was far more than needed because the \java part of 
 up the most memory) only needed 2Gb for in-memory \xml instance handling. The deployment configuration
 of the \xmlmate system consisted of the following components:
 
-\begin{itemize}
+\begin{itemize*}
   \item 1 instance of the \java \xmlmate core component
   \item 1 load balancer between the core component and converter instances
   \item 8 format converter instances
   \item 1 load balancer between the converters and the workers
   \item 8 worker instances (worker = test driver + test subject instance + pintool)
   \item 8 lifeguards for their respective workers
-\end{itemize}
+\end{itemize*}
 
 The setup can be imagined as in \cref{fig:components} with $n = m = 8$.
 It must be noted that no converters were used for testing \libxml as it consumes inputs as generated
@@ -49,7 +49,7 @@ instance and the worker instances.
 \subsection{Test Subjects}
 While \cref{sec:formats} has introduced you to the file formats used in this document, the following sections
 will give you a short description of programs that were used during the evaluation, which work with those
-formats.
+formats. Each test subject was chosen as the leading library for processing its corresponding file format.
 \tocless\subsubsection{libxml2}
 \libxml\footnote{\url{http://www.xmlsoft.org/}} is a library for processing generic \xml documents,
 which is written in {\small C}. It is widely used and provides bindings to many programming languages
@@ -112,8 +112,6 @@ to waste computational resources, one limitation was imposed on the images gener
 was limited to $2\times 2$ pixels because most defects found in \libpng originate from specific values
 in the metadata rather than image data itself.
 
-% TODO acknowledge Giorgi vor writing most of the png schema and converter
-
 %\subsubsection{libflac}
 \subsection{Results}
 In the following sections the results of the conducted experiments are presented: first a general overview is
@@ -122,6 +120,18 @@ followed by examples of vulnerabilities found in the \libpng library, and finall
 related programs are discussed.
 
 \subsubsection{Fitness Scores}
+The first experiment serves to investigate the practicality of each subject-oriented fitness function
+presented in \cref{sec:fit} when applied to the proposed test subjects. To accomplish this, a comparison
+between the fitness scores achieved by each function for each subject is needed.
+% One exception is the Schema Coverage fitness function, which is ignored here because using it only depends on
+% the format specification and its quality and is thus independent from test subjects.
+The subjects used for this comparison were taken from their respective official repositories, the versions
+used were as follows: \libpng \texttt{1.5.4}, \libpcap \texttt{1.3.0}, and \libxml \texttt{2.8.0}. While the
+\libpcap and \libxml versions were chosen as the most easily obtainable on the current stable branch of the
+Debian operating system, the version of \libpng was chosen such that both fitness values for a general
+comparison and defect search could be carried out at least in part simultaneously and with minimum effort.
+(This particular version of \libpng has an unchecked division by zero defect.)
+
 \Cref{tbl:fitness} shows an overview of
 the fitness scores achieved by each fitness function. These scores are average values computed over the ten
 experiment runs that were carried out for each fitness function. For each test subject the table has two rows
@@ -135,24 +145,18 @@ marked with a ``+'' sign in the \emph{Schema Valid} column, while the latter one
 \begin{tabular}{|r|c|r|r|r|r|r|r|}
 \hline
 \multicolumn{1}{|c|}{Subject}  & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Schema\\ Valid\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Coverage\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}BBL\\ Succession\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Memory\\ Access\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}$\downarrow$ Division\\ by 0\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Integer\\ Overflow\end{tabular}} & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Buffer\\ Overflow\end{tabular}} \\ \hline \hline
-                               & +                                                                           &              \color{gray}{142}                                          &                          185.3                                                &                                470                                           &                          no divs                                           &                          7.0369E13                                             &                          2175400                                                               \\ \cline{2-8} 
+                               & +                                                                           &              143.2                                                          &                          185.3                                                &                                470                                           &                          no divs                                           &                          7.0369E13                                             &                          2175400                                                               \\ \cline{2-8} 
 \multirow{-2}{*}{libpcap}      & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 152.8                                              & \cellcolor[HTML]{C0C0C0} 192                                                  & \cellcolor[HTML]{C0C0C0} 470                                                 & \cellcolor[HTML]{C0C0C0} no divs                                           & \cellcolor[HTML]{C0C0C0} 7.0369E13                                             & \cellcolor[HTML]{C0C0C0} 2175408                                                               \\ \hline \hline
-                               & +                                                                           &     ?                                                                       &         ?                                                                     &             ?                                                                &                     1                                                      &                          4.6115E18                                             &                          2102329                                                               \\ \cline{2-8} 
-\multirow{-2}{*}{libpng}       & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0} 66493                                               & \cellcolor[HTML]{C0C0C0}      1                                            & \cellcolor[HTML]{C0C0C0}        ?                                              & \cellcolor[HTML]{C0C0C0} 2102329                                                               \\ \hline \hline
-                               & +                                                                           &       ?                                                                     &                              ?                                                &                            858058                                            &                                      128                                   &                          4.4175E18                                             &                          73728                                                                 \\ \cline{2-8} 
-\multirow{-2}{*}{libxml2}      & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0}    ?                                               & \cellcolor[HTML]{C0C0C0} ?                                                    & \cellcolor[HTML]{C0C0C0}   848560                                            & \cellcolor[HTML]{C0C0C0}    104.4                                          & \cellcolor[HTML]{C0C0C0} 4.6216E18                                             & \cellcolor[HTML]{C0C0C0} 73728                                                                 \\ \hline
+                               & +                                                                           &                          14963                                              &                          11507                                                &                          4007                                                &                     1                                                      &                          4.6115E18                                             &                          2102329                                                               \\ \cline{2-8} 
+\multirow{-2}{*}{libpng}       & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0} 15330                                              & \cellcolor[HTML]{C0C0C0} 11657                                                & \cellcolor[HTML]{C0C0C0}  66493                                              & \cellcolor[HTML]{C0C0C0}      1                                            & \cellcolor[HTML]{C0C0C0}              4.6115E18                                & \cellcolor[HTML]{C0C0C0} 2102329                                                               \\ \hline \hline
+                               & +                                                                           &       18650                                                                 &                          12576                                                &                            858058                                            &                                      128                                   &                          4.4175E18                                             &                          73728                                                                 \\ \cline{2-8} 
+\multirow{-2}{*}{libxml2}      & \cellcolor[HTML]{C0C0C0}-                                                   & \cellcolor[HTML]{C0C0C0}    18987                                           & \cellcolor[HTML]{C0C0C0} 12791                                                & \cellcolor[HTML]{C0C0C0}   848560                                            & \cellcolor[HTML]{C0C0C0}    104.4                                          & \cellcolor[HTML]{C0C0C0} 4.6216E18                                             & \cellcolor[HTML]{C0C0C0} 73728                                                                 \\ \hline
 \end{tabular}
 \caption{Average Fitness Scores}
 \label{tbl:fitness}
 \end{table}
 
-The subjects used for this comparison of fitness scores were taken from their respective
-official repositories, the versions used were as follows: \libpng \texttt{1.5.4}, \libpcap \texttt{1.3.0}, and
-\libxml \texttt{2.8.0}. While the \libpcap and \libxml versions were chosen as the most easily obtainable on
-the current stable branch of the Debian operating system, the version of \libpng was chosen such that both
-fitness values for a general comparison and defect search could be carried out at least in part simultaneously
-and with minimum effort. % This particular version of \libpng has an unchecked division by zero defect.
-
+\paragraph{General Remarks} ~\\
 The fitness scores differ significantly across the different fitness functions even for the same subject,
 which is understandable because each of the functions has different metrics, which makes their scores
 largely incomparable because the functions are designed to measure different characteristics of a
@@ -162,7 +166,7 @@ What might seem somewhat surprising however, is the great variance in scores for
 across multiple subjects. For example take the difference for the Basic Block Coverage fitness function - it
 has a score of 15330 for \libpng and only 152.8 for \libpcap. 
 A similar difference can also be seen in all fitness functions whose scores are directly related to the
-complexity or richness of the inputs i.e. also the Basic Block Succession and the Memory Access fitness
+complexity or richness of the inputs i.e.\ also the Basic Block Succession and the Memory Access fitness
 functions. Two main reasons can be given to explain this difference:
 
 The first is that even though both libraries provide extensive parsing and data manipulation capabilities,
@@ -179,6 +183,60 @@ rightmost fitness functions use the singleton population evolution model, which 
 which, in turn, might have an effect on the utilization of the time frame allotted for an experiment run and
 thus the resulting fitness scores.
 
+\paragraph{Basic Block Coverage Fitness Function} ~\\
+The Basic Block Coverage fitness function provides a very basic and rather crude method to reach into a
+program's logic. Possibly somewhat counterintuitively, it does not provide a way to estimate the complexity of
+the application under test on its own. This is mainly because there is no guarantee that the entirety of
+the program's functionality can be reached at all from the entry point chosen in the test driver. So this fitness function
+rather provides a measure of the quality of the test harness itself, which can serve as a tool for improving
+its quality, and also for interpreting results achieved by other fitness functions more accurately by adjusting
+expectations accordingly.
+
+This does not mean, however, that this fitness function does not provide any indication as to the complexity of
+the program under test at all. Its scores are indeed proportionally indicative of the number of statements
+present in the part of the code reachable from the test driver's entry point. Using this interpretation it can
+be concluded that the extent of functionality engaged in \libpcap was an order of magnitude smaller than that
+of \libpng and \libxml.
+
+\paragraph{Basic Block Succession Fitness Function} ~\\
+As a more involved fitness function also concerning itself with basic blocks, the Basic Block Succession
+fitness function provides another view on the complexity of the program behavior engaged by the test driver.
+While the previous fitness function merely indicates the extent of a subject's engaged functionality, this
+fitness function illuminates its interconnectedness. It shows not only how much functionality has been reached,
+but also how it was reached i.e.\ which paths were taken during execution.
+
+The findings of this fitness function seem to suggest that while the complexity gap between \libpcap and the
+two other subjects found by the previous fitness function is legitimate, the gap of approx.\ 3500 BBLs between
+\libpng and \libxml is an overestimation as the difference in interconnectedness is not appropriately
+large. Because the test drivers are not equivalent and the \libpng driver involves more complex
+behavior, the findings of this fitness function lead to the conclusion that the large number of execution
+subpaths taken by \libxml must result from the increased expense of parsing its text based input format, which
+\libpng is lacking due to its inputs being in binary format already. This possibly also explains the larger
+number of BBLs an input has to pass through in \libxml.
+
+\paragraph{Memory Access Fitness Function} ~\\
+The scores achieved by the Memory Access fitness function indicate how much memory is accessed by the
+application under test when processing an input file. Please note that this function is somewhat simplistic.
+Its values are not always proportional to the size of the inputs as there is no guarantee that the program
+under test will load all data into its memory at once - it could just as easily process the input using a
+buffer or a sliding window technique only ever reusing the same constant memory space.
+Additionally, the scores of this fitness function are heavily influenced by how many operations on the input
+data are performed by the tested application - e.g.\ the \libpng driver first reads the data, manipulates
+it, and finally writes it out again, performing at least three passes over not necessarily the same regions of
+memory. Nevertheless, the Memory Access fitness function is a very helpful tool in detecting program defects
+related to memory operations, as you will see in the next section. 
+
+Taking a closer look at the outcome of the experiments, the result for \libpng is perhaps in need of special
+attention because of the very large difference between scores for schema-valid and invalid inputs of 4007 and
+66493, respectively. To explain this, please note that \libpng loads its input entirely into memory, which
+makes the values for the Memory Access fitness function proportional to the input size in this case. Now, with
+the generator occasionally violating schema restrictions based on numbers, the $2\times 2$ pixel limitation is
+happily ignored and images with very large dimensions are produced, which easily consume significantly more
+memory. E.g.\ if the generator produces image data of size $12 \times 10$, the memory consumption is increased
+30-fold. This increase leads to a corresponding increase in the fitness score, which favors the production
+of even larger images generation after generation.
+
+\paragraph{Division by Zero Fitness Function} ~\\
 In accordance with their respective descriptions (listed in \cref{sec:fit}), all fitness functions
 presented in \cref{tbl:fitness} are maximization functions with the exception of the Division by Zero fitness
 function, which is a minimization function - it is therefore marked with a downward arrow ($\downarrow$) in the
@@ -209,7 +267,12 @@ of the evolution only individuals that are as close as possible to having a perf
 reaching it are reported as the best individuals produced during the process. This, of course, is only an
 implementation detail, and a value of zero could be justifiably put in \cref{tbl:fitness}.
 
-% TODO analyse impact of schema violation once all results are in
+% TODO \paragraph{Integer Overflow Fitness Function} ~\\
+% TODO \paragraph{Buffer Overflow Fitness Function} ~\\
+
+% TODO \paragraph{Impact of Schema Violation} ~\\
+% explanation for the one under it => xml is xml, no validation, local search eats time
+
 
 % \begin{table}[H]
 % \small
@@ -227,10 +290,11 @@ implementation detail, and a value of zero could be justifiably put in \cref{tbl
 
 
 \subsubsection{Detected Vulnerabilities}
-\Cref{tbl:png:vulns} shows a selection of vulnerabilities in \libpng chosen as indicators for determining the
-effectiveness and efficiency of \xmlmate as a search-based tool for defect detection. The vulnerabilities are
+\Cref{tbl:png:vulns} shows a selection of known vulnerabilities in \libpng chosen as indicators for determining
+the effectiveness and efficiency of \xmlmate as a search-based tool for defect detection. The vulnerabilities are
 listed alongside the corresponding vulnerable program version and their CVSS - a score on a scale from 0 to 10
 that indicates the severity of a vulnerability.
+% TODO mention that these were selected as crash inducing because that's the class we can detect
 
 % as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
 \begin{table}[H]
@@ -244,7 +308,6 @@ CVE-2013-6954 & 5.0   & 1&.6.6  & Null pointer dereference on empty palette \\ \
 CVE-2011-3048 & 6.8   & 1&.5.9  & Unchecked failing malloc in constrained memory \\ \hline % mem(127/3449), buf 
 % TODO write about restricting memory to 450 MB
 CVE-2008-1382 & 7.5   & 1&.2.25 & Segmentation fault on unknown chunks of size 0\\ \hline % bbl2(20/0), schemaCov
-% TODO rerun and remember to change schema - allow unknown chunks
 \end{tabular}
 \caption{Vulnerabilities in \libpng Versions}
 \label{tbl:png:vulns}
@@ -257,19 +320,21 @@ as well as the fitness function used in each experiment.
 \centering
 \begin{tabular}{|l|l|r|}
 \hline
-Vulnerability                  & Fitness Function & \#found / hour \\ \hline
+Vulnerability                  & Fitness Function & \#found / hour \\ \hline \hline
 CVE-2011-3328                  & Division by Zero & 13.2           \\ \hline
 \multirow{2}{*}{CVE-2011-2691} & Buffer Overflow  & 138.8          \\ \cline{2-3} 
                                & Memory Access    & 43             \\ \hline
 CVE-2013-6954                  & Buffer Overflow  & 15.7           \\ \hline
-CVE-2011-3048                  & Memory Access    & 27.2           \\ \hline
-CVE-2008-1382                  & BBL Succession   & ?              \\ \hline
+\multirow{2}{*}{CVE-2011-3048} & Memory Access    & 27.2           \\ \cline{2-3}
+							   & Integer Overflow & 6.3			   \\ \hline
+CVE-2008-1382                  & BBL Succession   & 623            \\ \hline
 \end{tabular}
 \caption{Vulnerability Detection Rates}
 \label{tbl:png:rates}
 \end{table}
 
 % TODO update for more FFs and CVE-2008-1382
+% TODO Adde short descriptions of vulnerabilities
 Overall it is safe to say that \xmlmate is both effective and efficient as a vulnerability detection tool.
 % mention no false positives
 
@@ -277,9 +342,9 @@ Overall it is safe to say that \xmlmate is both effective and efficient as a vul
 % ??? mention problem of failure masking -> one crash makes another undetectable
 
 \subsubsection{Additional Defects}
-In the process of running the experiments needed for this evaluation several defects that were not specifically
-targeted were found in programs related to the used file formats. Here are the most interesting of them.
-
+In the process of running the experiments needed for this evaluation several defects were found in programs
+related to the used file formats, which were not specifically targeted. Here are the most interesting of them.
+\paragraph{Gimp} ~\\
 The GNU Image Manipulation Program\footnote{\url{http://www.gimp.org/}} (\texttt{gimp}) is an open source
 application, which is capable of opening and editing \png files. The latest available version of \texttt{gimp}
 is \texttt{2.8.2} on the current stable branch of the Debian operating system, which, at the time of writing,
@@ -287,7 +352,7 @@ is ``Wheezy''. In this version \texttt{gimp} has a defect that results in immedi
 opening a specially crafted \png file due to a segmentation fault. To cause this, the \png file must
 simply contain a \texttt{PLTE} chunk with an empty data region. This defect is no longer present in later
 versions of \texttt{gimp}, although it is not listed at \url{http://www.cvedetails.com}.
-
+\paragraph{Wireshark} ~\\
 Wireshark\footnote{\url{https://www.wireshark.org/}} is a cross-platform open source program for network packet
 inspection and analysis. Its latest version available on the aforementioned Debian configuration is
 \texttt{1.8.2} and this version has the following defect, which is also present in the same version on the
@@ -302,7 +367,7 @@ have crashed a \libpcap worker instance. Unfortunately, the crash in \libpcap it
 but while trying to inspect the generated \pcap file, Wireshark crashed instead. It is still possible that
 this file actually crashed \libpcap, but some other conditions were involved not directly controlled by the
 experiment; this investigation could present a topic for a future work item.
-
+\paragraph{Firefox} ~\\
 Input files for testing \libxml are generated in the \texttt{xhtml} format, which is primarily a web page
 description format, so several of them were opened in different web browsers for manual inspection. As a side
 effect several files exhibiting interesting behavior in modern browsers were found. The most notable is a 161KB

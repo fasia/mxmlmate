@@ -4,17 +4,21 @@
 \label{sec:components}
 The extension of \xmlmate to binary subjects benefits from frameworks described in \cref{sec:tech} as they 
 help solve the majority of the arising subtasks rather easily. Let me give you a superficial description
-of the components involved in the new extended \xmlmate work process. 
-\begin{itemize}
-  \item The \java application \xmlmate performs its genetic operations on a population of chromosomes; this 
+of the components involved in the new extended \xmlmate work process.
+%###  
+\paragraph{XMLMate Core} ~\\
+%### 
+  The \java application \xmlmate performs its genetic operations on a population of chromosomes; this 
   results in a set of \xml files, whose fitness needs to be determined according to the currently employed
   fitness function. The paths to these files are then sent out via a \zmq socket either directly to the
   \emph{test drivers}, in case the program being tested supports reading inputs in \xml format, or alternatively 
   to an arbitrary number of \emph{converters}, that, as the name suggests, convert the \xml files into a format 
   suitable for the system under test. This distinction is completely transparent to \xmlmate and thus allows for 
   adding an arbitrary number of transformation steps between itself and the test drivers.
-  
-  \item A load balancer is responsible for managing a set of homogeneous worker nodes like converters or test
+  %### 
+  \paragraph{Load Balancer} ~\\
+  %### 
+  A load balancer is responsible for managing a set of homogeneous worker nodes like converters or test
   drivers by distributing the arriving workloads fairly among them. The fair queueing provides a significant
   performance upgrade from the previously employed round robin method. Not all workloads require equal
   processing time, and because it is indeterminable a priori, the round robin workload distribution strategy
@@ -28,8 +32,10 @@ of the components involved in the new extended \xmlmate work process.
   and can fail at any moment. The most common system setup consists of two load balancers - one for the format
   converters and one for test drivers, so even though it says above that \xmlmate sends its work packets to
   converters or test drivers, in actuality it communicates with their respective load balancers. 
-    
-  \item A format converter (most of which are currently implemented in \python) receives a conversion task from
+  %### 
+  \paragraph{Format Converter} ~\\
+  %### 
+  A format converter (most of which are currently implemented in \python) receives a conversion task from
   its load balancer through a \zmq socket, which it completes by converting the file found at the location
   specified in the task message. It then responds with another message containing the location of the converted
   file. There can be an unlimited number of converters active at the same time processing multiple
@@ -41,8 +47,10 @@ of the components involved in the new extended \xmlmate work process.
   instances in parallel without them interfering; and, secondly, it makes it possible to apply meta-heuristics
   to the process by varying the number of converters dynamically depending on the load, which makes for an
   interesting future work item.
-  
-  \item A test driver receives a message from its balancer, which, in turn, receives it either directly from
+  %### 
+  \paragraph{Test Driver} ~\\
+  %### 
+  A test driver receives a message from its balancer, which, in turn, receives it either directly from
   \xmlmate in case of an \xml based file format, or otherwise from the previous balancer (most likely a 
   converter's balancer), unpacks the file path, and feeds it to the system under test, which is being monitored
   by a \emph{pintool} that implements the ``client side" of the aforementioned currently employed fitness
@@ -51,10 +59,12 @@ of the components involved in the new extended \xmlmate work process.
   and \texttt{PIN\_SCORE\_END}, which the pintool replaces with its own internal fitness data related
   processing methods. The driver is implemented in {\small C} and, as is the case with converters, there can
   be arbitrarily many active at the same time.
-  
-  \item As previously mentioned, the pintool monitors the execution of the program under test and records
+  %### 
+  \paragraph{Pintool} ~\\
+  %### 
+  As previously mentioned, the pintool monitors the execution of the program under test and records
   data relevant to the computation of the fitness score according to the fitness function it is part of.
-  E.g. for a fitness function that counts the number of basic blocks executed in the program, the pintool 
+  E.g.\ for a fitness function that counts the number of basic blocks executed in the program, the pintool 
   would keep a set of basic blocks that it has observed being executed. The pintool replaces the call to 
   \texttt{PIN\_SCORE\_START} in the driver with a method that resets its fitness related data stores (in the 
   above example it would clear the set of executed basic blocks). It also replaces the call to
@@ -63,8 +73,10 @@ of the components involved in the new extended \xmlmate work process.
   Because the pintool runs in the same process as the test driver, it is possible to share the same \zmq
   socket between the driver and pintool for communication with the load balancer, which makes it relatively
   easy to implement the following system component.
-  
-  \item A lifeguard protects the joint process of test driver, system under test and pintool from an untimely
+  %### 
+  \paragraph{Lifeguard} ~\\
+  %### 
+  A lifeguard protects the joint process of test driver, system under test and pintool from an untimely
   death. Whenever \xmlmate produces an input file which crashes the program under test, the entire process dies
   off without a possibility to report this valuable finding. To prevent this, a lifeguard launches a driver
   process and gives it an \emph{identity} (which is a \zmq concept - the load balancer distinguishes the
@@ -73,16 +85,20 @@ of the components involved in the new extended \xmlmate work process.
   balancer, which will transparently forward this to \xmlmate in order for the corresponding input to be
   stored. Afterwards, the lifeguard casts off the identity and relaunches the driver with it once again.
   Each test driver is being guarded by its own personal lifeguard implemented in \python.
-  
-  \item The fitness function in \xmlmate receives the message from the pintool, interprets it according to 
-  its specification (e.g. again, if the fitness function is supposed to count the number of executed basic blocks, 
-  it would expect to receive a set of basic block addresses) and finally assigns the computed fitness score to 
+  %### 
+  \paragraph{Fitness Function} ~\\
+  %### 
+  The fitness function in \xmlmate receives the message from the pintool, interprets it according to 
+  its specification (e.g.\ again, if the fitness function is supposed to count the number of executed basic
+  blocks, it would expect to receive a set of basic block addresses) and finally assigns the computed fitness score to 
   the genetic representation of the \xml file sent out in step 1. Unless the message says that the
   corresponding input has caused a test driver to die, in which case the genetic representation shall receive
   the worst fitness score to be removed from the population in order not to continuously keep crashing the test
   drivers, and the input file itself shall be kept permanently.
-\end{itemize}
 
+%### 
+\paragraph{Overview} ~\\
+%### 
 \Cref{fig:components} provides a schematic overview of the aforementioned components and which other components 
 they interact with inside the system. The visualization also shows that the system scales out to \texttt{n}
 format converters and \texttt{m} \emph{workers} (a collective noun summarizing a test driver, its
@@ -97,6 +113,9 @@ the flow of converted files, and the green arrows signify the way the fitness in
   \label{fig:components}
 \end{figure}
 
+%### 
+\paragraph{Development Mockups} ~\\
+%### 
 When developing such a diverse ecosystem it is important to be able to inspect and test each component
 individually, so as not to lose track of important details, and be able to isolate faults efficiently without
 having to keep the entire system in the focus of attention. This is best accomplished by having very light

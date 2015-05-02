@@ -10,7 +10,7 @@ levels of abstraction. To provide the pluggability on the level of  entire test 
 \texttt{FitnessFunction<XMLTestChromosome>}. 
 Secondary evolution objectives have a very similar type topography; secondary objectives are sometimes useful 
 as ``tie breakers'' when a decision between two chromosomes has to be made when both have equal fitness values,
-but possess subtle differences that e.g. might lead to slightly more or less favorable crossover behavior in 
+but possess subtle differences that e.g.\ might lead to slightly more or less favorable crossover behavior in 
 the future. The next sections describe some of the new fitness function implementations available with the 
 extended and improved \xmlmate.
 %### 
@@ -134,7 +134,7 @@ Like all subclasses of this \texttt{BinaryBackendFitnessFunction} the \texttt{Ba
 fitness function consists of two components: a \java class and a pintool written in \cpp.
 
 The pintool's task is to instrument the targeted binary in such a way, that whenever it executes a 
-basic block, which belongs to the image of interest (e.g. \texttt{libpng} - a parameter given at the start),
+basic block, which belongs to the image of interest (e.g.\ \texttt{libpng} - a parameter given at the start),
 its address is recorded in a set data structure. When the test driver, which is responsible for running 
 the program under test, signals the completion of the processing of the currently evaluated inputs, 
 the pintool sends the set as a packet to the \java class in \xmlmate.
@@ -526,7 +526,7 @@ to the argument of \texttt{free} if one is found.
 As mentioned previously, the fitness information the pintool of the \texttt{Buffer Overflow
 Fitness Function} sends to its \java counterpart is the memory access map, which, in contrast to the
 \texttt{Division by Zero} and \texttt{Integer Overflow} fitness functions is updated in-place and not only
-after the processing of an input file. Because memory accesses are much more numerous than e.g. \texttt{DIV}
+after the processing of an input file. Because memory accesses are much more numerous than e.g.\ \texttt{DIV}
 or \texttt{MUL} instruction invocations, the reasonable choice in the memory-speed trade off is somewhat offset.
 
 The \java part of this fitness function tries to maximize the maximum distance of the accesses from their

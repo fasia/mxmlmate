@@ -15,7 +15,7 @@ full-fledged format, it is rather a meta format, which many other formats are su
 such example is the E\textbf{x}tensible \textbf{H}ypertext \textbf{M}arkup \textbf{L}anguage format
 \texttt{xhtml}, which was created in an effort to force strict consistency rules onto web pages designed for
 rendering on \emph{thin clients} - devices with weak computational resources, for which it would be infeasible
-to implement graceful handling of inconsistent web page code (e.g. mismatched or missing tags, etc.). 
+to implement graceful handling of inconsistent web page code (e.g.\ mismatched or missing tags, etc.). 
  
 Because \texttt{xhtml} is in essence a simple \xml wrapper around \texttt{html}, it is possible to use standard
 and computationally lightweight \xml parsers instead of specialized lenient html parsers. It is further
@@ -63,8 +63,8 @@ Briefly, the global header consists of the following elements:
 \texttt{version\_major} and \texttt{version\_minor} denote the format version (currently 2.4),
 \texttt{thiszone} is the correction time in seconds between GMT and the current timezone (this value is
 usually set to 0); \texttt{sigfigs} is the accuracy of time stamps (also usually set to 0), \texttt{snaplen} is
-the snapshot length - i.e. the maximum number of bytes per captured packet; and finally \texttt{network}
-specifies link-layer header type of the captured packets (e.g. Ethernet, 802.11, PPP, etc.).
+the snapshot length - i.e.\ the maximum number of bytes per captured packet; and finally \texttt{network}
+specifies link-layer header type of the captured packets (e.g.\ Ethernet, 802.11, PPP, etc.).
 
 The individual packet headers are also very simple and structured as follows:
 \texttt{ts\_sec} and \texttt{ts\_usec} provide timing information about when the packet was captured,
@@ -268,7 +268,7 @@ following rules:
 
 \begin{itemize}
 \item[] The \emph{color type} in the \texttt{IHDR} chunk can have values of 0, 2, 3, 4, and 6, which place
-specific restrictions on several other elements e.g. the allowed bit depth value, as well as the presence of
+specific restrictions on several other elements e.g.\ the allowed bit depth value, as well as the presence of
 the \texttt{PLTE} chunk.
 
 \item[] The \texttt{PLTE} chunk must be present with the color type set to 3, it is optional with color types 2

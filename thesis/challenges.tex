@@ -16,7 +16,7 @@ the most noteworthy of them.
 \evosuite{}\cite{fraser2013whole} and as such must adhere to its specifications and structures 
 of genetic representations. 
 Because \evosuite as a whole is aimed at generating {\small JUnit} tests for \java applications, 
-the entities that comprise the population  (i.e. the \emph{chromosomes} or \emph{individuals}) 
+the entities that comprise the population  (i.e.\ the \emph{chromosomes} or \emph{individuals}) 
 are called \emph{test suites}. The test suites are what evolves from generation to generation.
 In turn, the test suites consist of \emph{tests}. Similarly, \xmlmate has adopted the concepts of 
 test suite and test - they correspond to a set of \xml trees and a single \xml tree, respectively. 
@@ -146,11 +146,11 @@ crossover. When the fitness of the suite is requested to be computed next time b
 only the tests that changed should be evaluated. For each of those a file is written and a packet is 
 formed consisting of a number identifying the test inside the test suite and the path to its corresponding 
 file. This packet is serialized into a byte string with \msgpack and then sent as a \zmq message via a 
-\texttt{PUSH} socket on a well known port (e.g. the default is 5556). After all messages have been sent,
+\texttt{PUSH} socket on a well known port (e.g.\ the default is 5556). After all messages have been sent,
 a response is awaited for each of those sent out tasks. Responses are collected as \zmq messages coming 
 in via a \texttt{PULL} socket on another well known port (default 5557) and deserialized with \msgpack 
 into the identifying number and whatever data format is expected by the current fitness function. 
-(E.g. a fitness function that counts the number of executed basic blocks expects an array of addresses.)
+(E.g.\ a fitness function that counts the number of executed basic blocks expects an array of addresses.)
 As far as the \java part of \xmlmate is concerned this is all it ever sees of the entire process, and so it 
 must rely on the pintool monitoring the application under test to collect and send back fitness results.
 
@@ -191,7 +191,7 @@ the same \zmq \texttt{DEALER} socket the test driver received the original messa
 because the pintool and the test driver run in the same process, which means they both have access to the same
 memory, and so a pointer can be easily shared between the two components.
 
-Because test drivers can sometimes terminate unpredictably and unexpectedly (e.g. due to receiving an input
+Because test drivers can sometimes terminate unpredictably and unexpectedly (e.g.\ due to receiving an input
 file that causes them to fail because of a vulnerability), they are always started and guarded by special
 lifeguard processes. Whenever control returns to the lifeguard process itself, which means that the guarded
 process has terminated, it assumes its identity, creates a \texttt{DEALER} socket and sends out a \texttt{DEAD}
@@ -250,7 +250,7 @@ to the mutation and crossover routines, which seems logical in retrospect becaus
 in-memory representations of \xml tree structures. That alone, however, is not sufficient to cause a 
 major bottleneck. \evosuite's genetic algorithm always makes backups of entire test suites as well as 
 single tests before applying any genetic operation to them in order to be able to recover from an 
-unfavorable outcome (e.g. decreased fitness) and roll back all changes. So each time an in-memory \xml 
+unfavorable outcome (e.g.\ decreased fitness) and roll back all changes. So each time an in-memory \xml 
 tree was going to be mutated, it was deeply copied, each time two \xml trees were going to be crossed 
 over, they were both deeply copied, each time an entire test suite was going to be mutated, it was 
 deeply copied - each of its tests one after another, and each time two test suites were about to 
@@ -299,13 +299,13 @@ rewrite the genetic algorithm in order to enable it to process the individual te
 not only mutation and crossover, but evaluation as well, leaving generation alternations to be the only
 thresholds to otherwise completely parallel execution.
 %###
-\subsubsection{Local Search}
+\subsubsection{Schema Violation}
 %###
 \label{sec:local}
 As previously mentioned, one of the core principles of \xmlmate was to always create schema-valid inputs; 
 however, this no longer complies with current requirements in the use case of security testing as the 
 inputs that most often cause the targeted program to fail usually deviate from the specification in 
-one way or another. The case where the syntactic validity of the \xml representation is violated is 
+one way or another. The case in which the syntactic validity of the \xml representation is violated, is 
 both unfavorable to format conversion and out of scope of this work.
 
 Fortunately, it is possible to use another artifact of \evosuite's design to provide deviations from the 
@@ -314,7 +314,7 @@ The local search is a mechanism which allows to perform small mutations in limit
 the regular genetic operations to find individuals that are ``closely related'' to existing ones
 yet have better fitness. One implementation of this is interval bounded numeric offset mutation whereby
 several numeric values in the individual are changed by an offset chosen at random from a predefined 
-interval. E.g. integer values are changed by random values from $[-10,10]$ and floating point numbers 
+interval. E.g.\ integer values are changed by random values from $[-10,10]$ and floating point numbers 
 are offset by values from $[-0.5,0.5]$.
 Performing such changes sometimes leads to the values leaving their value spaces specified in the schema, 
 which allows to accommodate for the new use case of security testing.
@@ -327,6 +327,6 @@ additionally taking full advantage of the newly implemented parallelized deep co
 Please note that due to its specification ignoring nature, the local search is currently incompatible with the
 schema coverage fitness function described in \cref{sec:fit:schema} as the algorithm responsible for computing
 how many of the schema's definitions are used in an \xml instance gets confused by unexpected invalid values.
-This seems to be a rather small issue and will probably be fixed at a later point in time; however, as of now
+This seems to be a rather small issue and will probably be fixed at a later point in time; however, to date
 there has been no reason to run schema coverage based evolutions with local search enabled, which, at least for
 the time being, makes this a non-issue.

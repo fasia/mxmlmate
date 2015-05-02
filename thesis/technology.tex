@@ -71,8 +71,8 @@ won this case as well, though mostly due to its more easily accessible and examp
 %### 
 \tocless\subsubsection{ZeroMQ}
 %###
-\label{sec:zmq}c
-\zmq\cite{zmq} (pronounced {\small ZeroMQ}) is an extremely efficient messaging library, 
+\label{sec:zmq}
+\zmq{}\cite{zmq} (pronounced {\small ZeroMQ}) is an extremely efficient messaging library, 
 which is very well suited for use in concurrent or distributed applications. \zmq regards messages as 
 completely transparent blobs of data which are to be transported across predefined communication channels 
 between sockets. Rather than unnecessarily defining its own transfer protocol, \zmq works on top of already exiting 
@@ -120,11 +120,11 @@ serialization/deserialization libraries usually come in. \msgpack{}\cite{msgpack
 format that is highly efficient as it uses binary representation of data. It is implemented as a library in at
 least 20 programming languages. Once again, \xmlmate uses the ones for \java, \python, {\small C}, and \cpp.
 While \msgpack is very efficient in what it does, it has some disadvantages such as 
-\begin{itemize}
+\begin{itemize*}
   \item Integer values are limited to be in $[-2^{63}, 2^{64}-1]$.
   \item The maximum length of an array or string is limited to $2^{32}-1$.
   \item It is the user's responsibility to ensure correct endianness across all endpoints.
-\end{itemize}
+\end{itemize*}
 
 There is another relatively young binary serialization format
 {\small CBOR}\footnote{\url{http://tools.ietf.org/html/rfc7049}} that does not have many of {\small
@@ -156,5 +156,5 @@ the \java compiler would perform the necessary boxing and unboxing automatically
 cost from inexperienced programmers. In most cases, these additional costs can be calmly neglected, but
 sometimes they cannot. In order to exclude the possibility of this becoming a problem and suddenly sneaking
 up, the decision was made to go with Trove collections from the beginning. These collections have since found
-their special use with the many details of the various evaluation result types, e.g. storing big amounts of
-memory addresses.
+their special use with the many details of the various evaluation result types, e.g. storing large quantities
+of memory addresses.
