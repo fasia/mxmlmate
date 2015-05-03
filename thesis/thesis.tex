@@ -11,6 +11,7 @@
 \usepackage{float}
 \usepackage{xspace}
 \usepackage{rotating}
+\usepackage{placeins}
 \usepackage{bytefield}
 \usepackage[pdftex,dvipsnames,table,xcdraw]{xcolor}  % Coloured text etc.
 \usepackage[activate={true,nocompatibility},stretch=10,shrink=10,factor=1100,babel=true]{microtype}
@@ -89,7 +90,7 @@
 \input{./abstract.tex}
 \newpage
 \pagenumbering{arabic} %
-\setcounter{page}{5} % TODO update page start if < toc content changes!
+\setcounter{page}{5} % XXX update page start if < toc content changes!
 \tableofcontents
 \newpage
 \input{./intro.tex}

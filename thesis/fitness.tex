@@ -255,9 +255,9 @@ All previously described fitness functions are aimed at increasing a coverage of
 in the context of using \xmlmate to try and find vulnerabilities in the system under test, this is not
 necessarily the most promising approach. In order to be able to find vulnerabilities having to do with
 operations such as reading from and writing to memory, such as null pointer dereferences or buffer underflows
-or overflows, the first na\"\i{}ve approach is to aim for a maximum number of memory reads and writes at a
-maximum of addresses. This is the idea behind the \texttt{Memory Access} fitness function, which like its
-cousin \texttt{Basic Block Coverage} fitness function, is a maximization function, with which it also shares
+or overflows, the first na\"\i{}ve approach is to aim for a maximal number of memory reads and writes at a
+maximal number of addresses. This is the idea behind the \texttt{Memory Access} fitness function, which, like
+its cousin \texttt{Basic Block Coverage} fitness function, is a maximization function, with which it also shares
 the \texttt{BinaryBackendFitnessFunction} as an ancestor. Once again, this fitness function consists of a
 pintool and its complementary \java class. 
 
@@ -267,7 +267,7 @@ The \java class is very similar to that of its cousin fitness function, in fact 
 their code.
 
 However, upon consideration of the current use case, the distinction between test suites and tests as
-prescribed by \evosuite no longer seems appropriate - what we actually want instead is to evolve a population
+prescribed by \evosuite no longer seems appropriate - instead it is preferable to evolve a population
 of single \xml files in order to find one individual file that triggers faulty behavior. To satisfy this newly
 appeared need, the concept of a \emph{singleton population} was introduced.
 
@@ -329,10 +329,10 @@ the system under test has ended, for each division instruction the pintool keeps
 smallest zero distance when it packages the message to be sent out to its \java fitness function counterpart.
 There is a reason behind selecting the best divisor only after the main runtime instead of doing it on-the-fly,
 even though it wastes some memory space for storing all observed divisors. This is an instance of the classical
-runtime vs memory requirement trade off: by having injected code simply append any new value to a list
+runtime vs memory requirement trade-off: by having injected code simply append any new value to a list
 instead of doing comparisons to decide whether to keep or reject the new value, the code is simple enough to
 be inlined and thus performs considerably faster; and with main memory being available in abundance on  modern
-computers and execution speed being the most limiting factor, it seems like a good trade off to make.
+computers and execution speed being the most limiting factor, it seems like a good trade-off to make.
 
 Because the \texttt{Division by Zero} fitness function is meant to be used for vulnerability scanning, it is
 exclusively compatible with the singleton population evolution mode introduced in \cref{sec:memcov}. The \java
@@ -527,7 +527,7 @@ As mentioned previously, the fitness information the pintool of the \texttt{Buff
 Fitness Function} sends to its \java counterpart is the memory access map, which, in contrast to the
 \texttt{Division by Zero} and \texttt{Integer Overflow} fitness functions is updated in-place and not only
 after the processing of an input file. Because memory accesses are much more numerous than e.g.\ \texttt{DIV}
-or \texttt{MUL} instruction invocations, the reasonable choice in the memory-speed trade off is somewhat offset.
+or \texttt{MUL} instruction invocations, the reasonable choice in the memory-speed trade-off is somewhat offset.
 
 The \java part of this fitness function tries to maximize the maximum distance of the accesses from their
 respective buffer's centers, and by employing additional secondary objectives, it also aims to enlarge the

@@ -43,7 +43,7 @@ overly strict rules on placement and integrity of its contents. \Cref{lst:pcapfi
 typical pcap file - it consists of a global header containing some global information followed by records for
 each captured packet, consisting of a packet header and data.
 
-\begin{listing}[h]
+\begin{listing}[htb]
 \centering
 \begin{bytefield}[boxformatting={\centering\tiny}]{32}
 \colorbitbox{mygreen}{8}{Global Header}{tbr} &
@@ -103,7 +103,7 @@ this schema. The root element of the \xml representation of \pcap is the \texttt
 type PCAPType. This type defines its contents as a \texttt{header} element of the type GlobalHeaderType
 followed by zero or more \texttt{packet} elements of the type PacketHeaderType. 
 
-Don't be confused by the ``tns:'' prefix found throughout the schema - it is just a marker assigning the
+Do not be confused by the ``tns:'' prefix found throughout the schema - it is just a marker assigning the
 declared entities to the target namespace \url{http://www.xmlmate.org/pcap}, this is a mechanism for
 disambiguating equally named declarations across multiple schema definitions; it is of no particular
 importance to the format description, so feel free to ignore it. 

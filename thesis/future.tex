@@ -2,58 +2,88 @@
 \label{sec:future}
 The presented approach paves the way for many more useful improvements and extensions on numerous facets and
 aspects of \xmlmate. This section gives a brief overview of some of the most interesting future work items.
-\begin{itemize}
-\item[]One particularly large work item is completely rewriting the genetic algorithm of \xmlmate from scratch
-aiming for better parallelization support from the beginning. At the time of writing it is estimated that this
+
+%###
+\paragraph{Better Parallelization} ~\\
+%###
+One particularly large work item is completely rewriting the
+genetic algorithm of \xmlmate from scratch aiming for better parallelization support from the beginning. At the time of writing it is estimated that this
 goal is best achieved by making heavy use of many of the features that the {\small
 Scala}\cite{scala-overview-tech-report} programming language has to offer, as well as utilizing the {\small
 Akka} actor-based message-driven concurrency framework\cite{Wyatt:2013:AC:2663429} to make \xmlmate fully
 concurrent and distributed.
-\item[]To make better use of the available computational resources, the genetic algorithm at the heart of
+%###
+\paragraph{Meta-Heuristics} ~\\
+%###
+To make better use of the available computational resources, the genetic algorithm at the heart of
 \xmlmate can profit from the addition of meta-heuristics that would govern the number of instances of certain
 subprocesses like format converters or worker nodes during runtime based on the proportion of their
 respective load on the system.
-\item[]Delving deeper into the use case of finding vulnerabilities, it might be wise to further investigate
+%###
+\paragraph{Specification Violation} ~\\
+%###
+Delving deeper into the use case of finding vulnerabilities, it might be wise to further investigate
 the mechanism responsible for generating aberrant and unexpected input values and extend it to work not only
 with integer and floating point types, but other types and even structures permissible in \xml as well.
-\item[]Since \xmlmate provides an interface for pluggable fitness functions, it is only natural to want to try
+%###
+\paragraph{Further Fitness Functions} ~\\
+%###
+Since \xmlmate provides an interface for pluggable fitness functions, it is only natural to want to try
 out more of them. Some next candidates would be the branch coverage fitness function as implemented in
 \evosuite in the context of generating test suites, and for program resilience testing purposes a fitness
 function that aims to maximize the number of context switches in a concurrent program seems interesting for
 finding multi-threading related issues such as deadlocks, livelocks, starvation and the like.
-\item[]For future fitness functions that use program performance values in the computation of their
+%###
+\paragraph{Hardware Counters and Virtualization} ~\\
+%###
+For future fitness functions that use program performance values in the computation of their
 fitness score it is possible to significantly increase efficiency by making use of hardware performance
 counters, which are provided by modern hardware and can be directly accessed in most operating systems by
-means of special APIs like the one provided by the {\small PAPI}\cite{Mucci99papi:a} library. Note that
-this would impose a limitation on the concurrent use of \xmlmate on a single machine; however, this limitation
-can probably be solved by using virtualization techniques like {\small Docker}\cite{docker} and {\small
-Vagrant}\cite{vagrant} - especially since \xmlmate is now a distributed system capable of running across
-multiple distinct hardware nodes. This arrangement can also be of special benefit to creating a fitness
-function specialized in detecting buffer overflows by means of advanced operating system features like memory
-page marking and eviction. One library specializing in such techniques of memory debugging is {\small
-DUMA}\footnote{\url{http://sourceforge.net/projects/duma/}}, which is a spiritual heir to the discontinued Electric Fence project.
-\item[]If \xmlmate is going to be used in truly distributed systems, it is probably a good idea to replace
+means of special APIs like the ones provided by the {\small PAPI}\cite{Mucci99papi:a} or {\small LTTng}\cite{
+combined_tracing_ols2009} libraries. Note that this would impose a limitation on the concurrent use of \xmlmate
+on a single machine; however, this limitation can probably be solved by using virtualization techniques like
+{\small Docker}\cite{docker} and {\small Vagrant}\cite{vagrant} - especially since \xmlmate is now a
+distributed system capable of running across multiple distinct hardware nodes. This arrangement can also be of
+special benefit to creating a fitness function specialized in detecting buffer overflows by means of advanced
+operating system features like memory page marking and eviction. One library specializing in such techniques
+of memory debugging is {\small DUMA}\footnote{\url{http://sourceforge.net/projects/duma/}}, which is a
+spiritual heir to the discontinued Electric Fence project.
+%###
+\paragraph{Efficient Message Transport} ~\\
+%###
+If \xmlmate is going to be used in truly distributed systems, it is probably a good idea to replace
 the currently employed \msgpack message serialization and deserialization engine by another, more efficient and
 sophisticated library. When real network traffic is involved, it seems like a good idea to minimize the amount
 of traffic that has to pass through the network, and having a library with a streaming interface that also
 allows to deserialize messages before they have reached their destination completely is certainly also of
 good use as well. Some candidate replacements can be found in \cref{sec:msgpack}.
-\item[]Further elaborating the idea of distributed execution environments in the presence of unreliable
+%###
+\paragraph{Robust Communication} ~\\
+%###
+Further elaborating the idea of distributed execution environments in the presence of unreliable
 nodes, it seems wise to invest some effort into extending the inter-component communication protocol for
 reliability and message delivery guarantees.
-\item[]With more fitness functions come more test subjects that can be explored. For formats, for which the
+%###
+\paragraph{Additional Test Subjects} ~\\
+%###
+With more fitness functions come more test subjects that can be explored. For formats, for which the
 corresponding schemas and converters already exist in the current version, such applications as \emph{tcpdump}
 and \emph{tshark} for the \pcap format and a whole
 lot\footnote{\url{http://www.libpng.org/pub/png/pngapcv.html}} of programs for {\small png} are available.
-\item[]Adding test subjects that process other file formats requires adding new schemas and converters that
+Adding test subjects that process other file formats requires adding new schemas and converters that
 support them. Some envisioned targets are \emph{libjpeg}, \emph{giflib} and \emph{libflac} libraries for
 processing image, animation and sound files, respectively.
-\item[]In terms of usability and convenience \xmlmate could profit from minimizing the files responsible for
+%###
+\paragraph{Result Minimization} ~\\
+%###
+In terms of usability and convenience \xmlmate could profit from minimizing the files responsible for
 revealing a defect in the application under test using delta debugging\cite{zeller2002simplifying} to make it
 easier for the user to find the actual cause of the failure in question.
-\item[]Ending on another big topic, seeing as \xmlmate has its origins in the \java world, it could be extended
+%###
+\paragraph{Crossing the Language Barrier} ~\\
+%###
+Ending on another big topic, seeing as \xmlmate has its origins in the \java world, it could be extended
 to support testing of \java applications that use native code by performing instrumentation on both \java
-byte code and the native binary code.
-\end{itemize}
+byte code and the native binary code. 
 
-% add multiplatform support? (windows?)
+{\color{white}{Thank you for reading the digital version and not printing this out on paper! :)}}

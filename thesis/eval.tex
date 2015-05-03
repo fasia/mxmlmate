@@ -119,8 +119,8 @@ given of the fitness scores achieved by each fitness function alongside explanat
 followed by examples of vulnerabilities found in the \libpng library, and finally, additional defects found in
 related programs are discussed.
 
-\subsubsection{Fitness Scores}
-The first experiment serves to investigate the practicality of each subject-oriented fitness function
+\subsubsection{Fitness Function Practicability}
+The first experiment serves to investigate the practicability of each subject-oriented fitness function
 presented in \cref{sec:fit} when applied to the proposed test subjects. To accomplish this, a comparison
 between the fitness scores achieved by each function for each subject is needed.
 % One exception is the Schema Coverage fitness function, which is ignored here because using it only depends on
@@ -132,14 +132,14 @@ Debian operating system, the version of \libpng was chosen such that both fitnes
 comparison and defect search could be carried out at least in part simultaneously and with minimum effort.
 (This particular version of \libpng has an unchecked division by zero defect.)
 
-\Cref{tbl:fitness} shows an overview of
+\Cref{tbl:fitness} gives an overview of
 the fitness scores achieved by each fitness function. These scores are average values computed over the ten
 experiment runs that were carried out for each fitness function. For each test subject the table has two rows
 for both of the input generation modes: the one that strictly adheres to the format specification and thus
 produces schema valid inputs, and the one that is able to ignore some specification rules. The former mode is
 marked with a ``+'' sign in the \emph{Schema Valid} column, while the latter one is marked with a ``-'' sign.
 
-\begin{table}[H]
+\begin{table}[htb]
 \small
 \centering
 \begin{tabular}{|r|c|r|r|r|r|r|r|}
@@ -206,13 +206,13 @@ fitness function illuminates its interconnectedness. It shows not only how much 
 but also how it was reached i.e.\ which paths were taken during execution.
 
 The findings of this fitness function seem to suggest that while the complexity gap between \libpcap and the
-two other subjects found by the previous fitness function is legitimate, the gap of approx.\ 3500 BBLs between
-\libpng and \libxml is an overestimation as the difference in interconnectedness is not appropriately
+two other subjects found by the previous fitness function is legitimate, the gap of approx.\ 3500 basic blocks
+between \libpng and \libxml is an overestimation as the difference in interconnectedness is not appropriately
 large. Because the test drivers are not equivalent and the \libpng driver involves more complex
 behavior, the findings of this fitness function lead to the conclusion that the large number of execution
 subpaths taken by \libxml must result from the increased expense of parsing its text based input format, which
 \libpng is lacking due to its inputs being in binary format already. This possibly also explains the larger
-number of BBLs an input has to pass through in \libxml.
+number of basic blocks an input has to pass through in \libxml.
 
 \paragraph{Memory Access Fitness Function} ~\\
 The scores achieved by the Memory Access fitness function indicate how much memory is accessed by the
@@ -248,8 +248,8 @@ to the limited reach of the test driver, or the division instructions used were 
 current version of the fitness function such as SIMD instructions that deal with entire arrays of data
 simultaneously.
 
-The lowest average divisor value reached for \libxml was 128, which is already better, but still nowhere near a
-desired division by zero. The minimal observed divisor value was 10, but it only appeared twice over the
+The lowest average divisor value reached for \libxml was 104.4, which is already better, but still nowhere near
+a desired division by zero. The minimal observed divisor value was 10, but it only appeared twice over the
 course of the ten experiments. It seems that this library does not have a distinctive correlation between user
 data and the divisions performed.
 
@@ -267,12 +267,67 @@ of the evolution only individuals that are as close as possible to having a perf
 reaching it are reported as the best individuals produced during the process. This, of course, is only an
 implementation detail, and a value of zero could be justifiably put in \cref{tbl:fitness}.
 
-% TODO \paragraph{Integer Overflow Fitness Function} ~\\
-% TODO \paragraph{Buffer Overflow Fitness Function} ~\\
+\paragraph{Integer Overflow Fitness Function} ~\\
+As another arithmetic-based fitness function, the Integer Overflow fitness function tries to steer the
+evolution of inputs towards inducing computations of great magnitude. According to the scores achieved during
+the experiments the computations were indeed large, and once again, there is a gap several orders of
+magnitude in size between the values for \libpcap and the two other test subjects. Combined with the
+results provided by the Memory Access fitness function, it appears as though this library does sliding window
+processing of its file inputs, and therefore also no very large computations related directly to the values in
+the inputs themselves are performed. When examining the fitness values over the course of evolution, it can
+be seen that the value that will ultimately become the result is reached already in the early generations.
+This fitness function might be worth improving in the future, yet even in its current simple implementation it
+is able to detect some vulnerabilities, as will be shown later.
+ 
+\paragraph{Buffer Overflow Fitness Function} ~\\
+The Buffer Overflow fitness function, whose aim it is to favor memory accesses at the edges of allocated
+buffers, produced results which seem surprising as they do not adhere to the trend established by the other
+fitness functions - for this fitness function, it is \libpcap which has the largest score. One explanation
+that can be given is that \libpcap processes its inputs with a sliding window, which occupies approximately
+4mb (estimated as roughly twice the buffer access distance), and according to the results found by the Memory
+Access fitness function, this reserved buffer is most likely not relocated during the program's lifetime, thus
+occupying the same memory addresses, such that accesses to different data within the same buffer do not count
+as unique accesses according to the definition of that fitness function. Further, this means that this buffer
+is likely to be probed at some points instead of being accessed linearly in the case of the test driver used
+in this experiment. 
 
-% TODO \paragraph{Impact of Schema Violation} ~\\
-% explanation for the one under it => xml is xml, no validation, local search eats time
+The similar Buffer Overflow fitness value for \libpng, especially when regarded together with its results for
+the Memory Access fitness function, suggests that while \libpng loads its entire input into memory and
+accesses it at a lot of unique addresses, it stores them in chunks, for which it reserves different buffers.
 
+On the other hand, \libxml does not seem to reserve particularly large buffers at all, mostly because the data
+it manages is tree structured, which imposes no need for large contiguous allocations, as it is sufficient to
+store each tree node in its own small buffer.
+
+\paragraph{Impact of Schema Violation} ~\\
+At this point, it is worth remembering that running the experiments in schema violation mode causes a
+significant strain on the utilization of the time allotted for each experiment run. Because schema violation
+is implemented by means of the local search mechanism, setting the corresponding frequency parameter to
+$n$ causes the genetic algorithm to lose every $n_{th}$ generation in the worst case. For a
+reasonable trade-off between benefiting from schema violation and forgoing some generations an empirically
+established value of $n=3$ was chosen.
+
+According to the experimental results listed in \cref{tbl:fitness}, schema violation has a noticeable impact in
+most cases; especially so for fitness functions, whose value is directly dependent on the complexity of the
+engaged program behavior (i.e.\ the four leftmost fitness functions). Most likely the reason for this are the
+very input validation mechanisms mentioned at the beginning of this document, which motivated this work in the
+first place: when confronted with inputs malformed in a nonrecoverable manner, the validation mechanisms of the
+program under test engage different behavior mostly associated with producing appropriate error messages,
+which leads to more code being executed and different memory regions being accessed.
+
+In cases where the fitness score is not necessarily dependent on the values of the inputs themselves, but
+rather their characteristics (e.g.\ their size, or presence/absence of particular structures), the schema
+violation mechanism does seem to have any noticeable effect, as seen in the cases of Integer and Buffer
+Overflow fitness functions.
+
+Returning to the previously mentioned performance vs.\ usefulness trade-off of using the schema violation
+mechanism, it must be noted that for the Memory Access fitness function applied to \libxml, schema
+violation only reduced the fitness score. This is the case because the format used is \texttt{xhtml}, which
+means that no structurally invalid instances are ever generated even with violation active, only the
+particular numbers inside \xml elements and attributes can be outside their specification range, which is, of
+course, of no consequence to a generic \xml parser such as \libxml. In this particular case the only
+noticeable effect of using the schema violation mechanism is that is wastes every third generation as it is
+unable to improve the fitness score by reaching previously inaccessible memory regions.
 
 % \begin{table}[H]
 % \small
@@ -289,14 +344,24 @@ implementation detail, and a value of zero could be justifiably put in \cref{tbl
 % Explanation for div0^{ls} < div0: ls uses the time resource, but doesn't provide a benefit because the zero is already legal
 
 
-\subsubsection{Detected Vulnerabilities}
-\Cref{tbl:png:vulns} shows a selection of known vulnerabilities in \libpng chosen as indicators for determining
-the effectiveness and efficiency of \xmlmate as a search-based tool for defect detection. The vulnerabilities are
+\subsubsection{Effectiveness and Efficiency}
+In this second experiment the goal is to ascertain the effectiveness and efficiency (as defined at the
+beginning of this section) of \xmlmate as a search-based tool for defect detection. This experiment consists of
+an empirical study concerning itself solely with the \libpng library. \Cref{tbl:png:vulns} shows a selection of known vulnerabilities in \libpng
+chosen as indicators for determining the effectiveness and efficiency of \xmlmate. The vulnerabilities are
 listed alongside the corresponding vulnerable program version and their CVSS - a score on a scale from 0 to 10
 that indicates the severity of a vulnerability.
-% TODO mention that these were selected as crash inducing because that's the class we can detect
+The vulnerabilities were selected in a way that both low and high CVSS scores were represented, as well as
+different library releases, but most importantly they were selected such that they make the test driver crash,
+which is an effect most easily detectable in the use case of input fuzzing. It is incomparably much harder to
+detect subtle vulnerabilities that do not lead to an application crash, which is why they are out of scope of
+this work.
 
-% as found in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
+The experiment itself consisted of running \xmlmate against each version of \libpng ten times for an hour,
+whereby each vulnerability was targeted with a limited selection of fitness functions most appropriate for
+its respective nature.
+
+% as listed in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
 \begin{table}[H]
 \centering
 \begin{tabular}{|r|c|r@{}l|l|}
@@ -306,42 +371,49 @@ CVE-2011-3328 & 2.6   & 1&.5.4 	& Arithmetic exception: division by zero   \\ \h
 CVE-2011-2691 & 5.0   & 1&.5.2	& Null pointer dereference in error message \\ \hline % buf(36/5k), mem(10/430)
 CVE-2013-6954 & 5.0   & 1&.6.6  & Null pointer dereference on empty palette \\ \hline % buf(10/157), bbl2, mem
 CVE-2011-3048 & 6.8   & 1&.5.9  & Unchecked failing malloc in constrained memory \\ \hline % mem(127/3449), buf 
-% TODO write about restricting memory to 450 MB
 CVE-2008-1382 & 7.5   & 1&.2.25 & Segmentation fault on unknown chunks of size 0\\ \hline % bbl2(20/0), schemaCov
 \end{tabular}
 \caption{Vulnerabilities in \libpng Versions}
 \label{tbl:png:vulns}
 \end{table}
 
-\Cref{tbl:png:rates} shows the average detection rate for each of the vulnerabilities from \cref{tbl:png:vulns}
-as well as the fitness function used in each experiment.
-
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|r|}
 \hline
-Vulnerability                  & Fitness Function & \#found / hour \\ \hline \hline
-CVE-2011-3328                  & Division by Zero & 13.2           \\ \hline
+Vulnerability                  & Fitness Function & \texttt\#found \texttt{/} hour \\ \hline \hline
+CVE-2011-3328                  & Division by Zero & 13.2           \\ \hline \hline
 \multirow{2}{*}{CVE-2011-2691} & Buffer Overflow  & 138.8          \\ \cline{2-3} 
-                               & Memory Access    & 43             \\ \hline
-CVE-2013-6954                  & Buffer Overflow  & 15.7           \\ \hline
+                               & Memory Access    & 43             \\ \hline \hline
+CVE-2013-6954                  & Buffer Overflow  & 15.7           \\ \hline \hline
 \multirow{2}{*}{CVE-2011-3048} & Memory Access    & 27.2           \\ \cline{2-3}
-							   & Integer Overflow & 6.3			   \\ \hline
-CVE-2008-1382                  & BBL Succession   & 623            \\ \hline
+							   & Integer Overflow & 6.3			   \\ \hline \hline
+\multirow{2}{*}{CVE-2008-1382} & BBL Succession   & 623            \\ \cline{2-3}
+                               & Schema Coverage  & 1              \\ \hline
 \end{tabular}
 \caption{Vulnerability Detection Rates}
 \label{tbl:png:rates}
 \end{table}
+% ??? update for more FFs
 
-% TODO update for more FFs and CVE-2008-1382
-% TODO Adde short descriptions of vulnerabilities
-Overall it is safe to say that \xmlmate is both effective and efficient as a vulnerability detection tool.
-% mention no false positives
+\Cref{tbl:png:rates} shows the average detection rate for each of the vulnerabilities listed in
+\cref{tbl:png:vulns} as well as the fitness function used in each experiment run. It must be noted that when
+testing for {\small CVE-2011-3048}, the amount of main memory available to the test driver was artificially
+limited to 450mb because this particular vulnerability only manifests itself in case \texttt{malloc} is unable
+to reserve sufficient memory. It must further be remarked that the \pin instrumentation framework and the
+pintool implementing a fitness function share their memory with the program under test, which effectively
+reduces the amount of memory available to the the program's allocator.
+ 
+The experimental results suggest that \xmlmate is indeed both effective and efficient as a defect detection
+tool, finding every targeted vulnerability multiple times over in the span of one hour. Additionally, by
+testing the targeted applications on the system level, \xmlmate avoids false positives, which makes the
+reported findings even more valuable.
 
-% XXX add a 24h run on the newest version of libpng as an additional bonus experiment 
+% XXX add a 24h run on the newest version of libpng as an additional bonus experiment
+% bblcov2 12142 after 23h
 % ??? mention problem of failure masking -> one crash makes another undetectable
 
-\subsubsection{Additional Defects}
+\subsubsection{Serendipitous Findings}
 In the process of running the experiments needed for this evaluation several defects were found in programs
 related to the used file formats, which were not specifically targeted. Here are the most interesting of them.
 \paragraph{Gimp} ~\\
@@ -375,11 +447,10 @@ sized file that causes the latest Firefox web browser (version \texttt{37.0.2} a
 consume several gigabytes of memory and promptly crash. The size of the input file can most certainly be
 reduced even further by using a variation on the delta debugging technique\cite{zeller2002simplifying}. 
 
-% ??? mention chrome warning
-% Yet another relatively small \texttt{xhtml} file of 549KB causes the latest Google Chrome web browser (version
-% \texttt{42.0.2311.90} at the time of writing) to freeze up for a considerable amount of time and then display a
-% notification asking the user whether to proceed with the efforts of loading the page. If allowed to proceed,
-% the page is rendered after another considerable stretch of time.
+The latest nightly build of Firefox does not exhibit this behavior as it behaves very similarly to the 
+latest Google Chrome web browser (version \texttt{42.0.2311.90}) in that it freezes up for a
+considerable amount of time and then displays a notification informing the user that the page could not be
+loaded.
 
 
 \subsection{Threats to Validity}
