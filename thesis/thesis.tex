@@ -12,6 +12,7 @@
 \usepackage{xspace}
 \usepackage{rotating}
 \usepackage{placeins}
+\usepackage{mdframed}
 \usepackage{bytefield}
 \usepackage[pdftex,dvipsnames,table,xcdraw]{xcolor}  % Coloured text etc.
 \usepackage[activate={true,nocompatibility},stretch=10,shrink=10,factor=1100,babel=true]{microtype}
@@ -90,7 +91,7 @@
 \input{./abstract.tex}
 \newpage
 \pagenumbering{arabic} %
-\setcounter{page}{5} % XXX update page start if < toc content changes!
+\setcounter{page}{5} % XXX update page start if pre-toc content changes!
 \tableofcontents
 \newpage
 \input{./intro.tex}
@@ -118,16 +119,7 @@ evaluate the effectiveness and efficiency of the presented extensions.
 \input{./formats.tex}
 \input{./fitness.tex}
 \input{./eval.tex}
-\section{Conclusion}
-\label{sec:conclusion}
-% xmlmate is a good defect search tool with extensions presented here
-% list extensions: support for binaries, pluggable fitfuncs, additional formats, schema violations
-% equipped with these extensions xmlmate yielded good results in identifying defects
-% its efficiency and effectiveness are justified by it finding known vulns a lot of times over
-% its practical use is strengthened by it finding unknown bugs even when not specifically targeting 
-% overall xmlmate shows potential
-% quality of results (fitness scores and crashes) depends on quality of test drivers and schema and converters
-% 		=> future work items
+\input{./conclusion.tex}
 \input{./future.tex}
 \newpage
 \section*{References}
