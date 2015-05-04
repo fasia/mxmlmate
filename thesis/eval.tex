@@ -187,10 +187,10 @@ thus the resulting fitness scores.
 The Basic Block Coverage fitness function provides a very basic and rather crude method to reach into a
 program's logic. Possibly somewhat counterintuitively, it does not provide a way to estimate the complexity of
 the application under test on its own. This is mainly because there is no guarantee that the entirety of
-the program's functionality can be reached at all from the entry point chosen in the test driver. So this fitness function
-rather provides a measure of the quality of the test harness itself, which can serve as a tool for improving
-its quality, and also for interpreting results achieved by other fitness functions more accurately by adjusting
-expectations accordingly.
+the program's functionality can be reached at all from the entry point chosen in the test driver. So this
+fitness function rather provides a measure of the quality of the test harness itself, which can serve as a
+tool for improving its quality, and also for interpreting results achieved by other fitness functions more
+accurately by adjusting expectations accordingly.
 
 This does not mean, however, that this fitness function does not provide any indication as to the complexity of
 the program under test at all. Its scores are indeed proportionally indicative of the number of statements
@@ -198,12 +198,17 @@ present in the part of the code reachable from the test driver's entry point. Us
 be concluded that the extent of functionality engaged in \libpcap was an order of magnitude smaller than that
 of \libpng and \libxml.
 
+\begin{mdframed}
+\centering
+The Basic Block Coverage fitness can indicate the complexity of the test driver. 
+\end{mdframed}
+
 \paragraph{Basic Block Succession Fitness Function} ~\\
 As a more involved fitness function also concerning itself with basic blocks, the Basic Block Succession
 fitness function provides another view on the complexity of the program behavior engaged by the test driver.
 While the previous fitness function merely indicates the extent of a subject's engaged functionality, this
-fitness function illuminates its interconnectedness. It shows not only how much functionality has been reached,
-but also how it was reached i.e.\ which paths were taken during execution.
+fitness function illuminates its degree of coupling or interconnectedness. It shows not only how much
+functionality has been reached, but also how it was reached i.e.\ which paths were taken during execution.
 
 The findings of this fitness function seem to suggest that while the complexity gap between \libpcap and the
 two other subjects found by the previous fitness function is legitimate, the gap of approx.\ 3500 basic blocks
@@ -213,6 +218,11 @@ behavior, the findings of this fitness function lead to the conclusion that the 
 subpaths taken by \libxml must result from the increased expense of parsing its text based input format, which
 \libpng is lacking due to its inputs being in binary format already. This possibly also explains the larger
 number of basic blocks an input has to pass through in \libxml.
+
+\begin{mdframed}
+\centering
+The Basic Block Succession fitness indicates the degree of coupling in reachable code.
+\end{mdframed}
 
 \paragraph{Memory Access Fitness Function} ~\\
 The scores achieved by the Memory Access fitness function indicate how much memory is accessed by the
@@ -235,6 +245,11 @@ happily ignored and images with very large dimensions are produced, which easily
 memory. E.g.\ if the generator produces image data of size $12 \times 10$, the memory consumption is increased
 30-fold. This increase leads to a corresponding increase in the fitness score, which favors the production
 of even larger images generation after generation.
+
+\begin{mdframed}
+\centering
+The Memory Access fitness gives an estimation of the spread of memory interactions.
+\end{mdframed}
 
 \paragraph{Division by Zero Fitness Function} ~\\
 In accordance with their respective descriptions (listed in \cref{sec:fit}), all fitness functions
@@ -267,6 +282,11 @@ of the evolution only individuals that are as close as possible to having a perf
 reaching it are reported as the best individuals produced during the process. This, of course, is only an
 implementation detail, and a value of zero could be justifiably put in \cref{tbl:fitness}.
 
+\begin{mdframed}
+\centering
+The Division by Zero fitness is a powerful tool for detecting arithmetic exceptions.
+\end{mdframed}
+
 \paragraph{Integer Overflow Fitness Function} ~\\
 As another arithmetic-based fitness function, the Integer Overflow fitness function tries to steer the
 evolution of inputs towards inducing computations of great magnitude. According to the scores achieved during
@@ -278,7 +298,12 @@ the inputs themselves are performed. When examining the fitness values over the 
 be seen that the value that will ultimately become the result is reached already in the early generations.
 This fitness function might be worth improving in the future, yet even in its current simple implementation it
 is able to detect some vulnerabilities, as will be shown later.
- 
+
+\begin{mdframed}
+\centering
+The Integer Overflow fitness is a simplistic guidance criterion towards overflows.
+\end{mdframed}
+
 \paragraph{Buffer Overflow Fitness Function} ~\\
 The Buffer Overflow fitness function, whose aim it is to favor memory accesses at the edges of allocated
 buffers, produced results which seem surprising as they do not adhere to the trend established by the other
@@ -298,6 +323,11 @@ accesses it at a lot of unique addresses, it stores them in chunks, for which it
 On the other hand, \libxml does not seem to reserve particularly large buffers at all, mostly because the data
 it manages is tree structured, which imposes no need for large contiguous allocations, as it is sufficient to
 store each tree node in its own small buffer.
+
+\begin{mdframed}
+\centering
+The Buffer Overflow fitness is indicative of internal memory management strategies.
+\end{mdframed}
 
 \paragraph{Impact of Schema Violation} ~\\
 At this point, it is worth remembering that running the experiments in schema violation mode causes a
@@ -328,6 +358,10 @@ particular numbers inside \xml elements and attributes can be outside their spec
 course, of no consequence to a generic \xml parser such as \libxml. In this particular case the only
 noticeable effect of using the schema violation mechanism is that is wastes every third generation as it is
 unable to improve the fitness score by reaching previously inaccessible memory regions.
+
+\begin{mdframed}
+The schema violation mechanism provides a worthwhile enhancements in many cases.
+\end{mdframed}
 
 % \begin{table}[H]
 % \small
@@ -452,6 +486,10 @@ latest Google Chrome web browser (version \texttt{42.0.2311.90}) in that it free
 considerable amount of time and then displays a notification informing the user that the page could not be
 loaded.
 
+\begin{mdframed}
+Inputs generated by \xmlmate are so elaborate, that they have revealed previously unknown defects in several
+applications which were not even specifically targeted.
+\end{mdframed}
 
 \subsection{Threats to Validity}
 As any empirical study, this evaluation is subject to several threats to validity.

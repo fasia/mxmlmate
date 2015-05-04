@@ -168,7 +168,7 @@ mostly had to do with hard-coded assumptions about the fitness function always b
 %### 
 \subsubsection{Basic Block Succession Fitness Function}
 %### 
-The \texttt{Basic Block Succession} fitness function is a spiritual successor and an extension of the
+The \texttt{Basic Block Succession} fitness function is a continuation and an extension of the
 \texttt{Basic Block Coverage} fitness function in that it is also heavily based on observing the execution of
 basic blocks. However, this extension also considers the order in which the blocks are executed. More
 specifically, for each basic block this fitness function aims to maximize the number of unique basic blocks
@@ -253,12 +253,12 @@ it contains 5 unique successions.
 \label{sec:memcov}
 All previously described fitness functions are aimed at increasing a coverage of one sort or another; however,
 in the context of using \xmlmate to try and find vulnerabilities in the system under test, this is not
-necessarily the most promising approach. In order to be able to find vulnerabilities having to do with
+necessarily the most appropriate approach. In order to be able to find vulnerabilities that have to do with
 operations such as reading from and writing to memory, such as null pointer dereferences or buffer underflows
 or overflows, the first na\"\i{}ve approach is to aim for a maximal number of memory reads and writes at a
 maximal number of addresses. This is the idea behind the \texttt{Memory Access} fitness function, which, like
 its cousin \texttt{Basic Block Coverage} fitness function, is a maximization function, with which it also shares
-the \texttt{BinaryBackendFitnessFunction} as an ancestor. Once again, this fitness function consists of a
+the \texttt{BinaryBackendFitnessFunction} as an ancestor. As before, this fitness function consists of a
 pintool and its complementary \java class. 
 
 The pintool stores memory addresses that were accessed by the program under test in a set, which it sends to
@@ -266,6 +266,9 @@ the \java class upon test completion.
 The \java class is very similar to that of its cousin fitness function, in fact they share the entirety of
 their code.
 
+%###
+\paragraph{Singleton Population} ~\\
+%###
 However, upon consideration of the current use case, the distinction between test suites and tests as
 prescribed by \evosuite no longer seems appropriate - instead it is preferable to evolve a population
 of single \xml files in order to find one individual file that triggers faulty behavior. To satisfy this newly
@@ -274,12 +277,14 @@ appeared need, the concept of a \emph{singleton population} was introduced.
 Using a singleton population is a compromise between \evosuite's need for the presence of test suites to
 evolve, and our need for only one set of files to be evolved. When the singleton population is used, the
 population size of the genetic algorithm is limited to only one suite and the genetic algorithm itself is
-modified accordingly, amongst other things by disabling elitism on the test suite level. Elitism is a
+modified accordingly - among other adjustments by disabling elitism on the test suite level. Elitism is a
 mechanism which ensures that the best individual (the best test suite in \evosuite's case) survives into the
-next generation unaltered, so that fitness may never decrease from one generation to the next. Note,
-that using elitism does not prevent the best individual from reproducing - its copies may do so freely, and
-usually this is what leads to an improvement in fitness. 
-
+next generation unaltered, so that fitness may never decrease from one generation to the next. 
+When the singleton population is used, instead of engaging elitism on the level of entire test suites, there
+is elitism among all the single files in the one suite being evolved, such that the one best file is
+guaranteed survival. Note, that using elitism does not prevent the best individual from reproducing as its
+copies may do so freely, and usually this is what leads to an improvement in fitness.
+ 
 With the singleton population in place, there is only one test suite to evolve, which means that the fitness
 must now be calculated differently. The fitness of this single suite can no longer reflect the cumulative
 result over all the tests, but must rather correspond to the fittest one of them, which, at the end of the
@@ -289,10 +294,10 @@ This routine can be somewhat improved by adding a secondary evolution objective,
 mutation of the test suite as an improvement even if it has the same number of memory accesses in the best
 test, yet cumulatively its tests cause more unique memory addresses to be accessed. 
 
-As a technical aside, I want to mention that there were considerations to model the use case of evolving a
+There were considerations to model the use case of evolving a
 set of files as a population of singleton test suites each containing a single file instead of the currently
 employed population consisting of one suite. This, however, would have been unfavorable to the parallelization
-efforts as per \cref{sec:par} because \evosuite does not allow parallel evaluation of test suites without some
+efforts as per \cref{sec:par} because \evosuite does not allow parallel evaluation of test suites without a
 major intrusion in its code base.
 %### 
 \subsubsection{Division by Zero Fitness Function}
@@ -347,7 +352,7 @@ registers\footnote{\url{https://software.intel.com/sites/landingpage/pintool/doc
 Working around this and adding support for \texttt{SIMD} instructions are some planned future improvements.
 
 An intuition is that it is unusual for valid well formed inputs to cause divisions by zero in the program under
-test. It is therefore recommended to use the local search feature described in \cref{sec:local}, which is
+test. It is therefore recommended to use the schema violation feature described in \cref{sec:local}, which is
 capable of producing values beyond the range of validity, in order to increase the chances of actually
 triggering arithmetic exceptions.
 
@@ -370,8 +375,8 @@ is selected when reporting fitness to the \java master process. Once again, this
 reasons.
  
 As this fitness function is also vulnerability-oriented, it is restricted to the singleton population usage
-scenario; additionally, it is very advisable to employ the local search mechanism to encourage values
-well outside the normal range of legal domains to increase the chance of triggering overflows.
+scenario; additionally, it is tentatively advisable to employ the schema violation mechanism to encourage
+values outside their legal domains with the aim of increasing the chance of triggering overflows.
 
 This fitness function employs additional secondary objectives that are analogous to those of the
 \texttt{Division by Zero} fitness function in that they also aim to increase the number of distinct
@@ -535,9 +540,10 @@ number of accessed buffers as well as the cumulative access distance in a suite,
 from bloating by favoring smaller ones if all their previously mentioned characteristics are equal.
 
 As is the case with several previous fitness functions, this fitness function is also geared towards finding
-vulnerabilities and employs the singleton population paradigm and benefits greatly from enabling local search -
-in this case especially so. It would be infeasible to count memory accesses outside allocated buffer ranges as
-out-of-bounds accesses to the buffers themselves because they may well be just accesses to ambient variables.
-Therefore this fitness function assigns maximum values to accesses just at the legal bounds of the buffers and
-the small mutations caused by the local search mechanism make it possible to break out of this restriction
-by a small amount and thus possibly trigger a sought-after vulnerability.
+vulnerabilities and employs the singleton population paradigm and benefits greatly from enabling the schema
+violation functionality - in this case especially so. It would be infeasible to count memory accesses outside
+allocated buffer ranges as out-of-bounds accesses to the buffers themselves because they may well be just
+accesses to ambient variables. Therefore this fitness function assigns maximum values to accesses just at the
+legal bounds of the buffers and the small mutations caused by the schema violation mechanism should make it
+possible to break out of this restriction by a small amount and thus possibly trigger a sought-after
+vulnerability.
