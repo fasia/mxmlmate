@@ -5,7 +5,7 @@ efficiency of their generation over guidance towards any certain criterion. Thes
 \emph{fuzzers}, their primary goal is usually to find failures and vulnerabilities, and they can be categorized
 as follows.
 \subsection{Blackbox Fuzzers}
-Blackbox fuzzers have no knowledge of the application they are testing whatsoever - they simply generate random
+Blackbox fuzzers have no knowledge of the application they are testing whatsoever -- they simply generate random
 inputs that can be fed into the program under test to see if it can handle the input or if it crashes.
 There are many tools that can be at least partially classified as blackbox fuzzers. For \xml-based formats
 there are the integrated development environments Eclipse\cite{eclipse} and Visual Studio\cite{visual} which
@@ -24,7 +24,7 @@ of the validation mechanism.
 
 Codenomicon Labs have developed a proprietary XML fuzzing framework\cite{codenomicon} as part of their
 \textsc{cross} initiative (Codenomicon Robust Open Source Software). According to their own description their
-fuzzer is capable of introducing various kinds of malformities into the generated inputs - breaking the
+fuzzer is capable of introducing various kinds of malformities into the generated inputs -- breaking the
 encoding, repetition of tags and elements, dropping of tags and elements, recursive structures, overflows,
 special characters, and many others.
 
@@ -39,7 +39,7 @@ primarily aimed at testing applications that take a binary file as input. Not ve
 combination of genetic algorithm and a lightweight form of dynamic instrumentation. Its main focus is on
 efficiency, which means that it can generate inputs for simple formats like jpeg reasonably
 well\footnote{\url{http://lcamtuf.blogspot.de/2014/11/pulling-jpegs-out-of-thin-air.html}}, however, it lacks
-the intelligence necessary to produce more sophisticated ones like png, which is riddled with internal
+the intelligence necessary to produce more sophisticated ones like \png, which is riddled with internal
 consistency checksums.
 
 The SAGE\cite{godefroid-sage} tool employs dynamic symbolic analysis of x86 binary code of the program under

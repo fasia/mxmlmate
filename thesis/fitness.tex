@@ -63,11 +63,11 @@ program's logic and thus increasing the code coverage. This is why there is no s
 fitness function alone.
 
 However, the schema coverage is a good evolution guide for the purpose of creating a diverse starting population
-which can then be further evolved with different purposes - be it code coverage of particular program regions, or
+which can then be further evolved with different purposes -- be it code coverage of particular program regions, or
 other kinds of fitness criteria like closeness to integer overflows and the like.
 
 Furthermore, there is no need in powering up any of the infrastructure involved with usual ways of measuring 
-fitness - no system under test, no brokers or converters are needed to compute the schema coverage fitness. 
+fitness -- no system under test, no brokers or converters are needed to compute the schema coverage fitness. 
 There is also no need for \texttt{IO} operations, as all \xml tree evaluations are processed in-memory.
 
 %### 
@@ -76,7 +76,7 @@ There is also no need for \texttt{IO} operations, as all \xml tree evaluations a
 A more or less direct transfer of \evosuite's \texttt{Instruction Count} fitness function is the 
 \texttt{Basic Block Coverage} fitness function, which aims to maximize the number of basic blocks 
 executed in the program under test. This fitness function makes heavy use of the {\small Intel} \pin
-instrumentation framework - in particular its definition of a basic block: a single entrance, 
+instrumentation framework -- in particular its definition of a basic block: a single entrance, 
 single exit sequence of instructions in the program under test. However, because \pin is discovering the 
 program dynamically as it is executed, its view of basic blocks can be somewhat unconventional. As an 
 example consider the code on the left in \cref{lst:bblcode}, which, when compiled for the IA-32 
@@ -134,7 +134,7 @@ Like all subclasses of this \texttt{BinaryBackendFitnessFunction} the \texttt{Ba
 fitness function consists of two components: a \java class and a pintool written in \cpp.
 
 The pintool's task is to instrument the targeted binary in such a way, that whenever it executes a 
-basic block, which belongs to the image of interest (e.g.\ \texttt{libpng} - a parameter given at the start),
+basic block, which belongs to the image of interest (e.g.\ \texttt{libpng} -- a parameter given at the start),
 its address is recorded in a set data structure. When the test driver, which is responsible for running 
 the program under test, signals the completion of the processing of the currently evaluated inputs, 
 the pintool sends the set as a packet to the \java class in \xmlmate.
@@ -153,14 +153,14 @@ However, when it comes to calculating the number of unique basic blocks covered 
 entire test suite, each time a new set must be created which consists of the union of 
 the individual arrays belonging to all \xml files in the suite. At this point the very efficient
 \texttt{TLongHashSet} implementation from the \emph{GNU Trove} collections mentioned in \cref{sec:trove} 
-is very useful - especially so because it stores the \java primitive values directly instead of \emph{boxing}
+is very useful -- especially so because it stores the \java primitive values directly instead of \emph{boxing}
 them in wrapper objects like the standard \java collections do. Because Trove saves space and is faster, it is
 used in all following fitness functions as a standard container provider.
 
 The actual fitness value of a test suite according to the \texttt{Basic Block Coverage} fitness function 
 is the number of unique basic blocks executed by all \xml files in the suite. Due to the dynamic nature 
 of instrumentation with \pin it is impossible to know the total number of basic blocks in the program 
-under test. One consequence of this is that this fitness function must be a maximization function - meaning
+under test. One consequence of this is that this fitness function must be a maximization function -- meaning
 that higher fitness values are considered better, which is somewhat atypical for \evosuite. Even though it has
 some degree of support for maximization functions, multiple code defects surfaced during the development that
 mostly had to do with hard-coded assumptions about the fitness function always being a minimization function.
@@ -181,14 +181,14 @@ fitness function complexity and effectiveness, and is very helpful in finding de
 
 To accomplish its task, the pintool maintains a map, which contains an address for each basic block that was
 observed to be executed as a key. Each key is assigned as value a set of all basic blocks that were executed
-immediately after it - be it by fall-through, call, return, or conditional jump. 
+immediately after it -- be it by fall-through, call, return, or conditional jump. 
 
 The \java part of the \texttt{Basic Block Succession} fitness function receives this map data for each file in
 the suite, and collates and merges it into a single basic block successor graph in order to determine the
 fitness of the entire suite. The fitness value is then calculated as the number of edges in this graph. 
 \Cref{fig:bblsuc} gives a small example for this process. The vertices represent basic blocks and the edges
 indicate succession of control between them. Subfigures (a) and (b) represent succession maps corresponding to
-two input files - each of them has a score of 3 because each has 3 edges. The merged graph has a score of 5 as
+two input files -- each of them has a score of 3 because each has 3 edges. The merged graph has a score of 5 as
 it contains 5 unique successions.
 
 \begin{figure}[h]
@@ -270,14 +270,14 @@ their code.
 \paragraph{Singleton Population} ~\\
 %###
 However, upon consideration of the current use case, the distinction between test suites and tests as
-prescribed by \evosuite no longer seems appropriate - instead it is preferable to evolve a population
+prescribed by \evosuite no longer seems appropriate -- instead it is preferable to evolve a population
 of single \xml files in order to find one individual file that triggers faulty behavior. To satisfy this newly
 appeared need, the concept of a \emph{singleton population} was introduced.
 
 Using a singleton population is a compromise between \evosuite's need for the presence of test suites to
 evolve, and our need for only one set of files to be evolved. When the singleton population is used, the
 population size of the genetic algorithm is limited to only one suite and the genetic algorithm itself is
-modified accordingly - among other adjustments by disabling elitism on the test suite level. Elitism is a
+modified accordingly -- among other adjustments by disabling elitism on the test suite level. Elitism is a
 mechanism which ensures that the best individual (the best test suite in \evosuite's case) survives into the
 next generation unaltered, so that fitness may never decrease from one generation to the next. 
 When the singleton population is used, instead of engaging elitism on the level of entire test suites, there
@@ -308,7 +308,7 @@ particular, this fitness function aims to uncover a single class of denial of se
 unhandled arithmetic exceptions that arise from performing division by zero.
 
 When the program under test processes an input file, it usually executes multiple distinct division
-instructions, and many of them - multiple times, so there is no simple and obvious way to directly assign a
+instructions, and many of them -- multiple times, so there is no simple and obvious way to directly assign a
 fitness value to an input file. The first idea is to record all observed instances of division and choose the
 smallest absolute value of a divisor as the fitness score. However, such an assignment is not very beneficial
 to the diversity of the inputs' gene pool as it makes it converge to smaller files with a minimum number of
@@ -322,7 +322,7 @@ program under test that are being explored by the search process by increasing t
 instructions covered by a suite. Using only this single secondary objective, however, leads to individuals
 simply growing in size over the course of evolution, while keeping at least one close-to-zero divisor. While
 this is beneficial to the diversity of the suites, it causes an unwelcome strain on the performance, which
-is why another secondary - or rather a tertiary - objective has been added - the
+is why another secondary -- or rather a tertiary -- objective has been added -- the
 \texttt{MinimizeCumulativeZeroDistanceSecondaryObjective}. The goal of this objective is to prevent an
 uncontrolled growth and ensure overall improvement of quality of the individuals by keeping the cumulative
 divisor distance to zero as small as possible.
@@ -457,7 +457,7 @@ addresses 24 and 42 respectively. The center of this buffer is at address $22 + 
 
 Having established the desired data model and coming back to the problem of capturing buffer allocations as they
 happen in a possibly multi-threaded application, a solution is to use {\small Pin's} API for instrumentation
-at procedure level and have two callbacks - one at the entry of the allocation function, and the other at the
+at procedure level and have two callbacks -- one at the entry of the allocation function, and the other at the
 exit. With this setup the \texttt{rip} and the \texttt{size} values are accessible to the first callback and
 \texttt{rip} and \texttt{start} to the second. So the idea is to reserve a triple \texttt{(rip, unknown, size)}
 in the first callback, and later find it and fill in the \texttt{start} value in the second. Unfortunately, due
@@ -479,7 +479,7 @@ all return instructions, but success is not guaranteed.
 Unfortunately, {\small IPOINT\_AFTER} is exactly the instrumentation point needed to implement the second
 callback, which makes the entire contraption unreliable at best and simply wrong at worst.
 
-Luckily, a better solution presented itself - it is possible to replace the allocating functions with variants
+Luckily, a better solution presented itself -- it is possible to replace the allocating functions with variants
 that additionally perform the record keeping task.
 This is actually exactly what is already used for communicating between the test drivers and their pintools, as
 mentioned in \cref{sec:components}, when the pintool replaces the well known functions in the test driver with
@@ -541,7 +541,7 @@ from bloating by favoring smaller ones if all their previously mentioned charact
 
 As is the case with several previous fitness functions, this fitness function is also geared towards finding
 vulnerabilities and employs the singleton population paradigm and benefits greatly from enabling the schema
-violation functionality - in this case especially so. It would be infeasible to count memory accesses outside
+violation functionality -- in this case especially so. It would be infeasible to count memory accesses outside
 allocated buffer ranges as out-of-bounds accesses to the buffers themselves because they may well be just
 accesses to ambient variables. Therefore this fitness function assigns maximum values to accesses just at the
 legal bounds of the buffers and the small mutations caused by the schema violation mechanism should make it

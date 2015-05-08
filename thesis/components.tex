@@ -29,7 +29,7 @@ components involved in the new extended \xmlmate work process.
   
   A load balancer provides a facade for the workers it manages, so that other system components only ever
   directly interact with the balancer, but never with the workers themselves, as they are sometimes unreliable
-  and can fail at any moment. The most common system setup consists of two load balancers - one for the format
+  and can fail at any moment. The most common system setup consists of two load balancers -- one for the format
   converters and one for test drivers, so even though it says above that \xmlmate sends its work packets to
   converters or test drivers, in actuality it communicates with their respective load balancers. 
   %### 
@@ -79,7 +79,7 @@ components involved in the new extended \xmlmate work process.
   A lifeguard protects the joint process of test driver, system under test and pintool from an untimely
   death. Whenever \xmlmate produces an input file which crashes the program under test, the entire process dies
   off without a possibility to report this valuable finding. To prevent this, a lifeguard launches a driver
-  process and gives it an \emph{identity} (which is a \zmq concept - the load balancer distinguishes the
+  process and gives it an \emph{identity} (which is a \zmq concept -- the load balancer distinguishes the
   workers by their identities). As soon as control returns to the lifeguard, which means that the launched
   process has died, it assumes the identity of the recently deceased and reports the fact of death to the load
   balancer, which will transparently forward this to \xmlmate in order for the corresponding input to be
@@ -123,7 +123,7 @@ mockup versions of the most important system components, so that the entire syst
 when concentrating on a single component. Instead, only the real component under investigation has to be
 started, while the rest of the system is being simulated by the ``bare bones'' component  mockups. 
 
-Examples for such mockup components that were used during development include two test driver mockups - one
+Examples for such mockup components that were used during development include two test driver mockups -- one
 written in \java and one in {\small C}, which were used to test basic \zmq connectivity and
 cross-language \msgpack serialization/deserialization respectively. Several mockups for the system under test
 were used to test the \java parts of \xmlmate's fitness functions by simply sending random data in the

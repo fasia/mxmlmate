@@ -12,8 +12,8 @@ frameworks. The following sections give a brief overview of the most notable tec
 It offers in-memory representation of \xml tree structures as well as support for namespaces in \xml, {\small
 XPath 1.0}, {\small XSLT 1.0}, {\small XInclude}, {\small xml:id}, {\small xml:base}, Canonical \xml, and Exclusive Canonical \xml.
 I decided for it in favor of {\small SAX}, {\small StAX}, {\small DOM4j} and {\small jDOM} because of its simplicity and efficiency.
-It is also the only \xml API that ensures correctness very strictly - \xom only allows to create namespace well-formed XML documents, 
-which coincides with one of the underlying principles of \xmlmate{} - generating valid and well-formed data.
+It is also the only \xml API that ensures correctness very strictly -- \xom only allows to create namespace well-formed XML documents, 
+which coincides with one of the underlying principles of \xmlmate{} -- generating valid and well-formed data.
 Furthermore, \xom is open to extension, which allows for easy enhancements and adaptations to make it suitable 
 for building the basis of genetic representations of \xml trees (further described in \cref{sec:repr}).
 
@@ -83,7 +83,7 @@ into more complex patterns, which remain easy to manage and use. Some basic patt
 There are implementations of \zmq in many programming languages, of which the ones for \java, \python, {\small C}, 
 and \cpp are actually used in \xmlmate. 
 
-It is very easy to get started with \zmq in all programming languages - the basic concept is the
+It is very easy to get started with \zmq in all programming languages -- the basic concept is the
 same everywhere: the program that uses \zmq must first set up a so called \emph{context}, which then becomes
 host to \emph{sockets}, which, in turn, are either bound or connected to \emph{endpoints} of some transport
 channel. A socket can have arbitrarily many ingoing and outgoing connections and \zmq automatically reconnects
@@ -102,7 +102,7 @@ like their names suggest, for example \xmlmate combines a multitude of \texttt{P
 to create a processing pipeline for its \xml files and their fitness scores.
 
 Beside \zmq there are other messaging solutions, some of which were considered for use in \xmlmate. One such
-library is {\small RabbitMQ}\cite{rabbitmq} - it implements the AMQP protocol and as such requires a central
+library is {\small RabbitMQ}\cite{rabbitmq} -- it implements the AMQP protocol and as such requires a central
 message broker. This means an additional process in need of customization and deployment would be needed, and
 writing client side code is also somewhat more difficult; this is why {\small RabbitMQ} was decided against.
 
@@ -115,7 +115,7 @@ the gigantic community support like that of \zmq, which ultimately lead me to no
 %### 
 \label{sec:msgpack}
 Because a messaging library only solves the problem of getting \emph{arbitrary data} between peers, it 
-alone does not suffice for creating a fully fledged communication protocol - this is where
+alone does not suffice for creating a fully fledged communication protocol -- this is where
 serialization/deserialization libraries usually come in. \msgpack{}\cite{msgpack} is one such serialization
 format that is highly efficient as it uses binary representation of data. It is implemented as a library in at
 least 20 programming languages. Once again, \xmlmate uses the ones for \java, \python, {\small C}, and \cpp.
@@ -149,7 +149,7 @@ standard \java collections API, and, in addition, offers collections supporting 
 A disadvantage of \java's standard collections, which can often quickly become a performance bottleneck in
 applications that handle lots of primitive values, is their lack of direct support for those. In
 order to store primitive values in the standard collections, it is necessary to envelop each and every single
-value in its own wrapper object - a process known as \emph{boxing}, which incurs costs both in memory use and
+value in its own wrapper object -- a process known as \emph{boxing}, which incurs costs both in memory use and
 computing time. This practice is so common that since version $1.5$ \java offers autoboxing functionality,
 whereby programmers can put primitive values where their wrapper counterparts are expected and vice versa, and
 the \java compiler would perform the necessary boxing and unboxing automatically, thus hiding the additional

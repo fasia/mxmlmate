@@ -2,7 +2,7 @@
 \label{sec:evaluation}
 From the previous sections you should be familiar with the main ideas and even some technical details behind
 the approach that is the main focus of this document. However, every approach is only worth as much as it can
-offer. To determine this for the presented implementation - \xmlmate, an empirical evaluation on several test
+offer. To determine this for the presented implementation -- \xmlmate, an empirical evaluation on several test
 subjects has been carried out, and the results are documented in this section.
 \subsection{Evaluation Setup}
 
@@ -102,7 +102,7 @@ relies for data compression. It is considered to be the reference implementation
 with \png files.
 
 In its 18 years of existence, the library was extensively tested as it evolved and matured. Ever since the very
-early versions it provides \emph{pngtest} - a utility that allows to test a \png file for conformance with the
+early versions it provides \emph{pngtest} -- a utility that allows to test a \png file for conformance with the
 \png file format. This process involves reading and parsing the file, storing it in memory, performing several
 transformations on it, writing it out to disk again, and comparing the result with the original input file.
 This seems like a good representation of the usual use case for this library, which is why it was chosen as
@@ -163,7 +163,7 @@ largely incomparable because the functions are designed to measure different cha
 program's execution.
 
 What might seem somewhat surprising however, is the great variance in scores for the same fitness function
-across multiple subjects. For example take the difference for the Basic Block Coverage fitness function - it
+across multiple subjects. For example take the difference for the Basic Block Coverage fitness function -- it
 has a score of 15330 for \libpng and only 152.8 for \libpcap. 
 A similar difference can also be seen in all fitness functions whose scores are directly related to the
 complexity or richness of the inputs i.e.\ also the Basic Block Succession and the Memory Access fitness
@@ -228,10 +228,10 @@ The Basic Block Succession fitness indicates the degree of coupling in reachable
 The scores achieved by the Memory Access fitness function indicate how much memory is accessed by the
 application under test when processing an input file. Please note that this function is somewhat simplistic.
 Its values are not always proportional to the size of the inputs as there is no guarantee that the program
-under test will load all data into its memory at once - it could just as easily process the input using a
+under test will load all data into its memory at once -- it could just as easily process the input using a
 buffer or a sliding window technique only ever reusing the same constant memory space.
 Additionally, the scores of this fitness function are heavily influenced by how many operations on the input
-data are performed by the tested application - e.g.\ the \libpng driver first reads the data, manipulates
+data are performed by the tested application -- e.g.\ the \libpng driver first reads the data, manipulates
 it, and finally writes it out again, performing at least three passes over not necessarily the same regions of
 memory. Nevertheless, the Memory Access fitness function is a very helpful tool in detecting program defects
 related to memory operations, as you will see in the next section. 
@@ -254,7 +254,7 @@ The Memory Access fitness gives an estimation of the spread of memory interactio
 \paragraph{Division by Zero Fitness Function} ~\\
 In accordance with their respective descriptions (listed in \cref{sec:fit}), all fitness functions
 presented in \cref{tbl:fitness} are maximization functions with the exception of the Division by Zero fitness
-function, which is a minimization function - it is therefore marked with a downward arrow ($\downarrow$) in the
+function, which is a minimization function -- it is therefore marked with a downward arrow ($\downarrow$) in the
 table to signify that smaller values are considered better.
 
 This particular fitness function was unfortunately useless in the case of \libpcap because no division
@@ -307,7 +307,7 @@ The Integer Overflow fitness is a simplistic guidance criterion towards overflow
 \paragraph{Buffer Overflow Fitness Function} ~\\
 The Buffer Overflow fitness function, whose aim it is to favor memory accesses at the edges of allocated
 buffers, produced results which seem surprising as they do not adhere to the trend established by the other
-fitness functions - for this fitness function, it is \libpcap which has the largest score. One explanation
+fitness functions -- for this fitness function, it is \libpcap which has the largest score. One explanation
 that can be given is that \libpcap processes its inputs with a sliding window, which occupies approximately
 4mb (estimated as roughly twice the buffer access distance), and according to the results found by the Memory
 Access fitness function, this reserved buffer is most likely not relocated during the program's lifetime, thus
@@ -383,7 +383,7 @@ In this second experiment the goal is to ascertain the effectiveness and efficie
 beginning of this section) of \xmlmate as a search-based tool for defect detection. This experiment consists of
 an empirical study concerning itself solely with the \libpng library. \Cref{tbl:png:vulns} shows a selection of known vulnerabilities in \libpng
 chosen as indicators for determining the effectiveness and efficiency of \xmlmate. The vulnerabilities are
-listed alongside the corresponding vulnerable program version and their CVSS - a score on a scale from 0 to 10
+listed alongside the corresponding vulnerable program version and their CVSS -- a score on a scale from 0 to 10
 that indicates the severity of a vulnerability.
 The vulnerabilities were selected in a way that both low and high CVSS scores were represented, as well as
 different library releases, but most importantly they were selected such that they make the test driver crash,

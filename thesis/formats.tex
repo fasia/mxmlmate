@@ -14,7 +14,7 @@ programs that actually process inputs in the \xml format. Technically, \xml as s
 full-fledged format, it is rather a meta format, which many other formats are subsumed by. One
 such example is the E\textbf{x}tensible \textbf{H}ypertext \textbf{M}arkup \textbf{L}anguage format
 \texttt{xhtml}, which was created in an effort to force strict consistency rules onto web pages designed for
-rendering on \emph{thin clients} - devices with weak computational resources, for which it would be infeasible
+rendering on \emph{thin clients} -- devices with weak computational resources, for which it would be infeasible
 to implement graceful handling of inconsistent web page code (e.g.\ mismatched or missing tags, etc.). 
  
 Because \texttt{xhtml} is in essence a simple \xml wrapper around \texttt{html}, it is possible to use standard
@@ -40,7 +40,7 @@ in this document; feel free, however, to visit the listed address for a quick gl
 \label{sec:formats:pcap}
 The \textbf{p}acket \textbf{cap}ture file format is rather simple in that it has no deeply nested structures or
 overly strict rules on placement and integrity of its contents. \Cref{lst:pcapfile} shows the layout of a
-typical pcap file - it consists of a global header containing some global information followed by records for
+typical pcap file -- it consists of a global header containing some global information followed by records for
 each captured packet, consisting of a packet header and data.
 
 \begin{listing}[htb]
@@ -63,7 +63,7 @@ Briefly, the global header consists of the following elements:
 \texttt{version\_major} and \texttt{version\_minor} denote the format version (currently 2.4),
 \texttt{thiszone} is the correction time in seconds between GMT and the current timezone (this value is
 usually set to 0); \texttt{sigfigs} is the accuracy of time stamps (also usually set to 0), \texttt{snaplen} is
-the snapshot length - i.e.\ the maximum number of bytes per captured packet; and finally \texttt{network}
+the snapshot length -- i.e.\ the maximum number of bytes per captured packet; and finally \texttt{network}
 specifies link-layer header type of the captured packets (e.g.\ Ethernet, 802.11, PPP, etc.).
 
 The individual packet headers are also very simple and structured as follows:
@@ -103,15 +103,15 @@ this schema. The root element of the \xml representation of \pcap is the \texttt
 type PCAPType. This type defines its contents as a \texttt{header} element of the type GlobalHeaderType
 followed by zero or more \texttt{packet} elements of the type PacketHeaderType. 
 
-Do not be confused by the ``tns:'' prefix found throughout the schema - it is just a marker assigning the
+Do not be confused by the ``tns:'' prefix found throughout the schema -- it is just a marker assigning the
 declared entities to the target namespace \url{http://www.xmlmate.org/pcap}, this is a mechanism for
 disambiguating equally named declarations across multiple schema definitions; it is of no particular
 importance to the format description, so feel free to ignore it. 
 
-The GlobalHeaderType is almost identical in its contents to the format definition from \cref{lst:pcapformat}
-with the exception of the missing declaration of \texttt{magic\_number}, which will be automatically inserted
-by the corresponding format converter because the endianness of the final \pcap file will depend entirely on
-the one used by the converter anyway.
+The GlobalHeaderType is almost identical in its contents to the format definition given in
+\cref{lst:pcapformat} with the exception of the missing declaration of \texttt{magic\_number}, which will be
+automatically inserted by the corresponding format converter because the endianness of the final \pcap file
+will depend entirely on the one used by the converter anyway.
 
 The PacketHeaderType similarly leaves the \texttt{orig\_len} value to be filled in by the converter because, as
 per format definition, it must not be smaller than \texttt{incl\_len}, which is generated randomly when
@@ -136,12 +136,12 @@ coordinated. It also shows that a considerable amount of intelligence can be pla
 component, although this is not necessary as the design of \xmlmate allows to plug transformer entities
 of arbitrary nature into the processing pipeline, so it might be favorable to have separate components
 responsible for correcting inconsistent values between \xmlmate and the converters to have more of a separation
-of concerns - in the end it's all about trade-offs.
+of concerns -- in the end it's all about trade-offs.
 
 The schema also introduces the type positiveInt as unsignedInt with the minimal possible value of 1 because
 there is no corresponding type among the \xsd built-ins.
 
-\Cref{lst:xmlexample} shows a possible instantiation of the described schema - the left side depicts the
+\Cref{lst:xmlexample} shows a possible instantiation of the described schema -- the left side depicts the
 textual representation that gets sent out to the converter, and the right side represents the instance as an
 in-memory \xml tree as operated upon by \xmlmate internally.
 
@@ -188,11 +188,11 @@ in-memory \xml tree as operated upon by \xmlmate internally.
 % This listing can probably be made as long as needed to increase the number of pages by adding packets ;)
 
 %### 
-\tocless\subsubsection{png}
+\tocless\subsubsection{PNG}
 %###
-The \textbf{p}ortable \textbf{n}etwork \textbf{g}raphics format is, as its name suggests, a graphics file
+The \textbf{P}ortable \textbf{N}etwork \textbf{G}raphics format is, as its name suggests, a graphics file
 format often abbreviated \png. It was mainly designed for use in sharing of images over the Internet,
-which is why it also supports lossless data compression and is riddles with internal consistency checks by
+which is why it also supports lossless data compression and is riddled with internal consistency checks by
 means of CRC-32 checksums. Compared to the previously presented \pcap format, \png is very complex; it bears,
 however, some similarity to \pcap in that \png files are also divided into smaller entities called
 \emph{chunks}. There are many kinds of chunks defined in the \png standard, but \cref{lst:pngfile} shows only
@@ -224,7 +224,7 @@ rendering the file, if a decoder does not recognize a critical chunk, it is requ
 supply an appropriate warning. Ancillary chunks contain information optional to overall processing of the file.
 
 The meaning of the case of other letters is not considered important enough to take up space in this document
-- if you wish to actually learn the format it is far more advisable to visit an appropriate specification
+- if you wish to actually learn the format, it is far more advisable to visit an appropriate specification
 page\footnote{For example \url{http://www.w3.org/TR/PNG/}}.
 
 \begin{listing}[H]

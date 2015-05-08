@@ -42,7 +42,7 @@ counters, which are provided by modern hardware and can be directly accessed in 
 means of special APIs like the ones provided by the {\small PAPI}\cite{Mucci99papi:a} or {\small LTTng}\cite{
 combined_tracing_ols2009} libraries. Note that this would impose a limitation on the concurrent use of \xmlmate
 on a single machine; however, this limitation can probably be solved by using virtualization techniques like
-{\small Docker}\cite{docker} and {\small Vagrant}\cite{vagrant} - especially since \xmlmate is now a
+{\small Docker}\cite{docker} and {\small Vagrant}\cite{vagrant} -- especially since \xmlmate is now a
 distributed system capable of running across multiple distinct hardware nodes. This arrangement can also be of
 special benefit to creating a fitness function specialized in detecting buffer overflows by means of advanced
 operating system features like memory page marking and eviction. One library specializing in such techniques
@@ -69,7 +69,7 @@ reliability and message delivery guarantees.
 With more fitness functions come more test subjects that can be explored. For formats, for which the
 corresponding schemas and converters already exist in the current version, such applications as \emph{tcpdump}
 and \emph{tshark} for the \pcap format and a whole
-lot\footnote{\url{http://www.libpng.org/pub/png/pngapcv.html}} of programs for {\small png} are available.
+lot\footnote{\url{http://www.libpng.org/pub/png/pngapcv.html}} of programs for \png are available.
 Adding test subjects that process other file formats requires adding new schemas and converters that
 support them. Some envisioned targets are \emph{libjpeg}, \emph{giflib} and \emph{libflac} libraries for
 processing image, animation and sound files, respectively.
