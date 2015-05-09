@@ -14,7 +14,7 @@ resulting tests as much as possible.
 
 The first idea is to leverage the same format definitions that are used for the checks when generating the
 inputs. For an example consider an \xsd, which describes the format of a concrete \xml dialect, it contains all
-the information necessary to generate instances of this dialect; another example -- the \png file format
+the information necessary to generate instances of this dialect. Another example is the \png file format
 documentation, which describes all values that are legal in \png files.
 
 The second idea is to occasionally ignore some parts of the specification with the goal of producing inputs
@@ -23,19 +23,19 @@ present a real threat to security or usability because tests of real usage scena
 cannot produce false positives by definition.
 
 The third idea is to benefit from search-based techniques when generating test inputs in order to increase
-effectiveness by steering the production of inputs towards desired properties or particular testing goals like
-specific classes of security vulnerabilities.
+effectiveness by steering the production of inputs towards desired properties or particular testing goals.
+Examples of such goals include specific classes of security vulnerabilities like integer or buffer overflows.
 
 \xmlmate{}\cite{Havrikov:2014:XEX:2635868.2661666} is a tool that already implements most of these ideas to
 some extent -- it is capable of generating \xml instances from an \xsd{}, and optionally additional \xml
 samples, using a search-based genetic algorithm based on \evosuite{}\cite{fraser2013whole}. \xmlmate is
 primarily aimed at \java applications that process \xml files, however, it is very well-suited to be extended
-to work with non-\java programs, non-\xml formats, and vulnerability-oriented guidance criteria for the
+to work with non-\java programs, non-\xml formats, and vulnerability-oriented guidance criteria for its
 search-based input generation algorithm.
 
 The goal of this thesis is to provide \xmlmate with prototypical implementations of these extensions and
-evaluate their effectiveness and efficiency on several test subjects, and thus determine the viability of the
-proposed ideas for enhancing test input generation techniques in the context of automated system testing.
+evaluate their effectiveness and efficiency on several real-world test subjects, and thus determine the
+viability of the proposed ideas for enhancing test input generation techniques in the context of automated system testing.
 
 % TODO Add short schematic description of proposed implementations and an illustration
 

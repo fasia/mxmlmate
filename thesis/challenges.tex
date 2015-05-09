@@ -22,15 +22,15 @@ In turn, the test suites consist of \emph{tests}. Similarly, \xmlmate has adopte
 test suite and test -- they correspond to a set of \xml trees and a single \xml tree, respectively. 
 They are also sometimes referred to as \emph{test suite chromosomes} and \emph{test chromosomes}, resp.
 
-To ease understanding of the representation of \xml test chromosomes, \cref{lst:repr} offers an attempt at
-visualization on an excerpt from the \texttt{pcap} file format example further described in
+To ease understanding of the representation of \xml test chromosomes, \cref{lst:repr} offers a
+visualization of an excerpt from the \texttt{pcap} file format example further described in
 \cref{sec:formats:pcap}. In \xmlmate all \xml trees are governed by a single \xsd (depicted in the top frame)
 that is given as a parameter at program start. In order to implement the genetic operation \emph{mutation} for
 test chromosomes more or less efficiently, each node in a test's \xml tree should have a reference to its
 corresponding definition in the schema (represented as blue dotted lines). This is accomplished by extending
-some of the \java classes provided by \xom to include the references in question as well as methods that maintain
-their relevance and correctness. This alone, however, is not sufficient for implementing an efficient
-\emph{crossover} of two \xml trees.
+some of the \java classes provided by the \xom library to include the references in question as well as methods
+that maintain their relevance and correctness. This alone, however, is not sufficient for implementing an
+efficient \emph{crossover} of two \xml trees.
 
 To quickly find sites suitable for crossover in two test chromosomes, an additional mapping is needed: 
 one that associates definitions in the global schema with nodes that are actually present in the \xml tree, so 
@@ -46,7 +46,7 @@ definition must only be stored once globally, and the local mappings are nothing
 internally and thus very lightweight. 
 
 The overall \xml test chromosome consists of an \xml tree instance together with its accompanying element map,
-denoted by a green dashdotted frame in \cref{lst:repr}.
+denoted by a red dashdotted frame in \cref{lst:repr}.
 
 \begin{listing}[H]
 \centering
@@ -96,7 +96,7 @@ distance=0pt,grow'=right]
 \node[below right=0.01pt of decl4](dummyend){};
 \end{scope}
 \end{scope}
-\node[draw,thick,loosely dashdotted,ForestGreen,fit=(dummy1)(dummyend)](instance){};
+\node[draw,thick,loosely dashdotted,red,fit=(dummy1)(dummyend)](instance){};
 \draw[blue,dotted,thick,->] (inspcap)..controls +(north:2) and +(west:4.7)..(pcap);
 \draw[blue,dotted,thick,->] (inspacket)..controls +(north west:4) and +(south west:4)..(pheader);
 \draw[blue,dotted,thick,->] (insheader)..controls +(north west:2) and +(south west:3)..(header);
@@ -137,20 +137,20 @@ interconnect the individual components. The communication channels themselves ar
 the \zmq messaging library with \msgpack as the serialization/deserialization engine. The current
 implementation uses tcp\footnote{TCP loopback is used because \zmq does not support \texttt{ipc} on the
 Windows platform, which I do most of the development on.} as a carrier for the messages; however, it is
-entirely possible to change this to inter-process communication just by changing a configuration option,
+entirely possible to change this to inter-process communication just by altering a configuration option,
 should it become necessary. As yet, it is very far from being a bottleneck.
 
 
 After each evolution step a test suite usually contains several tests that changed due to mutation and
 crossover. When the fitness of the suite is requested to be computed next time by the genetic algorithm, 
-only the tests that changed should be evaluated. For each of those a file is written and a packet is 
+only the changed tests should be evaluated. For each of those a file is written and a packet is 
 formed consisting of a number identifying the test inside the test suite and the path to its corresponding 
 file. This packet is serialized into a byte string with \msgpack and then sent as a \zmq message via a 
 \texttt{PUSH} socket on a well known port (e.g.\ the default is 5556). After all messages have been sent,
 a response is awaited for each of those sent out tasks. Responses are collected as \zmq messages coming 
 in via a \texttt{PULL} socket on another well known port (default 5557) and deserialized with \msgpack 
 into the identifying number and whatever data format is expected by the current fitness function. 
-(E.g.\ a fitness function that counts the number of executed basic blocks expects an array of addresses.)
+E.g.\ a fitness function that counts the number of executed basic blocks expects an array of addresses.
 As far as the \java part of \xmlmate is concerned this is all it ever sees of the entire process, and so it 
 must rely on the pintool monitoring the application under test to collect and send back fitness results.
 
@@ -165,7 +165,7 @@ Whenever a new worker wishes to join the balancer it sends a \texttt{RDY} messag
 which causes the worker's identity to be added to the queue of available workers. Similarly, when a worker
 process dies, its lifeguard signals the balancer with a \texttt{DEAD} message, which makes it forward a
 message with the corresponding input file number and the \texttt{dead} flag set to true further down the
-processing pipeline; the worker's identity is also removed form the worker queue. The most common system setup
+processing pipeline; the worker's identity is also removed from the worker queue. The most common system setup
 consists of two balancers operating on ports 5556, 5570, 5560, and 5560, 5580, 5557 as their frontends,
 backends, and forwards, respectively.
 

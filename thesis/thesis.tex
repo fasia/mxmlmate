@@ -1,5 +1,5 @@
 \RequirePackage[l2tabu, orthodox]{nag}
-\documentclass[a4paper,parskip=half]{scrartcl}
+\documentclass[a4paper,parskip=half,twoside=semi]{scrartcl}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -87,41 +87,46 @@
 \input{./oath.tex}
 \newpage
 \input{./acknowledgements.tex}
-\newpage
+\cleardoublepage
 \input{./abstract.tex}
 \newpage
 \pagenumbering{arabic} %
-\setcounter{page}{5} % XXX update page start if pre-toc content changes!
+\setcounter{page}{6} % XXX update page start if pre-toc content changes!
 \tableofcontents
 \newpage
 \input{./intro.tex}
+\cleardoublepage
 \input{./relwork.tex}
+\cleardoublepage
 \section{Approach}
 \label{sec:approach}
 The work presented in this document mainly consists of adding new features and areas of application to the
 prototypical \xmlmate implementation, thus increasing its value for automatic test generation use cases. The
 most significant extensions include: 
 \begin{itemize}
-\item[-]providing support for applications not running on the \java virtual machine by using an x86 binary code
-dynamic instrumentation to be able to analyze any x86-based programs including popular libraries and rendering
+\item[-]providing support for applications not running on the \java virtual machine by using dynamic 
+instrumentation to be able to analyze any x86-based programs including popular libraries and rendering
 engines.
-\item[-]extending support for pluggable fitness functions to allow for narrow-scope application contexts such
+\item[-]supplying pluggable fitness functions to allow for narrow-scope application contexts such
 as scanning the targeted program for specific classes of defects or vulnerabilities.
 \item[-]adding more output formats to both demonstrate the versatility of the original approach as well as
-increase the set of applications compatible to be tested with \xmlmate.
+increase the range of applications that can be tested with \xmlmate.
 \end{itemize}
 
-Yet another goal of this work is performing a case study on the libpng image file processing library to
-evaluate the effectiveness and efficiency of the presented extensions.
+Furthermore, a case study on the \libpng image file processing library is performed to assess the
+effectiveness and efficiency of the presented extensions.
 \input{./technology.tex}
 \input{./components.tex}
 \input{./challenges.tex}
 \input{./formats.tex}
 \input{./fitness.tex}
+\cleardoublepage
 \input{./eval.tex}
+\cleardoublepage
 \input{./conclusion.tex}
-\input{./future.tex}
 \newpage
+\input{./future.tex}
+\cleardoublepage
 \section*{References}
 \renewcommand\refname{}
 \addcontentsline{toc}{section}{References}

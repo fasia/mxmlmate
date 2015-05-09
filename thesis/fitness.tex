@@ -491,7 +491,7 @@ record the \texttt{rip} of an invocation, the malloc wrapper function has to hav
 \mintinline{cpp}{void *mallocWrapper(size_t size, void *rip)}, whereby \pin would fill in the second argument
 at the moment of invocation. The code of this wrapper function is roughly sketched in \cref{lst:mallocwrapper}.
 
-\begin{listing}[h]
+\begin{listing}[htb]
 \centering
 \begin{cppcode}
 void *MallocWrapper(size_t size, void *rip) {

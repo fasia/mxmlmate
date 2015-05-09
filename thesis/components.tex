@@ -2,9 +2,9 @@
 \subsection{System Components}
 %### 
 \label{sec:components}
-The extension of \xmlmate to binary subjects benefits from frameworks described in \cref{sec:tech} as they 
-help solve the majority of the arising subtasks rather easily. The following paragraphs describe the
-components involved in the new extended \xmlmate work process.
+Extending \xmlmate to support binary subjects has greatly benefited from frameworks described in
+\cref{sec:tech} as they help solve the majority of the arising subtasks rather easily. The following
+paragraphs describe the components involved in the new extended \xmlmate work process.
 %###  
 \paragraph{XMLMate Core} ~\\
 %### 
@@ -51,7 +51,7 @@ components involved in the new extended \xmlmate work process.
   \paragraph{Test Driver} ~\\
   %### 
   A test driver receives a message from its balancer, which, in turn, receives it either directly from
-  \xmlmate in case of an \xml based file format, or otherwise from the previous balancer (most likely a 
+  \xmlmate in case of an \xml based file format, or otherwise from the previous balancer (usually a
   converter's balancer), unpacks the file path, and feeds it to the system under test, which is being monitored
   by a \emph{pintool} that implements the ``client side" of the aforementioned currently employed fitness
   function. The test driver's responsibilities also include signaling the beginning and end of the execution of
@@ -66,45 +66,47 @@ components involved in the new extended \xmlmate work process.
   data relevant to the computation of the fitness score according to the fitness function it is part of.
   E.g.\ for a fitness function that counts the number of basic blocks executed in the program, the pintool 
   would keep a set of basic blocks that it has observed being executed. The pintool replaces the call to 
-  \texttt{PIN\_SCORE\_START} in the driver with a method that resets its fitness related data stores (in the 
-  above example it would clear the set of executed basic blocks). It also replaces the call to
-  \texttt{PIN\_SCORE\_END} with a method that sends out the stored data back to the balancer. 
+  \texttt{PIN\_SCORE\_START} in the driver with a method that resets its fitness related data stores. In the 
+  above example this would clear the set of executed basic blocks. The pintool also replaces the call to
+  \texttt{PIN\_SCORE\_END} with a method that sends the stored data back to the balancer. 
   The pintools are implemented in \cpp and there is always exactly one pintool per test driver.
-  Because the pintool runs in the same process as the test driver, it is possible to share the same \zmq
-  socket between the driver and pintool for communication with the load balancer, which makes it relatively
-  easy to implement the following system component.
+  Because each pintool runs in the same process as its test driver, it is possible to share the same \zmq
+  socket between driver and pintool to communicate with the load balancer, which makes it relatively
+  easy to implement the next system component.
   %### 
   \paragraph{Lifeguard} ~\\
   %### 
-  A lifeguard protects the joint process of test driver, system under test and pintool from an untimely
-  death. Whenever \xmlmate produces an input file which crashes the program under test, the entire process dies
-  off without a possibility to report this valuable finding. To prevent this, a lifeguard launches a driver
-  process and gives it an \emph{identity} (which is a \zmq concept -- the load balancer distinguishes the
-  workers by their identities). As soon as control returns to the lifeguard, which means that the launched
-  process has died, it assumes the identity of the recently deceased and reports the fact of death to the load
-  balancer, which will transparently forward this to \xmlmate in order for the corresponding input to be
+  A lifeguard protects the joint process of test driver, system under test and pintool from fatal application
+  crashes. Whenever \xmlmate produces an input file which crashes the program under test, the entire process
+  dies off without a possibility to report this valuable finding. To prevent this, a lifeguard launches a
+  driver process and gives it an \emph{identity} (which is a \zmq concept -- the load balancer distinguishes
+  the workers by their identities). As soon as control returns to the lifeguard, which means that the launched
+  process has died, it assumes the identity of the recently deceased and reports the fact of death to the load balancer, which will transparently forward this to \xmlmate in order for the corresponding input to be
   stored. Afterwards, the lifeguard casts off the identity and relaunches the driver with it once again.
   Each test driver is being guarded by its own personal lifeguard implemented in \python.
   %### 
   \paragraph{Fitness Function} ~\\
   %### 
-  The fitness function in \xmlmate receives the message from the pintool, interprets it according to 
-  its specification (e.g.\ again, if the fitness function is supposed to count the number of executed basic
-  blocks, it would expect to receive a set of basic block addresses) and finally assigns the computed fitness score to 
-  the genetic representation of the \xml file sent out in step 1. Unless the message says that the
-  corresponding input has caused a test driver to die, in which case the genetic representation shall receive
-  the worst fitness score to be removed from the population in order not to continuously keep crashing the test
-  drivers, and the input file itself shall be kept permanently.
+  The fitness function in \xmlmate receives the message from the pintool and interprets it according to 
+  its specification. E.g.\ again, if the fitness function is supposed to count the number of executed basic
+  blocks, it would expect to receive a set of basic block addresses. Finally, the  fitness function assigns the
+  computed fitness score to the genetic representation of the \xml file sent out in step 1, unless the message
+  says that the corresponding input has caused a test driver to die, in which case the genetic representation
+  will receive the worst fitness score to be removed from the population in order not to continuously keep
+  crashing the test drivers, and the input file itself will be kept permanently.
 
 %### 
 \paragraph{Overview} ~\\
 %### 
 \Cref{fig:components} provides a schematic overview of the aforementioned components and which other components 
 they interact with inside the system. The visualization also shows that the system scales out to \texttt{n}
-format converters and \texttt{m} \emph{workers} (a collective noun summarizing a test driver, its
-pintool, the program under test, and their lifeguard instance). The arrows demonstrate the flow of data between
-the system components. Orange arrows denote the work items in \xml format sent out by \xmlmate itself, the blue arrows show
-the flow of converted files, and the green arrows signify the way the fitness information takes.
+format converters and \texttt{m} \emph{workers} % TODO introduce earlier (maybe in intro with picture)
+(a collective noun summarizing a test driver, its pintool, the program under test, and their lifeguard
+instance).
+% TODO move the following to legend 
+The arrows demonstrate the flow of data between the system components. Orange arrows denote the work items in
+\xml format sent out by \xmlmate itself, the blue arrows show the flow of converted files, and the green
+arrows signify the way the fitness information takes.
 
 \begin{figure}[htb]
 \centering
@@ -117,24 +119,26 @@ the flow of converted files, and the green arrows signify the way the fitness in
 \paragraph{Development Mockups} ~\\
 %### 
 When developing such a diverse ecosystem it is important to be able to inspect and test each component
-individually, so as not to lose track of important details, and be able to isolate faults efficiently without
-having to keep the entire system in the focus of attention. This is best accomplished by having very light
-mockup versions of the most important system components, so that the entire system does not have to be launched
-when concentrating on a single component. Instead, only the real component under investigation has to be
-started, while the rest of the system is being simulated by the ``bare bones'' component  mockups. 
+individually, so as not to lose track of any important details, and to be able to isolate faults efficiently
+without having to keep the entire system in the focus of attention. % XXX rephrase? 
+This is best accomplished by constructing
+very lightweight mockup versions of the most important system components, so that the entire system does not
+have to be launched when concentrating on a single component. Instead, only the single real component under
+investigation has to be started, while the rest of the system is being simulated by the ``bare bones''
+component mockups.
 
 Examples for such mockup components that were used during development include two test driver mockups -- one
 written in \java and one in {\small C}, which were used to test basic \zmq connectivity and
 cross-language \msgpack serialization/deserialization respectively. Several mockups for the system under test
 were used to test the \java parts of \xmlmate's fitness functions by simply sending random data in the
-required \msgpack format without requiring any binary instrumentation. As for the ``other side'' of the system
-- there is a mock version of \xmlmate itself, which sends out work items that consist of hardcoded file paths,
-which alleviates the need to generate new input files, as well as provides deterministic inputs as a means to
-test the consistency of the values reported by the pintool components of fitness functions. Having this mockup
-send out predefined work items additionally allows to skip any format conversion phase, which further lightens
-the complexity of the system. 
+required \msgpack format without requiring any binary instrumentation. There is also a mock version of
+\xmlmate itself, which sends out work items that consist of hardcoded file paths, alleviating the need to
+constantly generate new input files, as well as providing deterministic inputs as a means to test the
+consistency of values reported by the pintool components of fitness functions. Having this mockup send out
+predefined work items also allows to skip the format conversion phase, which further lightens the complexity
+of the system.
 
 In most cases, when implementing new components of a system from scratch, I found it to be very advisable to
-start with their mockup version, as the effort is usually worthwhile because any mistakes can be caught
+start with their mockup version, as the effort is usually worthwhile since any mistakes can be caught
 cheaply and early on and most of the code is directly transferable to the finished component.
 \FloatBarrier
