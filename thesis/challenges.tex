@@ -26,7 +26,7 @@ To ease understanding of the representation of \xml test chromosomes, \cref{lst:
 visualization of an excerpt from the \texttt{pcap} file format example further described in
 \cref{sec:formats:pcap}. In \xmlmate all \xml trees are governed by a single \xsd (depicted in the top frame)
 that is given as a parameter at program start. In order to implement the genetic operation \emph{mutation} for
-test chromosomes more or less efficiently, each node in a test's \xml tree should have a reference to its
+test chromosomes efficiently, each node in a test's \xml tree should have a reference to its
 corresponding definition in the schema (represented as blue dotted lines). This is accomplished by extending
 some of the \java classes provided by the \xom library to include the references in question as well as methods
 that maintain their relevance and correctness. This alone, however, is not sufficient for implementing an
@@ -39,16 +39,9 @@ Since I am using \xerces for storing and accessing the schema information, and i
 \java interfaces, it was not possible to add this mapping to local copies of the schema  
 enhanced with the needed references to test chromosomes. However, what could be added were local 
 maps referencing the global definition instances as keys and local nodes as values. One such mapping is depicted
-in \cref{lst:repr} as the bottom frame, and its values are orange dashed lines. A disadvantage is that
-additional methods had to be added to ensure the relevance of these mappings, as the node composition of an
-\xml tree is constantly changing. One benefit of this approach is the reduced memory consumption as the schema
-definition must only be stored once globally, and the local mappings are nothing but sets of references 
-internally and thus very lightweight. 
+in \cref{lst:repr} as the bottom frame, and its values are orange dashed lines. 
 
-The overall \xml test chromosome consists of an \xml tree instance together with its accompanying element map,
-denoted by a red dashdotted frame in \cref{lst:repr}.
-
-\begin{listing}[H]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \tikzset{execute at begin node=\strut}
@@ -124,9 +117,23 @@ distance=0pt,grow'=right]
 \draw[orange,dashed,thick,->] (decl4)..controls +(north:3.5) and +(south west:1.5)..(insnetworkval);
 \draw[orange,dashed,thick,->] (decl4)..controls +(north:2) and +(south west:1)..(inssnaplenval);
 \end{tikzpicture}
-\caption{Chromosome Representation}
+\caption{Chromosome Representation. 
+Blue dotted lines represent references from \xml elements to their
+declarations in the \xsd. Orange dashed lines represent references from declarations to corresponding elements
+in the instance. The data set belonging to a single chromosome is delimited by a red dashdotted frame.
+}
 \label{lst:repr}
-\end{listing}
+\end{figure}
+\newpage
+A disadvantage is that
+additional methods had to be added to ensure the relevance of these mappings, as the node composition of an
+\xml tree is constantly changing. 
+One benefit of this approach is the reduced memory consumption as the schema
+definition must only be stored once globally, and the local mappings are nothing but sets of references 
+internally and thus very lightweight. 
+
+The overall \xml test chromosome consists of an \xml tree instance together with its accompanying element map,
+denoted by a red dashdotted frame in \cref{lst:repr}.
 
 %### 
 \subsubsection{Communication Protocol}
@@ -139,7 +146,6 @@ implementation uses tcp\footnote{TCP loopback is used because \zmq does not supp
 Windows platform, which I do most of the development on.} as a carrier for the messages; however, it is
 entirely possible to change this to inter-process communication just by altering a configuration option,
 should it become necessary. As yet, it is very far from being a bottleneck.
-
 
 After each evolution step a test suite usually contains several tests that changed due to mutation and
 crossover. When the fitness of the suite is requested to be computed next time by the genetic algorithm, 

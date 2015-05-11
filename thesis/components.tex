@@ -100,18 +100,18 @@ paragraphs describe the components involved in the new extended \xmlmate work pr
 %### 
 \Cref{fig:components} provides a schematic overview of the aforementioned components and which other components 
 they interact with inside the system. The visualization also shows that the system scales out to \texttt{n}
-format converters and \texttt{m} \emph{workers} % TODO introduce earlier (maybe in intro with picture)
-(a collective noun summarizing a test driver, its pintool, the program under test, and their lifeguard
-instance).
-% TODO move the following to legend 
-The arrows demonstrate the flow of data between the system components. Orange arrows denote the work items in
-\xml format sent out by \xmlmate itself, the blue arrows show the flow of converted files, and the green
-arrows signify the way the fitness information takes.
+format converters and \texttt{m} \emph{workers} --
+a collective noun summarizing a test driver, its pintool, the program under test, and their lifeguard
+instance.
 
 \begin{figure}[htb]
 \centering
   \includegraphics[width=\columnwidth]{system.pdf} 
-  \caption{The Components of \xmlmate}
+  \caption{The Components of \xmlmate. 
+  The arrows demonstrate the flow of data between the system components. Orange arrows denote the work items
+  in \xml format sent out by \xmlmate itself, the blue arrows show the flow of converted files, and the red
+  arrows signify the way the fitness information takes.
+}
   \label{fig:components}
 \end{figure}
 
@@ -120,7 +120,7 @@ arrows signify the way the fitness information takes.
 %### 
 When developing such a diverse ecosystem it is important to be able to inspect and test each component
 individually, so as not to lose track of any important details, and to be able to isolate faults efficiently
-without having to keep the entire system in the focus of attention. % XXX rephrase? 
+without having to keep the entire system in the focus of attention. 
 This is best accomplished by constructing
 very lightweight mockup versions of the most important system components, so that the entire system does not
 have to be launched when concentrating on a single component. Instead, only the single real component under

@@ -43,7 +43,7 @@ overly strict rules on placement and integrity of its contents. \Cref{lst:pcapfi
 typical pcap file -- it consists of a global header containing some global information followed by records for
 each captured packet, consisting of a packet header and data.
 
-\begin{listing}[htb]
+\begin{figure}[htb]
 \centering
 \begin{bytefield}[boxformatting={\centering\tiny}]{32}
 \colorbitbox{mygreen}{8}{Global Header}{tbr} &
@@ -55,7 +55,7 @@ each captured packet, consisting of a packet header and data.
 \end{bytefield}
 \caption{Pcap File Structure}
 \label{lst:pcapfile}
-\end{listing}
+\end{figure}
 
 Technical specifications of the individual headers are presented in \cref{lst:pcapformat}. 
 Briefly, the global header consists of the following elements:
@@ -198,7 +198,7 @@ however, some similarity to \pcap in that \png files are also divided into small
 \emph{chunks}. There are many kinds of chunks defined in the \png standard, but \cref{lst:pngfile} shows only
 the most basic ones. 
 
-\begin{listing}[H]
+\begin{figure}[H]
 \centering
 \begin{bytefield}[bitheight=\widthof{~{\tiny MAGIC}~},boxformatting={\centering}]{32}
 \bitbox{1}{\rotatebox{90}{{\tiny MAGIC}}} &
@@ -212,7 +212,7 @@ the most basic ones.
 \end{bytefield}
 \caption{Simple Example of PNG File Structure}
 \label{lst:pngfile}
-\end{listing}
+\end{figure}
 
 A \png file always starts with the magic byte sequence \texttt{89 50 4e 47 0d 0a 1a 0a}, which, in contrast to
 \pcap, is not part of the first chunk. All chunks have a common structure as shown in \cref{lst:pngchunks},
@@ -227,7 +227,7 @@ The meaning of the case of other letters is not considered important enough to t
 - if you wish to actually learn the format, it is far more advisable to visit an appropriate specification
 page\footnote{For example \url{http://www.w3.org/TR/PNG/}}.
 
-\begin{listing}[H]
+\begin{figure}[H]
 \centering
 \begin{bytefield}[boxformatting={\centering\small}]{32}
 \colorbitbox{lightgray}{7}{Length}{tlr} &
@@ -241,7 +241,7 @@ page\footnote{For example \url{http://www.w3.org/TR/PNG/}}.
 \end{bytefield}
 \caption{PNG Chunk Structure}
 \label{lst:pngchunks}
-\end{listing}
+\end{figure}
 
 To give you an impression as to the nature of some chunks defined in the format specification, the following
 listing offers a small selection of chunk types and their descriptions.

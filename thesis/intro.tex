@@ -8,8 +8,8 @@ testing purposes.
 
 Creating test inputs in sufficient quantities manually is often infeasible because of the overwhelming number
 of values that need to be produced -- possibly in different combinations and successions -- which is why in
-this case automatic testing is the only viable alternative. Several ideas can be explored to enable automatic
-testing techniques to produce test inputs which pass conformity checks as well as improve the quality of the
+these cases automatic testing is the only viable alternative. Several ideas can be explored to enable automatic
+testing techniques to produce test inputs which pass conformity checks and improve the quality of the
 resulting tests as much as possible.
 
 The first idea is to leverage the same format definitions that are used for the checks when generating the
@@ -37,7 +37,30 @@ The goal of this thesis is to provide \xmlmate with prototypical implementations
 evaluate their effectiveness and efficiency on several real-world test subjects, and thus determine the
 viability of the proposed ideas for enhancing test input generation techniques in the context of automated system testing.
 
-% TODO Add short schematic description of proposed implementations and an illustration
+\Cref{fig:overview} shows a schematic overview of the proposed extended \xmlmate process.
+% non-xml
+The core component of \xmlmate produces \xml files according an \xsd. 
+The files are transformed by means of a converter component if the program under test expects a different
+format. This way \xmlmate is no longer limited to producing \xml-based inputs.
+% non-java
+While the program under test is executed with the converted files as inputs, a fitness function component
+injected into it gathers data on the inputs' effects.
+% vulnoriented fitfuncs
+There are several fitness functions, each calibrated to different effects e.g.\ specific security vulnerability
+symptoms. 
+Upon receiving the data from the fitness function component, the \xmlmate core ranks the current inputs,
+selects the best and evolves them by changing them according to specific rules, while occasionally introducing
+values that violate the specification in the governing \xsd. 
+These modified input files make up the next generation, to be converted and fed into the program under test as
+before. 
+In this manner inputs are improved iteratively towards inducing desired behavior in the program under test. 
+
+\begin{figure}[htb]
+\centering
+  \includegraphics[width=\columnwidth]{overview.pdf}
+  \caption{Schematic Overview of \xmlmate's Extended Process}
+  \label{fig:overview}
+\end{figure}
 
 The remainder of this document is organized as follows: \cref{sec:relwork} gives an overview of approaches
 related to the one proposed, which is described in great detail in \cref{sec:approach}, including the
