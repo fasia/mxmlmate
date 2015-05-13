@@ -177,25 +177,25 @@ backends, and forwards, respectively.
 
 A format converter has a single \texttt{DEALER} type socket operating on default port 5570.
 When a format converter is first started, it registers itself with its load balancer facade by sending a
-\texttt{RDY} message. Afterwards it receives \zmq messages, unpacks them with \msgpack, stores their
-identifying number, converts the file, packs the stored number followed by the path to the converted file with
-\msgpack into new \zmq messages and sends them out to its load balancer as a response.
+\texttt{RDY} message. Afterwards it receives \zmq messages, unpacks them with \msgpack and stores their
+identifying number. It then converts the file, packs the stored number followed by the path to the converted
+file with \msgpack into new \zmq messages and sends them out to its load balancer as a response.
 
 Similarly to format converters, a test driver also has a \texttt{DEALER} type socket, which operates on the
 default port 5580 and with which it registers itself with its load balancer by sending \texttt{RDY}. After
 registration, the test driver listens for incoming \zmq messages and unpacks them with \msgpack
-into the identifying number and a path. It then calls \texttt{PIN\_SCORE\_START()} to signal the start of the
-execution of the system under test to the monitoring pintool, whereafter it passes the received file path to
-the sut for execution. When the sut finishes and control returns to the test driver, it calls
+into the identifying number and a path. It then calls \texttt{PIN\_SCORE\_START()} to signal the pintool to
+begin recording data, whereafter it passes the received file path to the system under test for execution. When
+the program under test finishes and control returns to the test driver, it calls
 \texttt{PIN\_SCORE\_END(number)} with the number stored from the message earlier.
 
 When a test driver invokes \texttt{PIN\_SCORE\_START()}, this invocation gets replaced with a call to a method
-in the pintool that clears its internal information buffers, thereby resetting all currently gathered fitness
-related information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets replaced
-with one that packs and sends out a message containing the identifying number and any fitness information via
-the same \zmq \texttt{DEALER} socket the test driver received the original message on. This is possible
-because the pintool and the test driver run in the same process, which means they both have access to the same
-memory, and so a pointer can be easily shared between the two components.
+in the pintool that clears its internal information buffers, thereby resetting all currently gathered
+fitness-related information. When the test driver then calls \texttt{PIN\_SCORE\_END(number)}, this call gets
+replaced with one that packs and sends out a message containing the identifying number and any fitness
+information via the same \zmq \texttt{DEALER} socket the test driver received the original message on. This is
+possible because the pintool and the test driver run in the same process, which means they both have access to
+the same memory, and so a pointer can be easily shared between the two components.
 
 Because test drivers can sometimes terminate unpredictably and unexpectedly (e.g.\ due to receiving an input
 file that causes them to fail because of a vulnerability), they are always started and guarded by special
@@ -204,16 +204,16 @@ process has terminated, it assumes its identity, creates a \texttt{DEALER} socke
 message to the load balancer. Afterwards, it destroys the socket and restarts the test driver.
 
 Please note that all ports mentioned above are customizable and even the individual message carriers for
-each leg of the communication pathway can be changed from tcp to any other protocol supported by \zmq, of which
-there are plenty.
+each leg of the communication pathway can be changed from \texttt{tcp} to any other protocol supported by \zmq,
+of which there are plenty.
 
 \Cref{fig:components} in \cref{sec:components} illustrates the described setup along with their 
 \zmq sockets -- the convex protrusions in the shapes signify binding sockets, while the concave notches
 correspond to connecting sockets.
 
 The described system contains quite a number of components and it is at least somewhat important to start them
-up in a manner that does not exhibit the slow joiner syndrome -- a condition, when a worker which is slow to
-join the system, does not receive its fair share of work items because all of them were already distributed
+up in a manner that does not exhibit the \emph{slow joiner syndrome} -- a condition, when a worker which is
+slow to join the system, does not receive its fair share of work items because all of them were already distributed
 among its faster peers. To avoid this pitfall, it is advisable to start up the load balancers first, followed
 by converter and test driver processes, and then finally \xmlmate itself. To make sure that all other
 processes have formed the necessary connections, the default behavior of \xmlmate is to wait for a maximum of
@@ -227,7 +227,8 @@ One of the main tasks of this work is to show that \xmlmate is versatile enough 
 only \xml and \xml-derived formats. In order to facilitate this versatility the concept of a format 
 converter has been introduced. The main goal of a converter for a specific format is to convert an 
 \xml file corresponding to a schema specification into another format as specified by the purpose 
-of this converter. For an example consider a converter from \xml to the packet capture format \pcap. 
+of this converter. For an example consider a converter from \xml to the packet capture format \pcap
+(described in more detail in \cref{sec:formats:pcap}).
 This converter expects \xml files in the format corresponding to the \pcap{} \xsd as shown in
 \cref{lst:xsdexample} and produces a valid \pcap file as in \cref{lst:pcapfile}.
 
@@ -242,16 +243,16 @@ could transform any valid \pcap file into its \xml representation governed by th
 \label{sec:par}
 After running the first tests on the initial \xmlmate design, which did not include any parallelization, 
 it quickly became clear that both format conversion and running the program under test with \pin 
-are two performance bottlenecks significantly slowing down the entire process. Considering that the 
+are two performance bottlenecks that significantly slow down the entire process. Considering that the 
 tests were run on a multi-core machine, and only one CPU was ever doing any work, the decision was 
-made to make both the conversion and evaluation steps parallel by allowing arbitrarily many 
+made to parallelize both the conversion and evaluation steps by allowing arbitrarily many 
 converter and test driver instances (along with their corresponding pintools) to participate in the process. 
-This was somewhat easily accomplished due to the very well thought out design of the messaging library \zmq, 
-as there were only minor issues to consider -- like adding the static broker component to 
-manage the dynamic number of converters and test drivers.
+This was made possible through the very well thought out design of the messaging library \zmq, 
+as there were only minor issues to consider -- like adding broker components to manage the dynamic number of
+converters and test drivers.
 
 However, after adding the aforementioned parallelization, a new bottleneck presented itself -- this time 
-somewhere inside the \java part of \xmlmate. Using a \java profiling tool I was able to trace the cause 
+somewhere inside the \java part of \xmlmate. By employing a \java profiling tool I was able to trace the cause 
 to the mutation and crossover routines, which seems logical in retrospect because both manipulate the 
 in-memory representations of \xml tree structures. That alone, however, is not sufficient to cause a 
 major bottleneck. \evosuite's genetic algorithm always makes backups of entire test suites as well as 
@@ -260,12 +261,12 @@ unfavorable outcome (e.g.\ decreased fitness) and roll back all changes. So each
 tree was going to be mutated, it was deeply copied, each time two \xml trees were going to be crossed 
 over, they were both deeply copied, each time an entire test suite was going to be mutated, it was 
 deeply copied -- each of its tests one after another, and each time two test suites were about to 
-undergo crossover, both of them were deeply copied. That was what caused this particular bottleneck. 
-To remedy this situation I applied the following two improvements:
+undergo crossover, both of them were deeply copied. To remedy this situation I applied the following two
+improvements:
 
-The first one was adding three distinct task executors dividing the responsibilities of deeply copying, mutating and 
-crossing over \xml trees. This way all three classes of tasks were enabled to run simultaneously 
-no longer needing to queue up linearly one strictly after another. The mutation task executor is 
+Firstly, I added three distinct task executors dividing the responsibilities of deeply copying, mutating
+and crossing over \xml trees. Hereby all three classes of tasks were enabled to run simultaneously 
+and to no longer need to queue up linearly one strictly after another. The mutation task executor is 
 responsible for taking a single individual \xml tree, copying it and mutating the copy; the 
 crossover task executor takes two \xml trees, delegates their copying to the copying task executor 
 for a speed up, and then performs the actual crossover on the returned copies.
@@ -275,7 +276,7 @@ This is a safe change since the individual tests are still copied before any cha
 to them -- the result is a kind of \emph{copy-on-maybe-write} policy as only those tests are copied 
 that are going to experience potential change.
 
-After that there were still other bottlenecks -- some more surprising than others. For example 
+After these improvements there were still other bottlenecks -- some more surprising than others. For example 
 it was rather unexpected to see calls to methods of the \texttt{Random} class being listed among the most time
 consuming by the profiler. In \java 7 the \texttt{Random} class is thread-safe, which has lead to a lot of 
 contention when multiple threads suddenly started asking the singleton instance of \evosuite's randomness 
@@ -297,7 +298,7 @@ mutation is still in progress. When an \xml file has left the mutation or crosso
 immediately sent out to a worker process for fitness evaluation. Preliminary tests showed promising 
 results; however, this optimization is very intrusive of \evosuite's concept of a single threaded 
 genetic algorithm possibly leading to grave incompatibilities with other mechanisms deep within other parts 
-of \evosuite, therefore it was deemed as a neat future work item, which should probably be combined with a 
+of \evosuite, therefore it was deemed as a future work item, which should probably be combined with a 
 proper restructuring of the genetic framework.
 
 Another optimization, which sadly also belongs to the list of currently incompatible changes, would require to
@@ -327,10 +328,10 @@ which allows to accommodate for the new use case of security testing.
 
 Quite ironically, \evosuite's genetic algorithm framework for some reason does not create a backup 
 copy of individuals before initiating local search, which manifested itself in abruptly diminishing 
-fitness values; this was, of course, fixed by issuing a backup copy inside the local search procedure, 
+fitness values; this was fixed by issuing a backup copy inside the local search procedure, 
 additionally taking full advantage of the newly implemented parallelized deep copying mechanism.
 
-Please note that due to its specification ignoring nature, the local search is currently incompatible with the
+Please note that due to its specification-ignoring nature, the local search is currently incompatible with the
 schema coverage fitness function described in \cref{sec:fit:schema} as the algorithm responsible for computing
 how many of the schema's definitions are used in an \xml instance gets confused by unexpected invalid values.
 This seems to be a rather small issue and will probably be fixed at a later point in time; however, to date

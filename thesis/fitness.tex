@@ -4,9 +4,9 @@
 \label{sec:fit}
 One requirement of this work was to provide \xmlmate with the concept of pluggable fitness functions and 
 give several examples that demonstrate the versatility of the approach. Luckily, \evosuite already provides 
-a \texttt{FitnessFunction<T extends Chromosome>} generic interface, which can be made use of on multiple 
+a \texttt{FitnessFunction<T extends Chromosome>} generic interface, which can be employed on multiple 
 levels of abstraction. To provide the pluggability on the level of  entire test suites there are implementers of
-\texttt{FitnessFunction<XMLTestSuiteChromosome>} and on the level of single test inputs ones of 
+\texttt{FitnessFunction<XMLTestSuiteChromosome>}, and on the level of single test inputs -- ones of 
 \texttt{FitnessFunction<XMLTestChromosome>}. 
 Secondary evolution objectives have a very similar type topography; secondary objectives are sometimes useful 
 as ``tie breakers'' when a decision between two chromosomes has to be made when both have equal fitness values,
@@ -30,11 +30,11 @@ More concretely the schema coverage fitness value is computed as the average of 
   \item[attribute coverage] is, similarly, a measure of how many attribute declarations were utilized, so its 
   value depends on both the optionality of the declarations and the number of generated elements (or more 
   precisely the number of elements carrying the corresponding attribute declarations).
-  \item[transition coverage] probably sounds a little out of place, so let me first explain how the concrete 
-  values for elements and attributes are generated. One of the most implementation-wise challenging features 
-  of the \xsd{} {\small Language} is the \texttt{pattern} facet that describes valid values of an element or 
-  attribute by means of a regular expression (that has a different grammar than that of \java, \python or 
-  {\small Perl} regular expression languages, which, as an aside, presented another whole technical challenge). 
+  \item[transition coverage] roughly describes how many values of elements and attributes were explored. One of
+  the most implementation-wise challenging features of the \xsd{} {\small Language} is the \texttt{pattern}
+  facet that describes valid values of an element or attribute by means of a regular expression. These
+  expressions have a different grammar than that of \java, \python or {\small Perl} regular expression
+  languages, which, as an aside, presented another whole technical challenge.
   In order to be able to provide values conforming to those regular expressions an automaton based representation 
   has been put in place for the types of the elements and attributes by using the automaton
   library\cite{automaton} for \java.
@@ -56,7 +56,7 @@ are numbers between zero and one, the overall schema coverage fitness value can 
 algorithm of \evosuite will try to get the value as close to zero as possible, which is its default behavior.
 
 In contrast with the initial intuition, the results of previous experiments did not 
-show a strong correlation between high schema coverage and some kinds of code coverage like 
+show a strong correlation between high schema coverage and certain kinds of code coverage like 
 branch or basic block coverage. This can be explained by the fact that it is not the abundance of different 
 input values, but rather the specific values themselves, that are responsible for penetrating deeper into a 
 program's logic and thus increasing the code coverage. This is why there is no separate evaluation of this
@@ -66,9 +66,10 @@ However, the schema coverage is a good evolution guide for the purpose of creati
 which can then be further evolved with different purposes -- be it code coverage of particular program regions, or
 other kinds of fitness criteria like closeness to integer overflows and the like.
 
-Furthermore, there is no need in powering up any of the infrastructure involved with usual ways of measuring 
-fitness -- no system under test, no brokers or converters are needed to compute the schema coverage fitness. 
-There is also no need for \texttt{IO} operations, as all \xml tree evaluations are processed in-memory.
+Furthermore, there is no need in powering up any of the infrastructure involved with the usual ways of
+measuring fitness -- no system under test, no brokers or converters are needed to compute the schema coverage
+fitness. There is also no need for \texttt{IO} operations, as all \xml tree evaluations are processed
+in-memory. This makes the Schema Coverage fitness function very efficient.
 
 %### 
 \subsubsection{Basic Block Coverage Fitness Function}
@@ -130,32 +131,32 @@ backend feature set. Therefore it profits from an abstract fitness function prot
 to work with binary test subjects, which abstracts away and manages the responsibilities of communicating 
 with the backend system, be it potential format converters, or the targeted program controlled by test 
 drivers and monitored by pintools.
-Like all subclasses of this \texttt{BinaryBackendFitnessFunction} the \texttt{Basic Block Coverage} 
+Like all subclasses of this \texttt{BinaryBackendFitnessFunction}, the \texttt{Basic Block Coverage} 
 fitness function consists of two components: a \java class and a pintool written in \cpp.
 
 The pintool's task is to instrument the targeted binary in such a way, that whenever it executes a 
-basic block, which belongs to the image of interest (e.g.\ \texttt{libpng} -- a parameter given at the start),
-its address is recorded in a set data structure. When the test driver, which is responsible for running 
+basic block, which belongs to the binary image of interest (e.g.\ \texttt{libpng} -- a parameter given at the
+start), its address is recorded in a set data structure. When the test driver, which is responsible for running 
 the program under test, signals the completion of the processing of the currently evaluated inputs, 
 the pintool sends the set as a packet to the \java class in \xmlmate.
 
-It is the purpose of the \java class to interpret the data received from the pintool.
+It is the purpose of the fitness function's \java class to interpret the data received from the pintool.
 In the case of the \texttt{Basic Block Coverage} fitness function, the data received represents the
 set of starting addresses of the basic blocks that were found to be executed in the program under test. 
 For each \xml in a test suite an individual set must be maintained in order to be able to profit 
 from result caching: when a test suite is modified during the evolution step, not necessarily all
 of its tests must have been changed and thus not all tests must be passed to a test driver for reevaluation, 
 their previous result can be reused because it is still up-to-date. Virtue of the fact that the pintool 
-already builds a set out of the addresses of the executed blocks on its side, the result for a single 
+builds a set out of the addresses of the executed blocks on its side already, the result for a single 
 \xml can be stored as an array (\texttt{long[]}) without having to wrap a \texttt{Set} container around it.
 
 However, when it comes to calculating the number of unique basic blocks covered by an 
-entire test suite, each time a new set must be created which consists of the union of 
-the individual arrays belonging to all \xml files in the suite. At this point the very efficient
-\texttt{TLongHashSet} implementation from the \emph{GNU Trove} collections mentioned in \cref{sec:trove} 
-is very useful -- especially so because it stores the \java primitive values directly instead of \emph{boxing}
-them in wrapper objects like the standard \java collections do. Because Trove saves space and is faster, it is
-used in all following fitness functions as a standard container provider.
+entire test suite, each time a new set consisting of the union of the individual arrays belonging to all \xml
+files in the suite must be created. At this point the very efficient \texttt{TLongHashSet} implementation from
+the \emph{GNU Trove} collections mentioned in \cref{sec:trove} is very useful -- especially so because it
+stores the \java primitive values directly instead of \emph{boxing} them in wrapper objects like the standard
+\java collections do. Because Trove saves space and is faster, it is used in all following fitness functions
+as a standard container provider.
 
 The actual fitness value of a test suite according to the \texttt{Basic Block Coverage} fitness function 
 is the number of unique basic blocks executed by all \xml files in the suite. Due to the dynamic nature 
@@ -164,6 +165,7 @@ under test. One consequence of this is that this fitness function must be a maxi
 that higher fitness values are considered better, which is somewhat atypical for \evosuite. Even though it has
 some degree of support for maximization functions, multiple code defects surfaced during the development that
 mostly had to do with hard-coded assumptions about the fitness function always being a minimization function.
+These discovered defects were fixed.
 
 %### 
 \subsubsection{Basic Block Succession Fitness Function}
@@ -263,8 +265,8 @@ pintool and its complementary \java class.
 
 The pintool stores memory addresses that were accessed by the program under test in a set, which it sends to
 the \java class upon test completion.
-The \java class is very similar to that of its cousin fitness function, in fact they share the entirety of
-their code.
+The \java class is very similar to that of its cousin fitness function, in fact they share almost the entirety
+of their code.
 
 %###
 \paragraph{Singleton Population} ~\\
@@ -275,8 +277,8 @@ of single \xml files in order to find one individual file that triggers faulty b
 appeared need, the concept of a \emph{singleton population} was introduced.
 
 Using a singleton population is a compromise between \evosuite's need for the presence of test suites to
-evolve, and our need for only one set of files to be evolved. When the singleton population is used, the
-population size of the genetic algorithm is limited to only one suite and the genetic algorithm itself is
+evolve, and the new need for only one set of files to be evolved. When the singleton population is used,
+the population size of the genetic algorithm is limited to only one suite and the genetic algorithm itself is
 modified accordingly -- among other adjustments by disabling elitism on the test suite level. Elitism is a
 mechanism which ensures that the best individual (the best test suite in \evosuite's case) survives into the
 next generation unaltered, so that fitness may never decrease from one generation to the next. 
@@ -285,12 +287,12 @@ is elitism among all the single files in the one suite being evolved, such that 
 guaranteed survival. Note, that using elitism does not prevent the best individual from reproducing as its
 copies may do so freely, and usually this is what leads to an improvement in fitness.
  
-With the singleton population in place, there is only one test suite to evolve, which means that the fitness
+With the singleton population in place, there is only one test suite to evolve, consequently, the fitness
 must now be calculated differently. The fitness of this single suite can no longer reflect the cumulative
-result over all the tests, but must rather correspond to the fittest one of them, which, at the end of the
-evolution, will be considered the result of the search, or the pinnacle of evolution, if you will.
+result over all the tests, but must rather correspond to the fittest one of them. At the end of the
+evolution this value will be considered the result of the search, or the pinnacle of evolution, if you will.
 
-This routine can be somewhat improved by adding a secondary evolution objective, which considers a
+This routine can be improved by adding a secondary evolution objective, which considers a
 mutation of the test suite as an improvement even if it has the same number of memory accesses in the best
 test, yet cumulatively its tests cause more unique memory addresses to be accessed. 
 
@@ -308,7 +310,7 @@ particular, this fitness function aims to uncover a single class of denial of se
 unhandled arithmetic exceptions that arise from performing division by zero.
 
 When the program under test processes an input file, it usually executes multiple distinct division
-instructions, and many of them -- multiple times, so there is no simple and obvious way to directly assign a
+instructions, and many of them multiple times, so there is no simple and obvious way to directly assign a
 fitness value to an input file. The first idea is to record all observed instances of division and choose the
 smallest absolute value of a divisor as the fitness score. However, such an assignment is not very beneficial
 to the diversity of the inputs' gene pool as it makes it converge to smaller files with a minimum number of
@@ -317,21 +319,22 @@ goal of triggering a division exception as it artificially and unnecessarily lim
 that are considered for exploration. 
 
 To counteract this effect additional secondary objectives were put in place. The first secondary objective is
-the \texttt{MaximizeDivisionsSecondaryObjective} and its goal is to enlarge the number of sites in the
-program under test that are being explored by the search process by increasing the number of division
-instructions covered by a suite. Using only this single secondary objective, however, leads to individuals
-simply growing in size over the course of evolution, while keeping at least one close-to-zero divisor. While
-this is beneficial to the diversity of the suites, it causes an unwelcome strain on the performance, which
-is why another secondary -- or rather a tertiary -- objective has been added -- the
+the \texttt{MaximizeDivisionsSecondaryObjective} whose goal is to enlarge the number of sites in the
+program under test that are being explored by the search process. This is achieved by increasing the number of
+division instructions covered by a suite. Using only this single secondary objective, however, causes 
+individuals to simply grow in size over the course of evolution, while keeping at least one close-to-zero
+divisor. While this is beneficial to the diversity of the suites, it imposes an unwelcome strain on the
+performance, which is why another secondary -- or rather a tertiary -- objective has been added: the
 \texttt{MinimizeCumulativeZeroDistanceSecondaryObjective}. The goal of this objective is to prevent an
 uncontrolled growth and ensure overall improvement of quality of the individuals by keeping the cumulative
 divisor distance to zero as small as possible.
 
-At runtime the pintool component of the \texttt{Division by Zero} fitness function intercepts all invocations
-of the \texttt{DIV} and \texttt{IDIV} x86 instructions and records the divisor value in a list, which is
-associated with the address of the instruction in question by means of a map container. When the execution of
-the system under test has ended, for each division instruction the pintool keeps only the divisor with the
-smallest zero distance when it packages the message to be sent out to its \java fitness function counterpart.
+The pintool component of the \texttt{Division by Zero} fitness function intercepts all invocations
+of the \texttt{DIV} and \texttt{IDIV} x86 instructions at runtime and records the divisor value in a list,
+which is associated with the address of the instruction in question by means of a map container. When the
+execution of the system under test has ended, for each division instruction the pintool keeps only the divisor
+with the smallest zero distance when packing the message to be sent out to its \java fitness function
+counterpart.
 There is a reason behind selecting the best divisor only after the main runtime instead of doing it on-the-fly,
 even though it wastes some memory space for storing all observed divisors. This is an instance of the classical
 runtime vs memory requirement trade-off: by having injected code simply append any new value to a list
@@ -351,7 +354,7 @@ because \pin imposes a limitation on retrieving floating point values from
 registers\footnote{\url{https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/index.html\#FP}}.
 Working around this and adding support for \texttt{SIMD} instructions are some planned future improvements.
 
-An intuition is that it is unusual for valid well formed inputs to cause divisions by zero in the program under
+Intuitively, it is unusual for valid, well formed inputs to cause divisions by zero in the program under
 test. It is therefore recommended to use the schema violation feature described in \cref{sec:local}, which is
 capable of producing values beyond the range of validity, in order to increase the chances of actually
 triggering arithmetic exceptions.
@@ -380,8 +383,8 @@ values outside their legal domains with the aim of increasing the chance of trig
 
 This fitness function employs additional secondary objectives that are analogous to those of the
 \texttt{Division by Zero} fitness function in that they also aim to increase the number of distinct
-potential exploitation sites by favoring suites with a larger number of unique instructions, while limiting the
-number of files in the suites to within a reasonable magnitude.
+potential exploitation sites. They do so by favoring suites with a larger number of unique instructions, while
+limiting the number of files in the suites to within a reasonable magnitude.
 
 %### 
 \subsubsection{Buffer Overflow Fitness Function}
@@ -389,7 +392,7 @@ number of files in the suites to within a reasonable magnitude.
 Yet another fitness function mainly aimed at its own specific class of vulnerabilities, the \texttt{Buffer
 Overflow Fitness Function} seeks to identify potential buffer overflows and underflows, which can be highly
 exploitable. This fitness function is very roughly based on the \texttt{Memory Access} fitness function,
-however, it is somewhat more technically involved. 
+however, it is technically more involved. 
 
 The main idea behind aiming towards buffer overflows and underflows is deceptively simple: all one has to do
 is monitor allocations, reallocations, and deallocations of buffers, record all memory accesses to them, and
@@ -400,25 +403,25 @@ turns out to be not as straightforward as the idea itself because, for the first
 function level is required. This is different from instrumenting applications on the level of individual
 instructions or loading and unloading of binary images mainly because there exists a distinct possibility of
 interleaved execution in multi-threaded applications. At least the technique for monitoring memory accesses
-can be inherited from the \texttt{Memory Access} fitness function, so the focus of the problem at hand rests
-with the potentially interleaved execution of \texttt{malloc}, \texttt{calloc} and \texttt{realloc} functions,
+can be inherited from the \texttt{Memory Access} fitness function, therefore the focus of the problem at hand
+rests with the potentially interleaved execution of \texttt{malloc}, \texttt{calloc} and \texttt{realloc} functions,
 which are responsible for allocating buffers. 
 
 Before considering concrete solutions, a data model for containing all relevant information must be designed.
 For currently allocated buffers a set of \texttt{(rip, start, size)} triples will be kept, where \texttt{start}
 and \texttt{size} are the beginning address and the size of the buffer, respectively, and \texttt{rip} is the
-address of the instruction executed immediately after the return from the buffer allocating function, which is
+address of the instruction executed immediately after the return from the buffer allocating function. It is
 used to provide both a distinction between different allocation sites, as well as a grouping criterion for
 buffers that serve the same purpose at different times (think of buffer allocations in a loop for processing
 subsequent chunks of an input). Logging of \texttt{rip}s arose from the need to uniquely identify different
 allocation calls; unfortunately, \pin offers no easy possibility to identify the call site, but it provides
-access to the \texttt{rip} out of the box. To ensure that only currently allocated buffers are stored, whenever
-a buffer is freed by a call to \texttt{free}, the corresponding allocation is removed from the set of
-recorded allocations.
+access to the \texttt{rip} out of the box. To ensure that only the currently allocated buffers are stored, an
+allocation is removed from the set of recorded allocations whenever a buffer is freed by a call to
+\texttt{free}.
 
 This set is just an auxiliary data structure that does not provide any useful information in terms of the
-planned fitness score. Therefore, another data structure is necessary for capturing the actual memory accesses
-- an associative mapping from \texttt{rip}s to the maximum access distance from the center of a buffer
+planned fitness score. Therefore, a second data structure is necessary to capture the actual memory accesses
+-- an associative mapping from \texttt{rip}s to the maximum access distance from the center of a buffer
 pertaining to an allocation before the \texttt{rip}. By using the distance from the center as a metric it
 is possible to aim for accesses at both extremes of a buffer, thus giving equal preference to both overflows
 and underflows at the same time. More specifically, the \texttt{access distance} of an access at address
@@ -469,22 +472,21 @@ auxiliary data structure to a set of \texttt{(thread\_id, rip, start, size)} wit
 variation in the first value, so it seems like a waste of space. An optimization can be achieved by using
 thread local storage facilities provided by \pin and reserve preliminary triples there, which requires
 additional synchronization when moving the completed triples into the common auxiliary data structure. This
-solution would be perfectly acceptable, if it weren't for a small comment in the examples section of {\small
-Pin's}
+solution would be perfectly acceptable, if it weren't for a small comment in the examples section of Pin's
 documentation\footnote{\url{https://software.intel.com/sites/landingpage/pintool/docs/67254/Pin/html/\#Invocation}}:
 \begin{quote}
 {\small IPOINT\_AFTER} is implemented by instrumenting each return instruction in a routine. \pin tries to find
 all return instructions, but success is not guaranteed.
 \end{quote}
 Unfortunately, {\small IPOINT\_AFTER} is exactly the instrumentation point needed to implement the second
-callback, which makes the entire contraption unreliable at best and simply wrong at worst.
+callback, which makes the entire contraption unreliable at best and factually wrong at worst.
 
-Luckily, a better solution presented itself -- it is possible to replace the allocating functions with variants
+Luckily, a better solution presented itself: it is possible to replace the allocating functions with variants
 that additionally perform the record keeping task.
 This is actually exactly what is already used for communicating between the test drivers and their pintools, as
 mentioned in \cref{sec:components}, when the pintool replaces the well known functions in the test driver with
-its own versions. Except in this case an additional feature of procedure replacement was used: the signature
-change. This is best explained on a simple example of the \texttt{malloc} function. 
+its own versions. In this case, however, an additional feature of procedure replacement was used: the signature
+change. This is best explained using a simple example of the \texttt{malloc} function.
 
 The original version has the signature \mintinline{cpp}{void *malloc(size_t size)}. In order to be able to
 record the \texttt{rip} of an invocation, the malloc wrapper function has to have a signature of 
@@ -506,11 +508,11 @@ void *MallocWrapper(size_t size, void *rip) {
 
 The wrapper function first invokes the original \texttt{malloc} and stores its return value. At this point the
 wrapper has access to all three necessary values at once and stores the triple \texttt{(rip, start, size)}
-before returning the original return value. Please regard the presented code as pseudocode because the actual
-code is somewhat more involved.
+before returning the original return value. Please regard the code presented in \cref{lst:mallocwrapper} as
+pseudocode because the actual code is somewhat more involved.
 
 Firstly, calling the original \texttt{malloc} function is not as straightforward because \pin has its own
-implementation of malloc that uses its own allocator and thus is not compatible with the intended
+implementation of \texttt{malloc} that uses its own allocator and thus is not compatible with the intended
 \texttt{malloc} call as any attempt to free the returned buffer from inside the instrumented program using a
 call to its \texttt{free} function will result in a segmentation error. Additionally, the space reserved for
 \pin allocations is rather limited, which also makes it infeasible to patch the \texttt{free} calls
@@ -528,22 +530,20 @@ The allocation functions \texttt{calloc} and \texttt{realloc} are treated analog
 (which, luckily, \pin guarantees to work) that will simply remove a triple with the \texttt{start} value equal
 to the argument of \texttt{free} if one is found.
 
-As mentioned previously, the fitness information the pintool of the \texttt{Buffer Overflow
-Fitness Function} sends to its \java counterpart is the memory access map, which, in contrast to the
+As mentioned previously, the fitness information, that the pintool of the \texttt{Buffer Overflow
+Fitness Function} sends to its \java counterpart, is the memory access map, which, in contrast to the
 \texttt{Division by Zero} and \texttt{Integer Overflow} fitness functions is updated in-place and not only
 after the processing of an input file. Because memory accesses are much more numerous than e.g.\ \texttt{DIV}
 or \texttt{MUL} instruction invocations, the reasonable choice in the memory-speed trade-off is somewhat offset.
 
-The \java part of this fitness function tries to maximize the maximum distance of the accesses from their
+The \java part of this fitness function tries to maximize the distance of the accesses from their
 respective buffer's centers, and by employing additional secondary objectives, it also aims to enlarge the
 number of accessed buffers as well as the cumulative access distance in a suite, while preventing the suites
 from bloating by favoring smaller ones if all their previously mentioned characteristics are equal.
 
-As is the case with several previous fitness functions, this fitness function is also geared towards finding
-vulnerabilities and employs the singleton population paradigm and benefits greatly from enabling the schema
-violation functionality -- in this case especially so. It would be infeasible to count memory accesses outside
-allocated buffer ranges as out-of-bounds accesses to the buffers themselves because they may well be just
-accesses to ambient variables. Therefore this fitness function assigns maximum values to accesses just at the
-legal bounds of the buffers and the small mutations caused by the schema violation mechanism should make it
-possible to break out of this restriction by a small amount and thus possibly trigger a sought-after
-vulnerability.
+As is the case with several previous fitness functions, this fitness function is also geared toward finding
+vulnerabilities and therefore employs the singleton population paradigm. Also note that it would be infeasible
+to count memory accesses outside allocated buffer ranges as out-of-bounds accesses to the buffers themselves because they may well be
+just accesses to ambient variables. Therefore this fitness function assigns maximum values to accesses just at
+the legal bounds of the buffers and relies on mutations to make it possible to break out of this restriction
+and possibly trigger a sought-after vulnerability.

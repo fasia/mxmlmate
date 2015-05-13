@@ -18,8 +18,8 @@ rendering on \emph{thin clients} -- devices with weak computational resources, f
 to implement graceful handling of inconsistent web page code (e.g.\ mismatched or missing tags, etc.). 
  
 Because \texttt{xhtml} is in essence a simple \xml wrapper around \texttt{html}, it is possible to use standard
-and computationally lightweight \xml parsers instead of specialized lenient html parsers. It is further
-possible to use \xml validation techniques to discard inconsistent web pages without wasting resources trying
+and computationally lightweight \xml parsers instead of specialized lenient \texttt{html} parsers. It is
+further possible to use \xml validation techniques to discard inconsistent web pages without wasting resources trying
 to render them.
 
 The main differences of \texttt{xhtml} from \texttt{html} include the mandatory presence of the
@@ -31,8 +31,8 @@ latter's values must always be quoted.
 
 The World Wide Web Consortium provides an official \xsd for
 \texttt{xhtml}\footnote{http://www.w3.org/TR/xhtml1-schema/} which is used in the \xmlmate experiments
-described in \cref{sec:evaluation}. Unfortunately, with its 2211 lines this schema is too long to be included
-in this document; feel free, however, to visit the listed address for a quick glance.
+described in \cref{sec:evaluation}. With its 2211 lines this schema is too long to be included
+in this document.
 
 %### 
 \tocless\subsubsection{pcap}
@@ -40,8 +40,8 @@ in this document; feel free, however, to visit the listed address for a quick gl
 \label{sec:formats:pcap}
 The \textbf{p}acket \textbf{cap}ture file format is rather simple in that it has no deeply nested structures or
 overly strict rules on placement and integrity of its contents. \Cref{lst:pcapfile} shows the layout of a
-typical pcap file -- it consists of a global header containing some global information followed by records for
-each captured packet, consisting of a packet header and data.
+typical \pcap file -- it consists of a global header containing various global information followed by records
+for each captured packet, consisting of a packet header and data.
 
 \begin{figure}[htb]
 \centering
@@ -74,7 +74,7 @@ real length of the packet as it appeared on the network.
 The packet data immediately follows the packet header as a blob of \texttt{incl\_len} bytes.
 
 
-\begin{listing}[H]
+\begin{listing}[htb]
 \centering
 \begin{cppcode}
 typedef struct pcap_hdr_s {
@@ -104,9 +104,8 @@ type PCAPType. This type defines its contents as a \texttt{header} element of th
 followed by zero or more \texttt{packet} elements of the type PacketHeaderType. 
 
 Do not be confused by the ``tns:'' prefix found throughout the schema -- it is just a marker assigning the
-declared entities to the target namespace \url{http://www.xmlmate.org/pcap}, this is a mechanism for
-disambiguating equally named declarations across multiple schema definitions; it is of no particular
-importance to the format description, so feel free to ignore it. 
+declared entities to the target namespace ``\url{http://www.xmlmate.org/pcap}'', this is a mechanism for
+disambiguating identically named declarations across multiple schema definitions. 
 
 The GlobalHeaderType is almost identical in its contents to the format definition given in
 \cref{lst:pcapformat} with the exception of the missing declaration of \texttt{magic\_number}, which will be
@@ -120,7 +119,7 @@ the one of \texttt{snaplen} from the global header, which is impossible to do by
 definition alone.
 
 The schema further lacks the definition for the data blob that represents the actual packet data itself, once
-again it is the converter's job to fill that in according to the (now possibly trimmed) \texttt{incl\_len}
+again it is the converter's job to provide that according to the (now possibly trimmed) \texttt{incl\_len}
 value. Besides, it would be somewhat wasteful to first generate a blob of data in string form only to 
 convert it to a binary format.
 
@@ -131,15 +130,15 @@ convert it to a binary format.
 \label{lst:xsdexample}
 \end{listing}
 
-The above shows pretty well that the schema definition and the code of the corresponding converter must be well
-coordinated. It also shows that a considerable amount of intelligence can be placed into the converter
-component, although this is not necessary as the design of \xmlmate allows to plug transformer entities
-of arbitrary nature into the processing pipeline, so it might be favorable to have separate components
-responsible for correcting inconsistent values between \xmlmate and the converters to have more of a separation
-of concerns -- in the end it's all about trade-offs.
+The above shows pretty well that the schema definition and the code of the corresponding converter
+must be well coordinated. It also shows that a considerable amount of functionality can be placed into the
+converter component, although this is not necessary as the design of \xmlmate allows to plug transformer
+entities of arbitrary nature into the processing pipeline, so it might be favorable to have separate
+components responsible for correcting inconsistent values between \xmlmate and the format converters to achieve
+a greater separation of concerns -- in the end it's all about trade-offs.
 
-The schema also introduces the type positiveInt as unsignedInt with the minimal possible value of 1 because
-there is no corresponding type among the \xsd built-ins.
+The schema also introduces the type \texttt{positiveInt} as \texttt{unsignedInt} with a minimum value of 1
+because there is no corresponding type among the \xsd built-ins.
 
 \Cref{lst:xmlexample} shows a possible instantiation of the described schema -- the left side depicts the
 textual representation that gets sent out to the converter, and the right side represents the instance as an
@@ -191,7 +190,7 @@ in-memory \xml tree as operated upon by \xmlmate internally.
 \tocless\subsubsection{PNG}
 %###
 The \textbf{P}ortable \textbf{N}etwork \textbf{G}raphics format is, as its name suggests, a graphics file
-format often abbreviated \png. It was mainly designed for use in sharing of images over the Internet,
+format often abbreviated \png. It was mainly designed for sharing of images over the Internet,
 which is why it also supports lossless data compression and is riddled with internal consistency checks by
 means of CRC-32 checksums. Compared to the previously presented \pcap format, \png is very complex; it bears,
 however, some similarity to \pcap in that \png files are also divided into smaller entities called
@@ -223,9 +222,9 @@ Critical chunks must be understood by the decoder program as they contain inform
 rendering the file, if a decoder does not recognize a critical chunk, it is required to abort the processing or
 supply an appropriate warning. Ancillary chunks contain information optional to overall processing of the file.
 
-The meaning of the case of other letters is not considered important enough to take up space in this document
-- if you wish to actually learn the format, it is far more advisable to visit an appropriate specification
-page\footnote{For example \url{http://www.w3.org/TR/PNG/}}.
+% The meaning of the case of other letters is not considered important enough to take up space in this document
+% - if you wish to actually learn the format, it is far more advisable to visit an appropriate specification
+% page\footnote{For example \url{http://www.w3.org/TR/PNG/}}.
 
 \begin{figure}[H]
 \centering
@@ -262,9 +261,8 @@ listing offers a small selection of chunk types and their descriptions.
 \end{description}
 
 There are many more chunk types, but unfortunately they cannot be placed randomly all over a \png file as the
-documentation specifies some rules regarding this, which causes a lot of complexity to writing an \xsd to
-reflect the \png format properly. For a short demonstration of some of the problem sources consider the
-following rules:
+documentation specifies certain rules regarding their usage. This causes a lot of complexity to writing an
+\xsd to reflect the \png format properly. Consider the following rules:
 
 \begin{itemize}
 \item[] The \emph{color type} in the \texttt{IHDR} chunk can have values of 0, 2, 3, 4, and 6, which place
@@ -293,10 +291,10 @@ means that every combination is declared as its own element and then all of the 
 decision as to which combination to instantiate are expressed by means of a \texttt{choice} particle.
 For an example consider \cref{lst:schemaexplosion}, which depicts the different legal combinations of color
 type and bit depth expressed as an exploded \texttt{choice} particle. Each listed element declaration includes
-a slightly different \texttt{IHDR} subtype with values for color type and bit depth set accordingly; also the
-presence of a \texttt{PLTE} chunk is governed by this \texttt{choice} because it depends on the color type as
-mentioned in the rules above. These explosions have lead the schema document to grow to 3106 lines in size
-distributed over 21 files. More complicated format requirements like checksum correctness and conformity of
+a slightly different \texttt{IHDR} subtype with values for color type and bit depth set accordingly.
+Furthermore, the presence of a \texttt{PLTE} chunk is governed by this \texttt{choice} because it depends on
+the color type as mentioned in the rules above. These explosions have lead the schema document to grow to 3106
+lines in size distributed over 21 files. More complicated format requirements like checksum correctness and conformity of
 the width and height of an image and the amount of data in \texttt{IDAT} chunks had to be moved into the format
 converter.
 
