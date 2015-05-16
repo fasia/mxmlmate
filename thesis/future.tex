@@ -8,9 +8,8 @@ aspects of \xmlmate. The following gives a brief overview of some of the most in
 %###
 One particularly large work item is completely rewriting the
 genetic algorithm of \xmlmate from scratch aiming for better parallelization support from the beginning. At the time of writing it is estimated that this
-goal is best achieved by making heavy use of many of the features that the {\small
-Scala}\cite{scala-overview-tech-report} programming language has to offer, as well as utilizing the {\small
-Akka} actor-based message-driven concurrency framework\cite{Wyatt:2013:AC:2663429} to make \xmlmate fully
+goal is best achieved by making heavy use of many of the features that the
+Scala\cite{scala-overview-tech-report} programming language has to offer, as well as utilizing the Akka actor-based message-driven concurrency framework\cite{Wyatt:2013:AC:2663429} to make \xmlmate fully
 concurrent and distributed.
 %###
 \paragraph{Meta-Heuristics} ~\\
@@ -39,15 +38,15 @@ finding multi-threading related issues such as deadlocks, livelocks, starvation 
 For future fitness functions that use program performance values in the computation of their
 fitness score it is possible to significantly increase efficiency by making use of hardware performance
 counters, which are provided by modern hardware and can be directly accessed in most operating systems by
-means of special APIs like the ones provided by the {\small PAPI}\cite{Mucci99papi:a} or {\small LTTng}\cite{
+means of special APIs like the ones provided by the PAPI\cite{Mucci99papi:a} or LTTng\cite{
 combined_tracing_ols2009} libraries. Note that this would impose a limitation on the concurrent use of \xmlmate
-on a single machine; however, this limitation can probably be solved by using virtualization techniques like
-{\small Docker}\cite{docker} and {\small Vagrant}\cite{vagrant} -- especially since \xmlmate is now a
+on a single machine; however, this limitation can probably be solved by using virtualization techniques such as
+Docker\cite{docker} -- especially since \xmlmate is now a
 distributed system capable of running across multiple distinct hardware nodes. This arrangement can also be of
 special benefit to creating a fitness function specialized in detecting buffer overflows by means of advanced
 operating system features like memory page marking and eviction. One library specializing in such techniques
-of memory debugging is {\small DUMA}\footnote{\url{http://sourceforge.net/projects/duma/}}, which is a
-spiritual heir to the discontinued Electric Fence project.
+of memory debugging is DUMA\footnote{\url{http://sourceforge.net/projects/duma/}}, which can be seen as a
+successor of the discontinued Electric Fence project.
 %###
 \paragraph{More Efficient Message Transport} ~\\
 %###

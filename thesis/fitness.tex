@@ -31,9 +31,9 @@ More concretely the schema coverage fitness value is computed as the average of 
   value depends on both the optionality of the declarations and the number of generated elements (or more 
   precisely the number of elements carrying the corresponding attribute declarations).
   \item[transition coverage] roughly describes how many values of elements and attributes were explored. One of
-  the most implementation-wise challenging features of the \xsd{} {\small Language} is the \texttt{pattern}
+  the most implementation-wise challenging features of the \xsd{} Language is the \texttt{pattern}
   facet that describes valid values of an element or attribute by means of a regular expression. These
-  expressions have a different grammar than that of \java, \python or {\small Perl} regular expression
+  expressions have a different grammar than that of \java, \python or Perl regular expression
   languages, which, as an aside, presented another whole technical challenge.
   In order to be able to provide values conforming to those regular expressions an automaton based representation 
   has been put in place for the types of the elements and attributes by using the automaton
@@ -76,7 +76,7 @@ in-memory. This makes the Schema Coverage fitness function very efficient.
 %###
 A more or less direct transfer of \evosuite's \texttt{Instruction Count} fitness function is the 
 \texttt{Basic Block Coverage} fitness function, which aims to maximize the number of basic blocks 
-executed in the program under test. This fitness function makes heavy use of the {\small Intel} \pin
+executed in the program under test. This fitness function makes heavy use of the Intel \pin
 instrumentation framework -- in particular its definition of a basic block: a single entrance, 
 single exit sequence of instructions in the program under test. However, because \pin is discovering the 
 program dynamically as it is executed, its view of basic blocks can be somewhat unconventional. As an 
@@ -459,7 +459,7 @@ addresses 24 and 42 respectively. The center of this buffer is at address $22 + 
 \end{figure}
 
 Having established the desired data model and coming back to the problem of capturing buffer allocations as they
-happen in a possibly multi-threaded application, a solution is to use {\small Pin's} API for instrumentation
+happen in a possibly multi-threaded application, a solution is to use Pin's API for instrumentation
 at procedure level and have two callbacks -- one at the entry of the allocation function, and the other at the
 exit. With this setup the \texttt{rip} and the \texttt{size} values are accessible to the first callback and
 \texttt{rip} and \texttt{start} to the second. So the idea is to reserve a triple \texttt{(rip, unknown, size)}
@@ -518,7 +518,7 @@ call to its \texttt{free} function will result in a segmentation error. Addition
 \pin allocations is rather limited, which also makes it infeasible to patch the \texttt{free} calls
 accordingly. Even if \pin did not override \texttt{malloc}, simply inserting a call to it would result in an
 infinite loop as \pin would try to replace this call by the wrapper as well. Therefore the invocation is
-actually a call to a special method in {\small Pin's} API that allows execution of the original function
+actually a call to a special method in Pin's API that allows execution of the original function
 without it being instrumented.
 
 Secondly, additional checks are performed inside the wrapper, such as ensuring that only calls pertaining to

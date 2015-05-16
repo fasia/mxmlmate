@@ -43,7 +43,7 @@ paragraphs describe the components involved in the new extended \xmlmate work pr
   
   The design decision to enable the converters to drop in and out at
   runtime has two very useful properties: firstly, it allows to circumvent the parallelism limitation
-  imposed by {\small Python's} GIL (global interpreter lock) by being able to run multiple interpreter
+  imposed by Python's GIL (global interpreter lock) by being able to run multiple interpreter
   instances in parallel without them interfering; and, secondly, it makes it possible to apply meta-heuristics
   to the process by varying the number of converters dynamically depending on the load, which makes for an
   interesting future work item.
@@ -57,7 +57,7 @@ paragraphs describe the components involved in the new extended \xmlmate work pr
   function. The test driver's responsibilities also include signaling the beginning and end of the execution of
   the program under test to the pintool by calling special marker methods \texttt{PIN\_SCORE\_START}
   and \texttt{PIN\_SCORE\_END}, which the pintool replaces with its own internal fitness data related
-  processing methods. The driver is implemented in {\small C} and, as is the case with converters, there can
+  processing methods. The driver is implemented in C and, as is the case with converters, there can
   be arbitrarily many active at the same time.
   %### 
   \paragraph{Pintool} ~\\
@@ -128,7 +128,7 @@ investigation has to be started, while the rest of the system is being simulated
 component mockups.
 
 Examples for such mockup components that were used during development include two test driver mockups -- one
-written in \java and one in {\small C}, which were used to test basic \zmq connectivity and
+written in \java and one in C, which were used to test basic \zmq connectivity and
 cross-language \msgpack serialization/deserialization respectively. Several mockups for the system under test
 were used to test the \java parts of \xmlmate's fitness functions by simply sending random data in the
 required \msgpack format without requiring any binary instrumentation. There is also a mock version of

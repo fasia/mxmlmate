@@ -4,8 +4,8 @@ The previous sections discussed the main ideas and some technical details behind
 the approach that is the main focus of this thesis. However, every approach is only worth as much as it can
 offer. To determine this for the presented implementation -- \xmlmate, an empirical evaluation on several test
 subjects has been carried out, and the results are documented in this section.
-\subsection{Evaluation Setup}
 
+\subsection{Evaluation Setup}
 Due to the random nature of the genetic algorithm that is at the heart of \xmlmate, it is necessary to perform
 multiple runs of each experiment in order to properly ascertain its effectiveness and efficiency statistically
 by considering the average values. At this point it is of particular importance to define what efficiency and
@@ -23,7 +23,10 @@ main focus of the evolution process, the limit is expressed simply as a single s
 individual files in it, while in the other use case, where the result of an evolution is a suite of files, the
 limit is enforced as a population of 25 suites with a maximum of 20 files in each.
 
-% TODO add justification for numbers 
+These numbers were chosen empirically in a way that the overall performance on today's average developer
+computer is perfectly acceptable, i.e.\ the execution of other programs at the same time remains unhampered.
+The size of the population is appropriate because it is not too small to cause rapid deterioration of results
+and not too large to become only laboriously usable.
 
 To produce statistically significant average result values, for each fitness function and for each test
 subject an experiment was run 10 times. This setup was replicated for the two modes of testing: with and
@@ -54,8 +57,8 @@ will give you a short description of programs that were used during the evaluati
 formats. Each test subject was chosen as a popular library for processing its corresponding file format.
 \tocless\subsubsection{libxml2}
 \libxml\footnote{\url{http://www.xmlsoft.org/}} is a library for processing generic \xml documents,
-which is written in {\small C}. It is widely used and provides bindings to many programming languages
-including \cpp, {\small C\#}, \python{}, {\small Ruby}, {\small PHP5}, and {\small Perl}. Furthermore, it was
+which is written in C. It is widely used and provides bindings to many programming languages
+including \cpp, C\#, \python{}, Ruby, PHP5, and Perl. Furthermore, it was
 designed for utmost portability, such that it works on a wide variety of operating systems such as
 Linux, Windows, CygWin, MacOS, RISC Os, OS/2, and others. Notably, the Google Chrome
 browser uses \libxml internally, which further shows the library's popularity.
@@ -79,9 +82,9 @@ overall execution speed.
 \libpcap\footnote{\url{http://www.tcpdump.org/}} is a library for working with the \pcap file format
 maintained by the \emph{Tcpdump Group}. It is used in the popular tools tcpdump, ngrep, Wireshark, Snort and
 nmap, among others. The main objective of \libpcap is to provide its users with a
-platform-independent API for network packet capturing. The API is designed to work with the {\small C} and \cpp
+platform-independent API for network packet capturing. The API is designed to work with the C and \cpp
 programming languages, but there exists a number of bindings to other languages as well such as \python, \java,
-{\small C\#}, or {\small Ruby}.
+C\#, or Ruby.
 
 While it first and foremost provides a nice abstraction layer above the operating system-specific live packet
 capturing mechanism (which every operating system vendor seems to have designed differently), \libpcap
@@ -99,7 +102,7 @@ Wireshark seem to have corresponding entries in Internet vulnerability databases
 \libpng\footnote{\url{http://www.libpng.org/}} is a ubiquitous library for manipulating, reading,
 writing and generally handling \png files. It is available freely under a permissive license, and thus very
 widely used in a vast number of both free and proprietary software products. The \libpng library is
-written in the {\small C} programming language and depends on the \texttt{zlib} library for data compression.
+written in the C programming language and depends on the \texttt{zlib} library for data compression.
 It is considered to be the reference implementation for all possible interactions with \png files.
 
 In its 18 years of existence, the library was extensively tested as it evolved and matured. Ever since the very
