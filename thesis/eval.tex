@@ -415,8 +415,8 @@ to detect subtle vulnerabilities that do not lead to an application crash, which
 this work.
 
 The experiment itself consisted of running \xmlmate against each version of \libpng ten times for an hour,
-whereby each vulnerability was targeted with a limited selection of fitness functions most appropriate for
-its respective nature.
+whereby each vulnerability was targeted with a limited selection of fitness functions deemed most appropriate
+for its respective nature.
 
 % as listed in https://wiki.mmci.uni-saarland.de/syssec/Vulnerabilities/libpng
 \begin{table}[H]
@@ -460,14 +460,26 @@ limited to 450mb because this particular vulnerability only manifests itself in 
 to reserve sufficient memory. It must further be remarked that the \pin instrumentation framework and the
 pintool implementing a fitness function share their memory with the program under test, which effectively
 reduces the amount of memory available to the program's allocator.
- 
-The experimental results suggest that \xmlmate is indeed both effective and efficient as a defect detection
-tool, finding every targeted vulnerability multiple times over in the span of one hour. Additionally, by
-testing the targeted applications on the system level, \xmlmate avoids false positives, which makes the
-reported findings even more valuable.
 
-% bblcov2 12142 after 23h
-% ??? mention problem of failure masking -> one crash makes another undetectable
+The experimental results show that \xmlmate is \emph{effective} -- it was able to find every targeted
+vulnerability on average at least once in each experiment run. The fact that some vulnerabilities could be detected by more than
+one fitness function further demonstrates that the input generation engine of \xmlmate is capable of flexibly
+adapting the production of instances to requirements imposed by different fitness functions. 
+The impact of this ability is clearly visible when comparing the average number of detections of the
+{\small CVE-2008-1382} vulnerability by the Basic Block Succession and the Schema Coverage fitness
+functions. The latter lacks subject-aware guidance, which is why the former is able to evolve
+crash-inducing inputs much more effectively, thus averaging on 623 crashes per hour against 1.
+
+The results further show that \xmlmate is \emph{efficient} as it was capable of finding every targeted
+vulnerability multiple times over in the span of one hour. This means that the average time to detection is
+far less than one hour, which makes it affirmatively usable for practical purposes. Additionally, by 
+testing the targeted applications on the system level, \xmlmate avoids false positives and thus yields
+100\% precision, which makes the reported findings even more valuable.
+
+\begin{mdframed}
+\centering
+The experimental results show \xmlmate to be both effective and efficient. 
+\end{mdframed}
 
 \subsubsection{Serendipitous Findings}
 In the process of running the presented experiments several defects were found in programs
