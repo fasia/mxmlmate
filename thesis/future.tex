@@ -4,11 +4,12 @@ The presented work paves the way for many more useful improvements and extension
 aspects of \xmlmate. The following gives a brief overview of some of the most interesting future work items.
 
 %###
-\paragraph{Better Parallelization} ~\\
+\paragraph{Complete Parallelization} ~\\
 %###
-One particularly large work item is completely rewriting the
-genetic algorithm of \xmlmate from scratch aiming for better parallelization support from the beginning. At the time of writing it is estimated that this
-goal is best achieved by making heavy use of many of the features that the
+One particularly large work item is rewriting the
+genetic algorithm of \xmlmate from scratch aiming for more comprehensive parallelization support from the
+beginning.
+At the time of writing it is estimated that this goal is best achieved by making heavy use of many of the features that the
 Scala\cite{scala-overview-tech-report} programming language has to offer, as well as utilizing the Akka actor-based message-driven concurrency framework\cite{Wyatt:2013:AC:2663429} to make \xmlmate fully
 concurrent and distributed.
 %###

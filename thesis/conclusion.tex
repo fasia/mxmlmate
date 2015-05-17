@@ -1,28 +1,30 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
-% xmlmate is a good defect search tool with extensions presented here
-\xmlmate is a good search-based tool for finding defects that induce crashes in the tested program. It has
-become especially versatile after being enhanced with the extensions proposed in this document.
+\xmlmate is an effective search-based utility for finding defects that induce crashes in the tested program. It
+has become especially versatile after being enhanced with several extensions:
 % list extensions: support for binaries, pluggable fitfuncs, additional formats, schema violations
+
 The part of the genetic algorithm responsible for fitness score representation has profited from adding
 support for both pluggable and vulnerability-specific fitness functions. Through this new interface \xmlmate
-has gained the ability to produce fitness scores for arbitrary binaries as it is no longer limited to
-the \java Virtual Machine, on which it is running itself. By leveraging various file format specifications and
-providing converters for those formats, it has now become possible to generate inputs compatible with a wide
-variety of potential test subjects previously inaccessible. For purposes of security testing the main
-functionality of the input generation engine has been extended to include intentional specification deviations.
+has gained the ability to produce fitness scores for arbitrary binaries as it is no longer confined to
+the \java Virtual Machine, on which it is running itself. 
 
-% equipped with these extensions xmlmate yielded good results in identifying defects
-% its efficiency and effectiveness are justified by it finding known vulns a lot of times over
+By leveraging various file format specifications and
+providing converters for those formats, it has now become possible to generate inputs compatible with a wide
+variety of potential test subjects previously inaccessible. 
+
+Additionally, for purposes of security testing, the main
+functionality of the input generation engine has been extended to include intentional specification deviations.
+This mechanism has proved to be a worthwhile enhancement in many cases.
+
 Equipped with these additions, \xmlmate yielded excellent results in an experiment designed to show its
 effectiveness and efficiency as it was able to repeatedly identify known vulnerabilities in a ubiquitously
 used library, while maintaining a zero false positives rate by design.
-% its practical use is strengthened by it finding unknown bugs even when not specifically targeting
-Its practicability is further emphasized by the fact that it has found defects previously unknown in programs
+
+Its practicability is further emphasized by the fact that it has found previously unknown defects in programs
 which were not even specifically targeted in the experiments. 
-% quality of results (fitness scores and crashes) depends on quality of test drivers and schema and converters
 It must be also noted, however, that the results are highly dependent on the quality of the user provided
-schema and test harness.
+schema and test driver.
 
 % overall xmlmate shows potential
 \begin{mdframed}

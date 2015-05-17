@@ -4,15 +4,25 @@ The previous sections discussed the main ideas and some technical details behind
 the approach that is the main focus of this thesis. However, every approach is only worth as much as it can
 offer. To determine this for the presented implementation -- \xmlmate, an empirical evaluation on several test
 subjects has been carried out, and the results are documented in this section.
+To state the research goals of the evaluation at hand more clearly, let me define them in terms of classic
+research questions:
+\begin{description}
+  \item[RQ1] Is \xmlmate effective in finding defects?
+  \item[RQ2] Is it efficient enough for practical reasons?
+  \item[RQ3] What are the benefits of each fitness function?
+  \item[RQ4] What is the impact of the schema violation mechanism?
+\end{description}
 
-\subsection{Evaluation Setup}
-Due to the random nature of the genetic algorithm that is at the heart of \xmlmate, it is necessary to perform
-multiple runs of each experiment in order to properly ascertain its effectiveness and efficiency statistically
-by considering the average values. At this point it is of particular importance to define what efficiency and
+At this point it is of particular importance to define what efficiency and
 effectiveness mean in regards to this evaluation. 
 
 Let \emph{effectiveness} be the measure of whether or not defects have been found in the time frame allocated
 for an experiment run. Similarly, let \emph{efficiency} be the defect detection count for the same time frame.
+
+\subsection{Evaluation Setup}
+Due to the random nature of the genetic algorithm that is at the heart of \xmlmate, it is necessary to perform
+multiple runs of each experiment in order to properly ascertain its effectiveness and efficiency statistically
+by considering the average values.
 
 One \emph{experiment} consists of running \xmlmate for one hour with a limit of 2200 elements per \xml instance
 as well as a maximum recursion depth of 12 for optional elements, meaning that no optional elements are generated
@@ -125,7 +135,9 @@ related programs are discussed.
 
 \subsubsection{Fitness Function Practicability}
 The first experiment serves to investigate the practicability of each subject-oriented fitness function
-presented in \cref{sec:fit} when applied to the proposed test subjects. To accomplish this, a comparison
+presented in \cref{sec:fit} when applied to the proposed test subjects with and without the schema violation
+mechanism in order to answer the research questions \textbf{RQ3} and \textbf{RQ4}. 
+To accomplish this, a comparison
 between the fitness scores achieved by each function for each subject is needed.
 % One exception is the Schema Coverage fitness function, which is ignored here because using it only depends on
 % the format specification and its quality and is thus independent from test subjects.
@@ -385,15 +397,16 @@ The schema violation mechanism provides a worthwhile enhancements in many cases.
 
 \subsubsection{Effectiveness and Efficiency}
 In this second experiment the goal is to ascertain the effectiveness and efficiency (as defined at the
-beginning of this section) of \xmlmate as a search-based tool for defect detection. This experiment consists of
+beginning of this section) of \xmlmate as a search-based tool for defect detection in order to answer the
+research questions \textbf{RQ1} and \textbf{RQ2}. This experiment consists of
 an empirical study concerning itself solely with the \libpng library. \Cref{tbl:png:vulns} shows a selection of known vulnerabilities in \libpng
 chosen as indicators for determining the effectiveness and efficiency of \xmlmate. The vulnerabilities are
 listed alongside the corresponding vulnerable program version and their CVSS -- a score on a scale from 0 to 10
 that indicates the severity of a vulnerability.
 The vulnerabilities were selected in a way that both low and high CVSS scores were represented, as well as
 different library releases, but most importantly they were selected such that they make the test driver crash,
-which is an effect most easily detectable in the use case of input fuzzing. It is incomparably much harder to
-detect subtle vulnerabilities that do not lead to an application crash, which is why they are out of scope of
+which is an effect definitely detectable in the use case of input fuzzing. It is incomparably much harder
+to detect subtle vulnerabilities that do not lead to an application crash, which is why they are out of scope of
 this work.
 
 The experiment itself consisted of running \xmlmate against each version of \libpng ten times for an hour,
@@ -430,7 +443,7 @@ CVE-2013-6954                  & Buffer Overflow  & 15.7           \\ \hline \hl
 \multirow{2}{*}{CVE-2008-1382} & BBL Succession   & 623            \\ \cline{2-3}
                                & Schema Coverage  & 1              \\ \hline
 \end{tabular}
-\caption{Vulnerability Detection Rates}
+\caption{\textsc{XMLMate's} Vulnerability Detection Rates}
 \label{tbl:png:rates}
 \end{table}
 % ??? update for more FFs
@@ -501,16 +514,17 @@ First, as regards \emph{external validity}, the subjects used in this study may 
 the entirety of all applications now compatible with \xmlmate, and may even be uncharacteristic among their
 respective application class.
 
-Concerning \emph{internal validity} it must be kept in mind that search-based testing is random in nature, and
+Concerning \emph{internal validity}, it must be kept in mind that search-based testing is random in nature, and
 thus the results may vary greatly over multiple experiments. Some effort was made to mitigate this problem by
 performing multiple runs and taking the average results. However, it is unclear if a much larger sample size
 would alter the results in any significant way.
 
 Furthermore, the choice of many of the parameters for the genetic algorithm such as population size,
 genetic operation probabilities, or chromosome limitations might not have been optimal for the chosen test
-subjects.
+subjects. Additionally, the results are dependent on the quality of the corresponding \xsd, format converter,
+and test driver.
 
-Regarding \emph{construct validity} it is uncertain if the metrics used in the evaluation are well suited
-to adequately measure the usefulness of the presented approach.
- 
-% partial bias -> pcap schema and converter was written by me, I tried to adhere to the specs
+Regarding \emph{construct validity}, it cannot be stated with absolute certainty that the metrics used in the
+evaluation are well suited to adequately measure the efficiency and effectiveness of the presented approach.
+In particular the defects targeted as indicators were chosen such that they crash the program under
+test, which may not be representative of software defects in general. 
