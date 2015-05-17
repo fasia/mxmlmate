@@ -355,19 +355,19 @@ reasonable trade-off between benefiting from schema violation and forgoing some 
 established value of $n=3$ was chosen.
 
 According to the experimental results listed in \cref{tbl:fitness}, schema violation has a noticeable impact in
-most cases; especially so for fitness functions, whose value is directly dependent on the complexity of the
-engaged program behavior (i.e.\ the four leftmost fitness functions). Most likely the reason for this are the
+most cases; especially so for fitness functions whose value is directly dependent on the complexity of the
+engaged program behavior (i.e.\ the four leftmost fitness functions). Most likely this is due to the
 very input validation mechanisms mentioned at the beginning of this document, which motivated this work in the
 first place: when confronted with inputs malformed in a nonrecoverable manner, the validation mechanisms of the
-program under test engage different behavior mostly associated with producing appropriate error messages,
+program under test engage different behavior associated with producing appropriate error messages,
 which leads to more code being executed and different memory regions being accessed.
 
 In cases where the fitness score is not necessarily dependent on the values of the inputs themselves, but
 rather their characteristics (e.g.\ their size, or presence/absence of particular structures), the schema
-violation mechanism does seem to have any noticeable effect, as seen in the cases of Integer and Buffer
+violation mechanism does not seem to have any noticeable effect, as seen in the cases of Integer and Buffer
 Overflow fitness functions.
 
-Returning to the previously mentioned performance vs.\ usefulness trade-off of using the schema violation
+Returning to the previously mentioned performance vs.\ usefulness trade-off of the schema violation
 mechanism, it must be noted that for the Memory Access fitness function applied to \libxml, schema
 violation only reduced the fitness score. This is the case because the format used is \texttt{xhtml}, which
 means that no structurally invalid instances are ever generated even with violation active, only the
@@ -375,6 +375,11 @@ particular numbers inside \xml elements and attributes can be outside their spec
 course, of no consequence to a generic \xml parser such as \libxml. In this particular case the only
 noticeable effect of using the schema violation mechanism is that is wastes every third generation as it is
 unable to improve the fitness score by reaching previously inaccessible memory regions.
+
+In the general case of applications whose business logic depends on the validity of the values in their
+corresponding input files (i.e.\ no mere parser applications), the schema violation mechanism produces
+noticeable effects. These effects are especially noticeable when used in conjunction with fitness functions
+capable of detecting and taking advantage of changes in program behavior.
 
 \begin{mdframed}
 The schema violation mechanism provides a worthwhile enhancements in many cases.
@@ -396,9 +401,9 @@ The schema violation mechanism provides a worthwhile enhancements in many cases.
 
 
 \subsubsection{Effectiveness and Efficiency}
-In this second experiment the goal is to ascertain the effectiveness and efficiency (as defined at the
-beginning of this section) of \xmlmate as a search-based tool for defect detection in order to answer the
-research questions \textbf{RQ1} and \textbf{RQ2}. This experiment consists of
+In this second experiment the goal is to ascertain the effectiveness and efficiency (as defined at the very
+beginning of \cref{sec:evaluation}) of \xmlmate as a search-based tool for defect detection in order to answer
+the research questions \textbf{RQ1} and \textbf{RQ2}. This experiment consists of
 an empirical study concerning itself solely with the \libpng library. \Cref{tbl:png:vulns} shows a selection of known vulnerabilities in \libpng
 chosen as indicators for determining the effectiveness and efficiency of \xmlmate. The vulnerabilities are
 listed alongside the corresponding vulnerable program version and their CVSS -- a score on a scale from 0 to 10
@@ -454,7 +459,7 @@ testing for {\small CVE-2011-3048}, the amount of main memory available to the t
 limited to 450mb because this particular vulnerability only manifests itself in case \texttt{malloc} is unable
 to reserve sufficient memory. It must further be remarked that the \pin instrumentation framework and the
 pintool implementing a fitness function share their memory with the program under test, which effectively
-reduces the amount of memory available to the the program's allocator.
+reduces the amount of memory available to the program's allocator.
  
 The experimental results suggest that \xmlmate is indeed both effective and efficient as a defect detection
 tool, finding every targeted vulnerability multiple times over in the span of one hour. Additionally, by
@@ -465,7 +470,7 @@ reported findings even more valuable.
 % ??? mention problem of failure masking -> one crash makes another undetectable
 
 \subsubsection{Serendipitous Findings}
-In the process of running the experiments needed for this evaluation several defects were found in programs
+In the process of running the presented experiments several defects were found in programs
 related to the used file formats, which were not specifically targeted. Here are the most interesting of them.
 \paragraph{Gimp} ~\\
 The GNU Image Manipulation Program\footnote{\url{http://www.gimp.org/}} (\texttt{gimp}) is an open source
@@ -478,7 +483,7 @@ versions of \texttt{gimp}, although it is not listed at \url{http://www.cvedetai
 \paragraph{Wireshark} ~\\
 Wireshark\footnote{\url{https://www.wireshark.org/}} is a cross-platform open source program for network packet
 inspection and analysis. Its latest version available on the aforementioned Debian configuration is
-\texttt{1.8.2} and this version has the following defect, which is also present in the same version on the
+\texttt{1.8.2} and this version has a defect, which is also present in the same version on the
 Windows 7 x64 operating system: when opening a specially formed \pcap file the application terminates and
 prints the following error message on the console:
 

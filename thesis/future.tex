@@ -38,8 +38,8 @@ finding multi-threading related issues such as deadlocks, livelocks, starvation 
 %###
 For future fitness functions that use program performance values in the computation of their
 fitness score it is possible to significantly increase efficiency by making use of hardware performance
-counters, which are provided by modern hardware and can be directly accessed in most operating systems by
-means of special APIs like the ones provided by the PAPI\cite{Mucci99papi:a} or LTTng\cite{
+counters. These are usually provided by modern hardware and can be directly accessed in most operating systems
+by means of special APIs like the ones provided by the PAPI\cite{Mucci99papi:a} or LTTng\cite{
 combined_tracing_ols2009} libraries. Note that this would impose a limitation on the concurrent use of \xmlmate
 on a single machine; however, this limitation can probably be solved by using virtualization techniques such as
 Docker\cite{docker} -- especially since \xmlmate is now a
@@ -54,13 +54,13 @@ successor of the discontinued Electric Fence project.
 If \xmlmate is going to be used in truly distributed systems, it is probably a good idea to replace
 the currently employed \msgpack message serialization and deserialization engine by another, more efficient and
 sophisticated library. When real network traffic is involved, it seems like a good idea to minimize the amount
-of traffic that has to pass through the network, and having a library with a streaming interface that also
-allows to deserialize messages before they have reached their destination completely is certainly also of
-good use as well. Some candidate replacements can be found in \cref{sec:msgpack}.
+of traffic that has to pass through the network, and having a library with a streaming interface that
+additionally allows to partially deserialize messages before they have reached their destination completely is
+certainly also of good use as well. Some candidate replacements can be found in \cref{sec:msgpack}.
 %###
 \paragraph{Robust Communication} ~\\
 %###
-Further elaborating the idea of distributed execution environments in the presence of unreliable
+Further elaborating upon the idea of distributed execution environments in the presence of unreliable
 nodes, it seems wise to invest some effort into extending the inter-component communication protocol for
 reliability and message delivery guarantees.
 %###
