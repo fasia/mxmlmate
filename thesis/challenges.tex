@@ -244,12 +244,12 @@ could transform any valid \pcap file into its \xml representation governed by th
 After running the first tests on the initial \xmlmate design, which did not include any parallelization, 
 it quickly became clear that both format conversion and running the program under test with \pin 
 are two performance bottlenecks that significantly slow down the entire process. Considering that the 
-tests were run on a multi-core machine, and only one CPU was ever doing any work, the decision was 
+tests were run on a multi-core machine, and only one CPU core was ever doing any work, the decision was 
 made to parallelize both the conversion and evaluation steps by allowing arbitrarily many 
 converter and test driver instances (along with their corresponding pintools) to participate in the process. 
 This was made possible through the very well thought out design of the messaging library \zmq, 
-as there were only minor issues to consider -- like adding broker components to manage the dynamic number of
-converters and test drivers.
+as there were only minor issues to consider -- like adding load-balancing broker components to manage the
+dynamic number of converters and test drivers.
 
 However, after adding the aforementioned parallelization, a new bottleneck presented itself -- this time 
 somewhere inside the \java part of \xmlmate. By employing a \java profiling tool I was able to trace the cause 

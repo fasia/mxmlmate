@@ -21,12 +21,14 @@ The very first extension from pure \java branch coverage and exception oriented 
 previously in \xmlmate is the \texttt{Schema Coverage} fitness function. Its goal is to maximize the number 
 of schema rules used in the generated inputs. The reasoning behind this is that inputs which exhibit most of 
 the features described in the specification should also trigger more functionality in the program under test. 
-More concretely the schema coverage fitness value is computed as the average of the folowing three values:
+More concretely the schema coverage fitness value is computed as the average of the following three values:
 \begin{description}
   \item[element coverage] describes how many element declarations were instantiated in the generated inputs, 
   including substitution group members. A substitution group consists of jointly declared elements, which 
   can take each other's place in the \xml. Additionally, the element coverage can reflect how many branches 
-  of choice particles as well as how many of the optional elements are present in the produced files.
+  of \texttt{choice} particles as well as how many of the optional elements are present in the produced files.
+  This is somewhat reminiscent of the branch coverage criterion applied on the level of the input format
+  definition instead of the executed code.
   \item[attribute coverage] is, similarly, a measure of how many attribute declarations were utilized, so its 
   value depends on both the optionality of the declarations and the number of generated elements (or more 
   precisely the number of elements carrying the corresponding attribute declarations).
@@ -50,7 +52,7 @@ More concretely the schema coverage fitness value is computed as the average of 
   over all type definitions regarded together.
 \end{description}
 
-If the element, attribute and transition coverages are designated as $c_e$, $c_a$, and $c_t$ respectively and
+If the element, attribute, and transition coverages are designated as $c_e$, $c_a$, and $c_t$ respectively and
 are numbers between zero and one, the overall schema coverage fitness value can be computed as $1 -
 \frac{c_e+c_a+c_t}{3}$, which makes this a \emph{minimization} fitness function, meaning that the genetic
 algorithm of \evosuite will try to get the value as close to zero as possible, which is its default behavior.
@@ -176,10 +178,13 @@ basic blocks. However, this extension also considers the order in which the bloc
 specifically, for each basic block this fitness function aims to maximize the number of unique basic blocks
 that are executed immediately after.
 Put differently, the \texttt{Basic Block Succession} fitness function provides guidance for maximizing the
-number of control paths of length two taken by the program under test. According to the
+number of control paths of length two taken by the program under test. This makes it, strictly speaking, a
+specialization of the more general \emph{path coverage} criterion, which indicates whether every possible route
+of control in the targeted program has been executed.
+According to the
 author\footnote{http://lcamtuf.blogspot.de/2014/08/a-bit-more-about-american-fuzzy-lop.html} of the
-\texttt{American Fuzzy Lop} smart fuzzing tool\cite{afl} this strategy strikes a good balance between
-fitness function complexity and effectiveness, and is very helpful in finding defects.
+\texttt{American Fuzzy Lop} smart fuzzing tool\cite{afl}, this specialized strategy strikes a good balance
+between fitness function complexity and effectiveness, and is very helpful in finding defects.
 
 To accomplish its task, the pintool maintains a map, which contains an address for each basic block that was
 observed to be executed as a key. Each key is assigned as value a set of all basic blocks that were executed
@@ -312,9 +317,21 @@ unhandled arithmetic exceptions that arise from performing division by zero.
 When the program under test processes an input file, it usually executes multiple distinct division
 instructions, and many of them multiple times, so there is no simple and obvious way to directly assign a
 fitness value to an input file. The first idea is to record all observed instances of division and choose the
-smallest absolute value of a divisor as the fitness score. However, such an assignment is not very beneficial
-to the diversity of the inputs' gene pool as it makes it converge to smaller files with a minimum number of
-executed divisions as long as there is at least one divisor close to zero. Such a constriction opposes the
+smallest absolute value of a divisor as the fitness score. \Cref{fig:div0} shows an example calculation of the
+fitness score for a test suite that consists of two input files. 
+
+\begin{figure}[htb]
+\centering
+  \includegraphics[width=\linewidth]{./div0.pdf}
+  \caption{Division By Zero Fitness Score Calculation. Orange blocks indicate division instructions, while
+  the numbers on the arrows represent divisors achieved by an input file. The fitness score for the entire
+  suite is the minimal attained divisor.}
+  \label{fig:div0}
+\end{figure}
+
+However, this assignment on its own is not very beneficial
+to the diversity of the inputs' gene pool as it makes it converge to smaller files with a minimum
+number of executed divisions as long as there is at least one divisor close to zero. Such a constriction opposes the
 goal of triggering a division exception as it artificially and unnecessarily limits the number of sites
 that are considered for exploration. 
 
@@ -340,14 +357,14 @@ even though it wastes some memory space for storing all observed divisors. This 
 runtime vs memory requirement trade-off: by having injected code simply append any new value to a list
 instead of doing comparisons to decide whether to keep or reject the new value, the code is simple enough to
 be inlined and thus performs considerably faster; and with main memory being available in abundance on  modern
-computers and execution speed being the most limiting factor, it seems like a good trade-off to make.
+computers and execution speed being the most limiting factor, it seems like a reasonable trade-off to make.
 
 Because the \texttt{Division by Zero} fitness function is meant to be used for vulnerability scanning, it is
 exclusively compatible with the singleton population evolution mode introduced in \cref{sec:memcov}. The \java
 component of this fitness function keeps a record of all executed division instructions alongside the absolute
 value of their divisor closest to zero for each file in a suite. The overall fitness score of the entire suite
 is then determined by finding the minimal divisor distance over all division instructions over all files in
-the suite.
+the suite as sketched in \cref{fig:div0}.
 
 As previously suggested, this fitness function currently only supports integer based division instructions
 because \pin imposes a limitation on retrieving floating point values from
@@ -378,8 +395,9 @@ is selected when reporting fitness to the \java master process. Once again, this
 reasons.
  
 As this fitness function is also vulnerability-oriented, it is restricted to the singleton population usage
-scenario; additionally, it is tentatively advisable to employ the schema violation mechanism to encourage
-values outside their legal domains with the aim of increasing the chance of triggering overflows.
+scenario and the fitness score of a suite is defined as the sum of the largest argument pair over all sites
+and input files. Additionally, it is tentatively advisable to employ the schema violation mechanism to
+encourage values outside their legal domains with the aim of increasing the chance of triggering overflows.
 
 This fitness function employs additional secondary objectives that are analogous to those of the
 \texttt{Division by Zero} fitness function in that they also aim to increase the number of distinct
@@ -536,13 +554,15 @@ Fitness Function} sends to its \java counterpart, is the memory access map, whic
 after the processing of an input file. Because memory accesses are much more numerous than e.g.\ \texttt{DIV}
 or \texttt{MUL} instruction invocations, the reasonable choice in the memory-speed trade-off is somewhat offset.
 
-The \java part of this fitness function tries to maximize the distance of the accesses from their
+The \java part of this fitness function aims to maximize the distance of the accesses from their
 respective buffer's centers, and by employing additional secondary objectives, it also aims to enlarge the
 number of accessed buffers as well as the cumulative access distance in a suite, while preventing the suites
 from bloating by favoring smaller ones if all their previously mentioned characteristics are equal.
 
 As is the case with several previous fitness functions, this fitness function is also geared toward finding
-vulnerabilities and therefore employs the singleton population paradigm. Also note that it would be infeasible
+vulnerabilities and therefore employs the singleton population paradigm.
+The fitness score of a suite is calculated as the maximal access distance over all buffers and input files. 
+Also note that it would be infeasible
 to count memory accesses outside allocated buffer ranges as out-of-bounds accesses to the buffers themselves because they may well be
 just accesses to ambient variables. Therefore this fitness function assigns maximum values to accesses just at
 the legal bounds of the buffers and relies on mutations to make it possible to break out of this restriction

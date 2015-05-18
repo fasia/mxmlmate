@@ -5,11 +5,11 @@ When generating test inputs with the goal of revealing failures and vulnerabilit
 the inputs must adhere to a format specific to this program, otherwise they are 
 quickly discarded without getting anywhere near executing important code responsible for program logic.
 %%%Methodology - grammars + search-based + specific criteria
-Several techniques can be used to profitably apply automated test input generation in this usage scenario -
+Several techniques can be used to profitably apply automated test input generation in this usage scenario --
 they include leveraging format description grammars, employing search-based algorithms,
 and utilizing guidance criteria specifically designed for individual vulnerability classes.
 %%%Results - prototype, subjects, failures
-A prototypical implementation extending the search-based input generator \emph{XMLMate} with the suggested
+A prototypical implementation extending the search-based input generator \xmlmate with the suggested
 techniques has been applied to several file formats and their corresponding reference libraries, and has shown
 promise as it detected defects, several of which are classified as security threats in the database of common
 vulnerabilities and exposures. 
