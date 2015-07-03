@@ -32,6 +32,7 @@ public final class ValueGenerator {
         //        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
         private final Automaton charAutomaton = new RegExp("[a-zA-Z0-9]").toAutomaton();
         private final Automaton hexBinary = new RegExp("([A-Fa-f0-9][A-Fa-f0-9])+").toAutomaton();
+        private final Automaton idAutomaton = new RegExp("id[0-9]{3,}").toAutomaton();
 
         @Override
         public Automaton getAutomaton(String name) {
@@ -41,11 +42,14 @@ public final class ValueGenerator {
                 return charAutomaton.repeat();
             if ("hexBinary".equalsIgnoreCase(name))
                 return hexBinary;
+            if ("ID".equalsIgnoreCase(name))
+                return idAutomaton;
             return super.getAutomaton(name);
         }
     };
     private static Automaton rndString = Automaton.minimize(automatonProvider.getAutomaton("Char").repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
     private static Set<String> knownTypes = new HashSet<>(Arrays.asList(
+        "ID",
         "NCName",
         // "QName",
         // "URI",
@@ -228,6 +232,7 @@ public final class ValueGenerator {
     }
 
     private static String generate(Automaton a) {
+        assert a.getNumberOfStates() > 1 || a.getInitialState().isAccept(): "Useless automaton: \n" + a.toString();
         assert a.isDeterministic();
         StringBuilder str = new StringBuilder();
         State start = a.getInitialState();
