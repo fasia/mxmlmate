@@ -1,5 +1,6 @@
 package org.xmlmate.genetics;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import nu.xom.Node;
 import nu.xom.ParentNode;
@@ -105,8 +106,10 @@ public class XMLCrossOverFunction extends CrossOverFunction {
         ArrayList<AwareElement> partners = new ArrayList<>(recipientParent.getChildCount());
         for (int i = 0; i < recipientParent.getChildCount(); i++) {
             Node child = recipientParent.getChild(i);
-            if (child instanceof AwareElement)
+            if (child instanceof AwareElement) {
+                assert !from.contains(child);
                 partners.add((AwareElement) child);
+            }
         }
         int leftSize = from.size(), rightSize = partners.size();
         for (AwareElement donor : from) {// iterate over left side
@@ -215,8 +218,8 @@ public class XMLCrossOverFunction extends CrossOverFunction {
 
         ArrayList<AwareElement> elements1, elements2;
         try {
-            elements1 = new ArrayList<AwareElement>(eleMap1.get(decl));
-            elements2 = new ArrayList<AwareElement>(eleMap2.get(decl));
+            elements1 = new ArrayList<>(eleMap1.get(decl));
+            elements2 = new ArrayList<>(Sets.difference(eleMap2.get(decl), eleMap1.get(decl)));
         } catch (NullPointerException e) {
             crossOverXMLs(x1, x2, visited);
             return;
@@ -251,6 +254,7 @@ public class XMLCrossOverFunction extends CrossOverFunction {
                         XSModelGroup mgroup = (XSModelGroup) term;
                         // choose elements whose children might get swapped
                         AwareElement swapRoot1 = Randomness.choice(elements1), swapRoot2 = Randomness.choice(elements2);
+                        assert swapRoot1 != swapRoot2;
                         switch (mgroup.getCompositor()) {
                             case XSModelGroup.COMPOSITOR_SEQUENCE:
                                 // TODO implement the subtle differences in handling of SEQUENCE
