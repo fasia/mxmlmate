@@ -356,6 +356,13 @@ public class AwareElement extends Element {
      * registers this element and all of its children in the given element map
      */
     public void register(Map<XSElementDeclaration, Set<AwareElement>> eleMap) {
+        if (decl == null) {
+            if (!"http://bogus.org".equals(getNamespaceURI()))
+            logger.debug("Tried to register an element without a declaration: {}", this);
+            // also prevents any children from registering themselves
+            // TODO see if it causes a memory leak - unlikely
+            return;
+        }
         if (eleMap == null)
             logger.error("Tried to register an element with no document {}", this); // and then a NPE will be thrown
         @SuppressWarnings("null")
@@ -375,7 +382,7 @@ public class AwareElement extends Element {
      * removes this element and all of its children from the element map
      */
     void deregister(Map<XSElementDeclaration, Set<AwareElement>> eleMap) {
-        if (eleMap == null)
+        if (eleMap == null || "http://bogus.org".equals(getNamespaceURI()))
             return;
         Set<AwareElement> relatives = eleMap.get(decl);
         if (relatives == null) {
