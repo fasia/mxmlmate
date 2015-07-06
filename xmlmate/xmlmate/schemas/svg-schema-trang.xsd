@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <xs:include schemaLocation="svg-datatypes.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="svg-core-attrib.xsd"/>
+  <xs:element name="SVG.Description.class" abstract="true"/>
+  <xs:element name="SVG.Use.class" abstract="true" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.use.content">
+          <xs:attributeGroup ref="svg:attlist.use"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SVG.Structure.class" abstract="true"/>
+  <xs:attributeGroup name="SVG.Presentation.attrib">
+    <xs:attribute name="flood-color" type="svg:SVGColor.datatype"/>
+    <xs:attribute name="flood-opacity" type="svg:OpacityValue.datatype"/>
+    <xs:attribute name="lighting-color" type="svg:SVGColor.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.svg.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="svg" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.svg.content">
+          <xs:attributeGroup ref="svg:attlist.svg"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.svg">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" type="svg:Length.datatype"/>
+    <xs:attribute name="height" type="svg:Length.datatype"/>
+    <xs:attribute name="viewBox" type="svg:ViewBoxSpec.datatype"/>
+    <xs:attribute name="preserveAspectRatio" default="xMidYMid meet" type="svg:PreserveAspectRatioSpec.datatype"/>
+    <xs:attribute name="zoomAndPan" default="magnify">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="disable"/>
+          <xs:enumeration value="magnify"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="version" default="1.1">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="1.1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="baseProfile" type="svg:Text.datatype"/>
+    <xs:attribute name="contentScriptType" default="text/ecmascript" type="svg:ContentType.datatype"/>
+    <xs:attribute name="contentStyleType" default="text/css" type="svg:ContentType.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.g.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="g" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.g.content">
+          <xs:attributeGroup ref="svg:attlist.g"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.g">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.defs.content">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="svg:SVG.Description.class"/>
+      <xs:element ref="svg:SVG.Structure.class"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="defs" substitutionGroup="svg:SVG.Structure.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="svg:SVG.defs.content">
+          <xs:attributeGroup ref="svg:attlist.defs"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.defs">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+  <xs:element name="desc" substitutionGroup="svg:SVG.Description.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.desc"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.desc">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="title" substitutionGroup="svg:SVG.Description.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.title"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.title">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="metadata" substitutionGroup="svg:SVG.Description.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="svg:attlist.metadata"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.metadata">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+  </xs:attributeGroup>
+  <xs:complexType name="SVG.use.content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="svg:SVG.Description.class"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="use" substitutionGroup="svg:SVG.Use.class"/>
+  <xs:attributeGroup name="attlist.use">
+    <xs:attributeGroup ref="xml:SVG.Core.attrib"/>
+    <xs:attributeGroup ref="svg:SVG.Presentation.attrib"/>
+    <xs:attribute name="x" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="y" type="svg:Coordinate.datatype"/>
+    <xs:attribute name="width" type="svg:Length.datatype"/>
+    <xs:attribute name="height" type="svg:Length.datatype"/>
+    <xs:attribute name="transform" type="svg:TransformList.datatype"/>
+  </xs:attributeGroup>
+</xs:schema>
