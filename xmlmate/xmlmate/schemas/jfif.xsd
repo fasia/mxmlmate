@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xmlmate.org/schemas/jfif"
+        xmlns:tns="http://xmlmate.org/schemas/jfif" elementFormDefault="qualified">
+
+    <element name="x-thumbnail" type="unsignedByte"/>
+    <element name="x-thumbnail-0" type="unsignedByte" fixed="0" substitutionGroup="tns:x-thumbnail"/>
+    <element name="y-thumbnail" type="unsignedByte"/>
+    <element name="y-thumbnail-0" type="unsignedByte" fixed="0" substitutionGroup="tns:y-thumbnail"/>
+    <element name="version_minor" type="unsignedByte"/>
+    <element name="version_minor_known" substitutionGroup="tns:version_minor">
+        <simpleType>
+            <restriction base="unsignedByte">
+                <enumeration value="0"/>
+                <enumeration value="1"/>
+                <enumeration value="2"/>
+            </restriction>
+        </simpleType>
+    </element>
+
+
+    <complexType name="JFIF-APP0">
+        <sequence>
+            <!--<element name="APP0marker" type="hexBinary" fixed="FFE0"/>--> <!-- will be put by the converter -->
+            <!--<element name="length" type="unsignedInt"/>--> <!-- will be put by the converter -->
+            <!--<element name="identifier" type="hexBinary" fixed="4A46494600" /> --> <!-- will be put by the converter -->
+            <element name="version_major" type="unsignedByte" fixed="1"/>
+            <element ref="tns:version_minor"/>
+            <element name="density-units" type="tns:DenistyUnitsType"/>
+            <element name="Xdensity" type="tns:DensityType"/>
+            <element name="Ydensity" type="tns:DensityType"/>
+            <element ref="tns:x-thumbnail" />
+            <element ref="tns:y-thumbnail" />
+            <!--<element name="thumbnail" type="hexBinary"/>--> <!-- will be put by the converter -->
+        </sequence>
+    </complexType>
+
+    <complexType name="JFXX-APP0">
+        <sequence>
+            <!--<element name="APP0marker" type="hexBinary" fixed="FFE0"/>--> <!-- will be put by the converter -->
+            <!--<element name="length" type="unsignedInt"/>--> <!-- will be put by the converter -->
+            <!--<element name="identifier" type="hexBinary" fixed="4A46585800" /> --> <!-- will be put by the converter -->
+            <element name="thumbnail" type="tns:ThumbnailType"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="DensityType">
+        <restriction base="unsignedShort">
+            <minInclusive value="1"/>
+        </restriction>
+    </simpleType>
+    <simpleType name="DenistyUnitsType">
+        <restriction base="unsignedByte">
+            <maxInclusive value="2"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="ThumbnailType" abstract="true">
+        <sequence>
+            <element name="Xthumbnail" type="unsignedByte"/>
+            <element name="Ythumbnail" type="unsignedByte"/>
+            <!--<element name="data" type="hexBinary"/>--> <!-- will be put by the converter -->
+        </sequence>
+    </complexType>
+
+    <complexType name="PaletteThumbnailType">
+        <complexContent>
+            <extension base="tns:ThumbnailType">
+                <sequence>
+                    <element name="palette">
+                        <complexType>
+                            <sequence minOccurs="768" maxOccurs="768">
+                                <element name="data" type="unsignedByte"/>
+                            </sequence>
+                        </complexType>
+                    </element>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="RGBThumbnailType">
+        <complexContent>
+            <extension base="tns:ThumbnailType"/>
+        </complexContent>
+    </complexType>
+
+    <complexType name="DQT">
+        <sequence>
+            <!--<element name="DQTmarker" type="hexBinary" fixed="FFDB"/>--> <!-- will be put by the converter -->
+            <!--<element name="length" type="unsignedShort" fixed="67"/>--> <!-- will be put by the converter -->
+            <!--<element name="destination"/>--> <!-- will be put by the converter -->
+            <element name="data" type="unsignedByte" minOccurs="64" maxOccurs="64"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="SOF">
+        <sequence>
+            <!--<element name="SOFmarker" type="hexBinary" fixed="FFC0"/>--> <!-- will be put by the converter -->
+            <!--<element name="length" type="unsignedShort"/>--> <!-- will be put by the converter -->
+            <!--<element name="bit-depth" type="unsignedByte" fixed="8"/>--> <!-- will be put by the converter -->
+            <element name="width" type="unsignedShort"/>
+            <element name="height" type="unsignedShort"/>
+            <!--<element name="number-of-components" type="unsignedByte"/>--> <!-- will be put by the converter -->
+            <element name="component" maxOccurs="3">
+                <complexType>
+                    <sequence>
+                        <element name="identifier">
+                            <simpleType>
+                                <restriction base="unsignedByte">
+                                    <maxInclusive value="2"/>
+                                </restriction>
+                            </simpleType>
+                        </element>
+                        <element name="hivi">
+                            <simpleType>
+                                <restriction base="unsignedByte">
+                                    <enumeration value="17"/> <!-- 1 x 1 -->
+                                    <enumeration value="18"/> <!-- 1 x 2 -->
+                                    <enumeration value="9"/>  <!-- 2 x 1 -->
+                                    <enumeration value="10"/> <!-- 2 x 2 -->
+                                </restriction>
+                            </simpleType>
+                        </element>
+                        <element name="dqt-selector">
+                            <simpleType>
+                                <restriction base="unsignedByte">
+                                    <maxInclusive value="1"/>
+                                </restriction>
+                            </simpleType>
+                        </element>
+                    </sequence>
+                </complexType>
+            </element>            
+        </sequence>
+    </complexType>
+
+    <complexType name="DHT">
+        <sequence>
+            <!--<element name="DHTmarker" type="hexBinary" fixed="FFC4"/>--> <!-- will be put by the converter -->
+            <!--<element name="length" type="unsignedShort"/>--> <!-- will be put by the converter -->
+            <element name="class-dest">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <enumeration value="0"/>
+                        <enumeration value="1"/>
+                        <enumeration value="16"/>
+                        <enumeration value="17"/>
+                    </restriction>
+                </simpleType>
+            </element>
+            <element name="bit" type="unsignedByte" minOccurs="16" maxOccurs="16"/> <!-- will be modified by the converter -->
+            <!-- huffval will be generated by the converter --> <!-- XXX consider putting is here instead -->
+        </sequence>
+    </complexType>
+
+    <complexType name="SOS">
+        <sequence>
+            <!--<element name="SOSmarker" type="hexBinary" fixed="FFDA"/>--> <!-- will be put by the converter -->
+            <!--<element name="length" type="unsignedShort"/>--> <!-- will be put by the converter -->
+            <!--<element name="number-of-components" type="unsignedByte"/>--> <!-- will be put by the converter -->
+            <element name="component" maxOccurs="3">
+                <complexType>
+                    <sequence>
+                        <element name="identifier">
+                            <simpleType>
+                                <restriction base="unsignedByte">
+                                    <maxInclusive value="2"/>
+                                </restriction>
+                            </simpleType>
+                        </element>
+                        <element name="dc-ac">
+                            <simpleType>
+                                <restriction base="unsignedByte">
+                                    <enumeration value="0"/>
+                                    <enumeration value="1"/>
+                                    <enumeration value="16"/>
+                                    <enumeration value="17"/>
+                                </restriction>
+                            </simpleType>
+                        </element>
+                    </sequence>
+                </complexType>
+            </element>
+            <!--<element name="sos-end" type="hexBinary" fixed="006300"/>--> <!-- will be put by the converter -->
+        </sequence>
+    </complexType>
+
+    <complexType name="JfifType">
+        <sequence>
+            <!--<element name="soi" type="hexBinary" fixed="FFD8"/>--> <!-- will be put by the converter -->
+            <element name="jfif-app0" type="tns:JFIF-APP0"/>
+            <element name="jfxx-app0" type="tns:JFXX-APP0" minOccurs="0"/>
+            <!--<element name="com" />--> <!-- XXX -->
+            <element name="dqt" type="tns:DQT" minOccurs="0" maxOccurs="4"/>
+            <element name="sof" type="tns:SOF"/>
+            <sequence maxOccurs="2">
+                <element name="dht" type="tns:DHT" minOccurs="2" maxOccurs="2"/>
+            </sequence>
+            <element name="sos" type="tns:SOS" />
+
+            <!--<element name="data" type="hexBinary" />--> <!-- TODO -->
+            <!--<element name="eoi" type="hexBinary" fixed="FFD9"/>--> <!-- will be put by the converter -->
+        </sequence>
+    </complexType>
+
+    <element name="jfif" type="tns:JfifType">
+    </element>
+</schema>

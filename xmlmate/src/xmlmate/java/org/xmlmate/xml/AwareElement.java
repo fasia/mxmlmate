@@ -225,7 +225,7 @@ public class AwareElement extends Element {
         // XXX process nillable
         // if type is abstract - change to a subtype
         if (complexType.getAbstract()) {
-            logger.debug("Mutating abstract complex type {}\t at deph: {}", complexType.getName(), currentDepth);
+            logger.trace("Mutating abstract complex type {}\t at depth: {}", complexType.getName(), currentDepth);
             List<XSComplexTypeDefinition> subTypes = getConcreteSubTypes(complexType);
             XSComplexTypeDefinition subType = Randomness.choice(subTypes);
             NamespaceManager nsm = NamespaceManager.getInstance();
