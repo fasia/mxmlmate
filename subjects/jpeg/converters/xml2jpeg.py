@@ -4,16 +4,21 @@ import io
 from xml.etree.ElementTree import parse
 import struct
 from array import array
-from builtins import range, map
 import random
 from bitarray import bitarray
 from itertools import count
+from collections import defaultdict
+from bitarray import bitarray
+from heapq import heappush, heappop
+
+
 
 ns = {'jfif': 'http://xmlmate.org/schemas/jfif'}
 
 
 def random_data(length, seed):
-    random.seed(seed)
+    if seed is not None:
+        random.seed(seed)
     return bytearray(random.getrandbits(8) for _ in range(length))
 
 
@@ -77,51 +82,45 @@ def write_dqt(dqt, f, num):
 
 
 def write_sof(sof, f):
-    components = sof.findall('./jfif:component', ns)
-    num = len(components)
-    assert 1 <= num <= 3
+    components = sof.findall('./jfif:qdt-selector', ns)
+    assert not components or len(components) == 2
+    print(type(components))  # FIXME remove
+    num = 3 if components else 1
     length = 8 + 3 * num
-    f.write(struct.pack('>HHBHHB',
+    f.write(struct.pack('>HHBHHBBBB',
                         0xFFC0,  # FFC0
                         length,  # length
                         8,  # bit depth
                         int(sof[0].text),  # height
                         int(sof[1].text),  # width
-                        num  # num components
+                        num,  # num components
+                        0,    # Y component id
+                        int(sof[2][0]),  # Hi+Vi
+                        int(sof[2][0])   # DQT selector
                         ))
-    for component in components:
+    for i, component in enumerate(components, start=1):
         f.write(struct.pack('>BBB',
-                            int(component[0].text),  # identifier
-                            int(component[1].text),  # Hi+Vi
-                            int(component[2].text)  # DQT selector
+                            i,  # identifier
+                            0x11,  # Hi+Vi
+                            int(component[0].text)  # DQT selector
                             ))
 
 
-def huffman(seed):
-    random.seed(seed)
-    vals = []
-    for i in range(1, 17):
-        ul = 2 ** min(i, 8)
-        ul = min(ul, ul - sum(map(lambda xy: xy[1] * 2 ** (i - xy[0]), enumerate(vals, start=1))))
-        x = random.randint(0, max(0, ul))
-        # print('i=%d \t%d <= %d' % (i, x, ul))
-        vals.append(x)
-    return vals
-
-
 def write_dht(dht, f):
-    bitseed = int(dht[1].text)
-    bits = bytearray(huffman(bitseed))
-    nhv = sum(bits)
-    length = 19 + nhv
-    f.write(struct.pack('>HHB',
-                        0xFFC4,  # FFC4
-                        length,  # length
-                        int(dht[0].text)  # class + destination
-                        ))
-    f.write(array('B', bits))
-    nhvseed = int(dht[2].text)
-    f.write(random_data(nhv, nhvseed))
+    pass
+    # FIXME
+    # bitseed = int(dht[1].text)
+    # bits = bytearray(huffman(bitseed))
+    # nhv = sum(bits)
+    # length = 19 + nhv
+    # f.write(struct.pack('>HHB',
+    #                     0xFFC4,  # FFC4
+    #                     length,  # length
+    #                     int(dht[0].text)  # class + destination
+    #                     ))
+    # f.write(array('B', bits))
+    # nhvseed = int(dht[2].text)
+    # f.write(random_data(nhv, nhvseed))
 
 
 def write_sos(sos, f):
@@ -150,11 +149,22 @@ def xml2jpeg(input_file, output_file):
     sof = root.find('./jfif:sof', ns)
     assert sof is not None
     height = int(sof[0].text)
+    # ensure height divisible by 8
+    height = ((height + 7) // 8) * 8
+    sof[0].text = str(height)
     width = int(sof[1].text)
+    # ensure width divisible by 8
+    width = ((width + 7) // 8) * 8
+    sof[1].text = str(width)
+    subsampling = int(sof.find('./jfif:hivi', ns).text)
+    hi = subsampling >> 4
+    vi = subsampling & 0xF0
     dhts = root.findall('./jfif:dht', ns)
     assert dhts
     sos = root.find('./jfif:sos', ns)
     assert sos is not None
+    data_seed = root.find('./jfif:data-seed', ns)
+    assert data_seed is not None
 
     with io.open(output_file, mode='wb') as f:
         f.write(struct.pack('>H', 0xFFD8))  # SOI
@@ -170,12 +180,64 @@ def xml2jpeg(input_file, output_file):
             write_dqt(dqt, f, num)
         # SOF
         write_sof(sof, f)
+        # Precompute the image data
+        num_Ys = width * height // 64
+        num_CbCrs = num_Ys // (hi * vi)
+
+        random.seed(data_seed)
+        Ydc_codes = [random.randrange(12) for _ in range(num_Ys)]
+        Ydc_bits = [k and bitarray(bin(random.getrandbits(k))[2:].zfill(k)) for k in Ydc_codes]
+        # TODO compute huffman for Ydc_codes
+        # TODO add stuff bytes
+
+
         # DHTs
         for dht in dhts:
             write_dht(dht, f)
+        # SOS
         write_sos(sos, f)
-        # f.write(random_data(1920*1080, 5))  # TODO
+        # DATA
+        # f.write(coded_image_data)
         f.write(struct.pack('>H', 0xFFD9))  # EOI
+
+
+def huff_code(freq):
+    """
+    Given a dictionary mapping symbols to their frequency,
+    return the Huffman code in the form of
+    a dictionary mapping the symbols to bitarrays.
+    """
+    minheap = []
+    for s in freq:
+        heappush(minheap, (freq[s], s))
+
+    while len(minheap) > 1:
+        right, left = heappop(minheap), heappop(minheap)
+        parent = (left[0] + right[0], left, right)
+        heappush(minheap, parent)
+
+    # Now minheap[0] is the root node of the Huffman tree
+
+    def traverse(tree, prefix=bitarray()):
+        if len(tree) == 2:
+            result[tree[1]] = prefix
+        else:
+            traverse(tree[1], prefix + bitarray([0]))
+            traverse(tree[2], prefix + bitarray([1]))
+
+    result = {}
+    traverse(minheap[0])
+    return result
+
+def freq_string(s):
+    """
+    Given a string, return a dictionary
+    mapping characters to thier frequency.
+    """
+    res = defaultdict(int)
+    for c in s:
+        res[c] += 1
+    return res
 
 
 if __name__ == '__main__':
