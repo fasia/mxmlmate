@@ -23,6 +23,12 @@
             </restriction>
         </simpleType>
     </element>
+    
+    <simpleType name="LimitedDimension">
+        <restriction base="unsignedShort">
+            <maxInclusive value="1024"/>
+        </restriction>
+    </simpleType>
 
 
     <complexType name="JFIF-APP0">
@@ -105,13 +111,13 @@
             <!--<element name="SOFmarker" type="hexBinary" fixed="FFC0"/>--> <!-- will be put by the converter -->
             <!--<element name="length" type="unsignedShort"/>--> <!-- will be put by the converter -->
             <!--<element name="bit-depth" type="unsignedByte" fixed="8"/>--> <!-- will be put by the converter -->
-            <element name="height" type="unsignedShort"/>
-            <element name="width" type="unsignedShort"/>
+            <element name="height" type="tns:LimitedDimension"/>
+            <element name="width" type="tns:LimitedDimension"/>
             <!--<element name="number-of-components" type="unsignedByte"/>--> <!-- will be put by the converter -->
             <element name="Y">
                 <complexType>
                     <sequence>
-                        <!--<element name="identifier" type="unsignedByte" fixed="0"/>--> <!-- will be put by the converter -->
+                        <!--<element name="identifier" type="unsignedByte"/>--> <!-- will be put by the converter -->
                         <element name="hivi">
                             <simpleType>
                                 <restriction base="unsignedByte">
@@ -138,28 +144,16 @@
             <!--<element name="SOSmarker" type="hexBinary" fixed="FFDA"/>--> <!-- will be put by the converter -->
             <!--<element name="length" type="unsignedShort"/>--> <!-- will be put by the converter -->
             <!--<element name="number-of-components" type="unsignedByte"/>--> <!-- will be put by the converter -->
-            <element name="component" maxOccurs="3">
-                <complexType>
-                    <sequence>
-                        <element name="identifier">
-                            <simpleType>
-                                <restriction base="unsignedByte">
-                                    <maxInclusive value="2"/> <!-- TODO find out if it's [1,2,3] -->
-                                </restriction>
-                            </simpleType>
-                        </element>
-                        <element name="dc-ac">
-                            <simpleType>
-                                <restriction base="unsignedByte">
-                                    <enumeration value="0"/>
-                                    <enumeration value="1"/>
-                                    <enumeration value="16"/>
-                                    <enumeration value="17"/>
-                                </restriction>
-                            </simpleType>
-                        </element>
-                    </sequence>
-                </complexType>
+            <!--<element name="identifier" type="unsignedByte" maxOccurs="3"/> --> <!-- will be taken by the converter from the xmlmate-component-id -->
+            <element name="dc-ac" maxOccurs="3">
+                <simpleType>
+                    <restriction base="unsignedByte">
+                        <enumeration value="0"/>  <!-- 0x00 -->
+                        <enumeration value="1"/>  <!-- 0x01 -->
+                        <enumeration value="16"/> <!-- 0x10 -->
+                        <enumeration value="17"/> <!-- 0x11 -->
+                    </restriction>
+                </simpleType>
             </element>
             <!--<element name="sos-end" type="hexBinary" fixed="006300"/>--> <!-- will be put by the converter -->
         </sequence>
@@ -167,11 +161,15 @@
 
     <complexType name="JfifType">
         <sequence>
+            <!-- xmlmate specific components describing the IDs used in the jpeg file -->
+            <element name="xmlmate-component-id" type="unsignedByte" minOccurs="3" maxOccurs="3"/>
             <!--<element name="soi" type="hexBinary" fixed="FFD8"/>--> <!-- will be put by the converter -->
             <element name="jfif-app0" type="tns:JFIF-APP0"/>
             <element name="jfxx-app0" type="tns:JFXX-APP0" minOccurs="0"/>
             <!--<element name="com" />--> <!-- XXX -->
-            <element name="dqt" type="tns:DQT" minOccurs="0" maxOccurs="4"/>
+            <sequence maxOccurs="2">
+                <element name="dqt" type="tns:DQT" minOccurs="2" maxOccurs="2"/>
+            </sequence>
             <element name="sof" type="tns:SOF"/>
             <!--<sequence minOccurs="1" maxOccurs="2">
                 <element name="dht" type="tns:DHT" minOccurs="2" maxOccurs="2"/>

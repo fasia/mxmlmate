@@ -3,18 +3,19 @@
 from xml.etree.ElementTree import parse
 import struct
 from array import array
-import random
+from random import Random
 from collections import defaultdict, OrderedDict
-from heapq import heappush, heappop
+from itertools import chain, islice
 from bitarray import bitarray
 
 ns = {'jfif': 'http://xmlmate.org/schemas/jfif'}
 
 
 def random_data(length, seed):
-    if seed is not None:
-        random.seed(seed)
-    return bytearray(random.getrandbits(8) for _ in range(length))
+    if length > 100000:
+        print 'WARNING! Trying to non-lazily instantiate a large bytearray of %d elements.' % length
+    r = Random(seed)
+    return bytearray(r.getrandbits(8) for _ in xrange(length))
 
 
 def write_jfif(jfif, f):
@@ -76,26 +77,26 @@ def write_dqt(dqt, f, num):
     f.write(array('B', map(lambda x: int(x.text), data)))  # 64 bytes of data
 
 
-def write_sof(sof, f):
+def write_sof(sof, ids, f):
     components = sof.findall('./jfif:qdt-selector', ns)
     assert not components or len(components) == 2
     num = 3 if components else 1
     length = 8 + 3 * num
     f.write(struct.pack('>HHBHHBBBB',
-                        0xFFC0,  # FFC0
-                        length,  # length
-                        8,  # bit depth
-                        int(sof[0].text),  # height
-                        int(sof[1].text),  # width
-                        num,  # num components
-                        0,    # Y component id
-                        int(sof[2][0].text),  # Hi+Vi
-                        int(sof[2][1].text)   # DQT selector
+                        0xFFC0,                     # FFC0
+                        length,                     # length
+                        8,                          # bit depth
+                        int(sof[0].text),           # height
+                        int(sof[1].text),           # width
+                        num,                        # num components
+                        ids[0],                     # Y component id
+                        int(sof[2][0].text),        # Hi+Vi
+                        int(sof[2][1].text)         # DQT selector
                         ))
     for i, component in enumerate(components, start=1):
         f.write(struct.pack('>BBB',
-                            i,  # identifier
-                            0x11,  # Hi+Vi
+                            ids[i],                 # identifier
+                            0x11,                   # Hi+Vi
                             int(component[0].text)  # DQT selector
                             ))
 
@@ -170,14 +171,14 @@ def write_dht(huff_dict, cls_dst, f):
                         ))
     # calculate number of prefixes of each length
     freqs = freq_string(map(lambda x: x.length(), huff_dict.itervalues()))
-    f.write(array('B', [freqs[p] for p in range(1, 17)]))
+    f.write(array('B', [freqs[p] for p in xrange(1, 17)]))
     # stably order by the corresponding value
-    sorted1 = sorted(huff_dict.items(), key=lambda t: (t[1].length(),int(t[1].to01(), 2)))
+    sorted1 = sorted(huff_dict.items(), key=lambda t: (t[1].length(), int(t[1].to01(), 2)))
     f.write(array('B', zip(*sorted1)[0]))
 
 
-def write_sos(sos, f):
-    components = sos.findall('./jfif:component', ns)
+def write_sos(sos, ids, f):
+    components = sos.findall('./jfif:dc-ac', ns)
     num = len(components)
     assert 1 <= num <= 3
     length = 6 + 2 * num
@@ -186,13 +187,15 @@ def write_sos(sos, f):
                         length,  # length
                         num      # num components
                         ))
-    for component in components:
+    for i, component in enumerate(components):
         f.write(struct.pack('>BB',
-                            int(component[0].text),  # identifier
-                            int(component[1].text)   # DC + AC
+                            ids[i],              # identifier
+                            int(component.text)  # DC + AC
                             ))
     f.write(struct.pack('>BBB', 0, 63, 0))
 
+
+generate_bits = lambda r,k: bitarray(bin(r.getrandbits(k))[2:].zfill(k)) if k else bitarray()
 
 def xml2jpeg(input_file, output_file):
     tree = parse(input_file)
@@ -217,6 +220,8 @@ def xml2jpeg(input_file, output_file):
     data_seed = root.find('./jfif:data-seed', ns)
     assert data_seed is not None
     data_seed = int(data_seed.text)
+    component_ids = map(lambda x: int(x.text), root.findall('./jfif:xmlmate-component-id', ns))
+    assert len(component_ids) == 3
 
     with open(output_file, mode='wb') as f:
         f.write(struct.pack('>H', 0xFFD8))  # SOI
@@ -231,68 +236,74 @@ def xml2jpeg(input_file, output_file):
         for num, dqt in enumerate(dqts):
             write_dqt(dqt, f, num)
         # SOF
-        write_sof(sof, f)
+        write_sof(sof, component_ids, f)
 
         # Precompute the image data
         num_Ys = width * height // 64
-        num_CbCrs = num_Ys // (hi * vi)
-        random.seed(data_seed)
-        Ydc_lengths = bytearray([random.randrange(12) for _ in range(num_Ys)])
-        Ydc_bits = [bitarray(bin(random.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in Ydc_lengths]
-        # compute huffman for Ydc_codes
-        huffman_Ydc = huff_code(freq_string(Ydc_lengths))
+        r = Random(data_seed)
+        # FIXME eliminate generator reuse! itertools.tee won't help. move data generation into file writing loop
+        Ydc_lengths = (r.randrange(12) for _ in xrange(num_Ys))
+        # Yac_lengths = bytearray([random.randrange(11) for _ in xrange(num_Ys * 63)])
+        Yac_lengths = (r.choice(huffman_luminance_ac_values) for _ in xrange(num_Ys * 63))
+
+        # luminance_bits = [bitarray(bin(random.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in chain(Ydc_lengths, Yac_lengths)]
+        # Ydc_bits, Yac_bits = luminance_bits[:num_Ys], luminance_bits[num_Ys:]
+
+        # Ydc_bits = (bitarray(bin(r.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in Ydc_lengths)
+        # Yac_bits = (bitarray(bin(r.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in (x & 0x0F for x in Yac_lengths))
 
         # write huffman table for Y_dc
         write_dht(huffman_luminance_dc, 0, f)  # 0x00 = DC, ID0
-        # write_dht(huffman_Ydc, 0, f)
 
         # write huffman table for Y_ac
         write_dht(huffman_luminance_ac, 0x10, f)  # 0x10 = AC, ID0
 
+        # num_CbCrs = num_Ys // (hi * vi)
         # TODO write huffman table for CbCr_dc
 
         # TODO write huffman table for CbCr_ac
 
         # SOS
-        write_sos(sos, f)
+        write_sos(sos, component_ids, f)
         # DATA
         data = bitarray(endian='big')
-        for code, bits in zip(Ydc_lengths, Ydc_bits):
-            data.extend(huffman_luminance_dc[code])
-            # data.extend(huffman_Ydc[code])
-            data.extend(bits)
-            data.extend(huffman_luminance_ac[0x00])  # FIXME replace with actual data, also note the subsampling
+        for mcu, ydc_len, yac_lens in zip(xrange(num_Ys), Ydc_lengths, chunks(63, Yac_lengths)):
+            yac_lens = list(yac_lens)  # it's only 63 elements, so it's ok
+            ydc_data = generate_bits(r, ydc_len)
+            yac_data = (generate_bits(r, k & 0x0F) for k in yac_lens)
+            data.extend(huffman_luminance_dc[ydc_len])
+            data.extend(ydc_data)
+            ac_values = 63
+            for l, b in zip(yac_lens, yac_data):
+                assert b.length() == l & 0x0F
+                assert ac_values >= 0
+                if 0 == ac_values:
+                    break
+                else:
+                    runlength = min((l & 0xF0) >> 4, ac_values - 1)  # cap maximum runlength
+                    l = l & 0x0F | runlength << 4
+                    try:
+                        data.extend(huffman_luminance_ac[l])
+                    except KeyError:  # XXX fix this hacky workaround some time
+                        l = 0x00
+                        data.extend(huffman_luminance_ac[l])
+                    if l == 0x00:
+                        ac_values = 0
+                        break
+                    else:
+                        data.extend(b)
+                        ac_values -= (runlength + 1)
+            assert 0 == ac_values
+            # TODO chromaticity + subsampling
         # add stuff bytes
         f.write(stuff_bytes(bytearray(data.tobytes())))
         f.write(struct.pack('>H', 0xFFD9))  # EOI
 
-def huff_code(freq):
-    """
-    Given a dictionary mapping symbols to their frequency,
-    return the Huffman code in the form of
-    a dictionary mapping the symbols to bitarrays.
-    """
-    minheap = []
-    for s in freq:
-        heappush(minheap, (freq[s], s))
 
-    while len(minheap) > 1:
-        right, left = heappop(minheap), heappop(minheap)
-        parent = (left[0] + right[0], left, right)
-        heappush(minheap, parent)
-
-    # Now minheap[0] is the root node of the Huffman tree
-
-    def traverse(tree, prefix=bitarray(endian='big')):
-        if len(tree) == 2:
-            result[tree[1]] = prefix
-        else:
-            traverse(tree[1], prefix + bitarray([0]))
-            traverse(tree[2], prefix + bitarray([1]))
-
-    result = {}
-    traverse(minheap[0])
-    return result
+def chunks(n, iterable):
+    iterable = iter(iterable)
+    while True:
+        yield chain([next(iterable)], islice(iterable, n-1))
 
 def freq_string(s):
     """
