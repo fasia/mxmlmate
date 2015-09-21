@@ -94,6 +94,8 @@ public class XMLProperties {
         exclude.setArgs(possibleExcludes);
         options.addOption(exclude);
         options.addOption("x", "extension", true, "File extension of the generated files. Default is " + FILE_EXTENSION);
+
+        // XXX redesign as subcommands
         options.addOption("single", true, "Generate a single xml instance into the given file.");
         options.addOption("measure", true, "Measure the schema coverage of all suites in the given directory.");
         options.addOption("schemaCoverage", false, "Use the schema coverage as sole fitness function.");
@@ -104,6 +106,11 @@ public class XMLProperties {
         options.addOption("div0Fitness", false, "Use with PIN to aim for div by zero.");
         options.addOption("intOverflow", false, "Use with PIN to aim for integer overflows.");
         options.addOption("bufOverflow", false, "Use with PIN to aim for buffer overflows.");
+        options.addOption("noGuidance", false, "Don't use any evolution guidance. Equivalent to blackbox fuzzing");
+        options.addOption("maximizeLong", false, "Maximize an arbitrary long value.");
+        options.addOption("minimizeLong", false, "Minimize an arbitrary long value.");
+        options.addOption("minTimeMaxFile", false, "Minimize execution time while maximizing file size.");
+
         options.addOption("r", "root", true, "Root element of the xml tree.");
         options.addOption("a", "samples", true, "Path to samples (file or folder). If given, root must also be given.");
         options.addOption("t", "timeout", true, "Termination time in sec. Default is " + GLOBAL_TIMEOUT);
@@ -199,6 +206,40 @@ public class XMLProperties {
             }
             if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
                 logger.error("bufOverflow can only be used with a population of 1!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("noGuidance")) return true;
+        if (line.hasOption("maximizeLong")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -maximizeLong option!");
+                return false;
+            }
+            if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
+                logger.error("maximizeLong can only be used with a population of 1!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("minimizeLong")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -minimizeLong option!");
+                return false;
+            }
+            if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
+                logger.error("minimizeLong can only be used with a population of 1!");
+                return false;
+            }
+            return true;
+        }
+        if (line.hasOption("minTimeMaxFile")) {
+            if (line.hasOption("class")) {
+                logger.error("You may not use the -class options with the -minTimeMaxFile option!");
+                return false;
+            }
+            if (!line.hasOption("population") || Integer.parseInt(line.getOptionValue("population")) != 1) {
+                logger.error("minTimeMaxFile can only be used with a population of 1!");
                 return false;
             }
             return true;
@@ -386,6 +427,23 @@ public class XMLProperties {
         	assert Properties.POPULATION == 1;
         	return new SingletonPopulationBackendUseCase(factory, new BufferOverflowFitnessFunction());
         }
+        if (line.hasOption("noGuidance")) {
+        	RUN_NAME = "noGuidance " + RUN_NAME;
+        	return new BinaryBackendUseCase(factory, new NoFitnessFunction());
+        }
+        if (line.hasOption("maximizeLong")) {
+        	RUN_NAME = "maximizeLong " + RUN_NAME;
+        	return new SingletonPopulationBackendUseCase(factory, new MaximizeLongFitnessFunction());
+        }
+        if (line.hasOption("minimizeLong")) {
+            RUN_NAME = "minimizeLong " + RUN_NAME;
+            return new SingletonPopulationBackendUseCase(factory, new MinimizeLongFitnessFunction());
+        }
+        if (line.hasOption("minTimeMaxFile")) {
+            RUN_NAME = "minTimeMaxFile " + RUN_NAME;
+            return new SingletonPopulationBackendUseCase(factory, new MinimizeTimeMaximizeSizeFitnessFunction());
+        }
+
         RUN_NAME = "branchCoverage " + RUN_NAME;
         return new EvolveBranchCoverageUseCase(factory);
     }
