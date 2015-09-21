@@ -30,7 +30,7 @@
   </xs:annotation>
 
   <xs:import namespace="http://www.w3.org/XML/1998/namespace"
-      schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+      schemaLocation="xml.xsd"/>
 
   <xs:annotation>
     <xs:documentation>
@@ -2182,7 +2182,7 @@
           <xs:attribute name="headers" type="xs:IDREFS"/>
           <xs:attribute name="scope" type="Scope"/>
           <xs:attribute name="rowspan" default="1" type="Number"/>
-          <xs:attribute name="colspan" default="1" type="Number"/>
+          <xs:attribute name="colspan" default="1" type="xs:positiveInteger"/>
           <xs:attributeGroup ref="cellhalign"/>
           <xs:attributeGroup ref="cellvalign"/>
         </xs:extension>
@@ -2200,7 +2200,7 @@
           <xs:attribute name="headers" type="xs:IDREFS"/>
           <xs:attribute name="scope" type="Scope"/>
           <xs:attribute name="rowspan" default="1" type="Number"/>
-          <xs:attribute name="colspan" default="1" type="Number"/>
+          <xs:attribute name="colspan" default="1" type="xs:positiveInteger"/>
           <xs:attributeGroup ref="cellhalign"/>
           <xs:attributeGroup ref="cellvalign"/>
         </xs:extension>
