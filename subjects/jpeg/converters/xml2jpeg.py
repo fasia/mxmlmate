@@ -18,6 +18,7 @@ def random_data(length, seed):
     return bytearray(r.getrandbits(8) for _ in xrange(length))
 
 
+
 def write_jfif(jfif, f):
     x_thumbnail = int(jfif[5].text)
     y_thumbnail = int(jfif[6].text)
@@ -102,10 +103,10 @@ def write_sof(sof, ids, f):
 
 
 huffman_luminance_dc = {x: y for x, y in enumerate(map(bitarray,
-                                                       ['00', '010', '011', '100', '101', '110', '1110', '11110',
-                                                        '111110', '1111110', '11111110', '111111110']))}
+                                                       ('00', '010', '011', '100', '101', '110', '1110', '11110',
+                                                        '111110', '1111110', '11111110', '111111110')))}
 
-huffman_luminance_ac_values = [0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12, 0x21, 0x31, 0x41, 0x06, 0x13, 0x51, 0x61,
+huffman_luminance_ac_values = (0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12, 0x21, 0x31, 0x41, 0x06, 0x13, 0x51, 0x61,
                                0x07, 0x22, 0x71, 0x14, 0x32, 0x81, 0x91, 0xA1, 0x08, 0x23, 0x42, 0xB1, 0xC1, 0x15, 0x52,
                                0xD1, 0xF0, 0x24, 0x33, 0x62, 0x72, 0x82, 0x09, 0x0A, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x25,
                                0x26, 0x27, 0x28, 0x29, 0x2A, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x43, 0x44, 0x45,
@@ -115,9 +116,10 @@ huffman_luminance_ac_values = [0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12, 0
                                0x9A, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6,
                                0xB7, 0xB8, 0xB9, 0xBA, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xD2, 0xD3,
                                0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8,
-                               0xE9, 0xEA, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA]
+                               0xE9, 0xEA, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA)
 
-huffman_luminance_ac_prefixes = ['00', '01', '100', '1010', '1011', '1100', '11010', '11011', '11100', '111010',
+
+huffman_luminance_ac_prefixes = ('00', '01', '100', '1010', '1011', '1100', '11010', '11011', '11100', '111010',
                                  '111011', '1111000', '1111001', '1111010', '1111011', '11111000', '11111001',
                                  '11111010', '111110110', '111110111', '111111000', '111111001', '111111010',
                                  '1111110110', '1111110111', '1111111000', '1111111001', '1111111010', '11111110110',
@@ -153,13 +155,13 @@ huffman_luminance_ac_prefixes = ['00', '01', '100', '1010', '1011', '1100', '110
                                  '1111111111101111', '1111111111110000', '1111111111110001', '1111111111110010',
                                  '1111111111110011', '1111111111110100', '1111111111110101', '1111111111110110',
                                  '1111111111110111', '1111111111111000', '1111111111111001', '1111111111111010',
-                                 '1111111111111011', '1111111111111100', '1111111111111101', '1111111111111110']
+                                 '1111111111111011', '1111111111111100', '1111111111111101', '1111111111111110')
 
 huffman_luminance_ac = OrderedDict(zip(huffman_luminance_ac_values, map(bitarray, huffman_luminance_ac_prefixes)))
 
 huffman_chrominance_dc = {x: y for x, y in enumerate(map(bitarray,
-                                                         ['00', '01', '10', '110', '1110', '11110', '111110', '1111110',
-                                                          '11111110', '111111110', '1111111110', '11111111110']))}
+                                                         ('00', '01', '10', '110', '1110', '11110', '111110', '1111110',
+                                                          '11111110', '111111110', '1111111110', '11111111110')))}
 
 
 def write_dht(huff_dict, cls_dst, f):
@@ -195,7 +197,7 @@ def write_sos(sos, ids, f):
     f.write(struct.pack('>BBB', 0, 63, 0))
 
 
-generate_bits = lambda r,k: bitarray(bin(r.getrandbits(k))[2:].zfill(k)) if k else bitarray()
+generate_bits = lambda r, k: bitarray(bin(r.getrandbits(k))[2:].zfill(k), endian='big') if k else bitarray(endian='big')
 
 def xml2jpeg(input_file, output_file):
     tree = parse(input_file)
@@ -241,16 +243,8 @@ def xml2jpeg(input_file, output_file):
         # Precompute the image data
         num_Ys = width * height // 64
         r = Random(data_seed)
-        # FIXME eliminate generator reuse! itertools.tee won't help. move data generation into file writing loop
         Ydc_lengths = (r.randrange(12) for _ in xrange(num_Ys))
-        # Yac_lengths = bytearray([random.randrange(11) for _ in xrange(num_Ys * 63)])
         Yac_lengths = (r.choice(huffman_luminance_ac_values) for _ in xrange(num_Ys * 63))
-
-        # luminance_bits = [bitarray(bin(random.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in chain(Ydc_lengths, Yac_lengths)]
-        # Ydc_bits, Yac_bits = luminance_bits[:num_Ys], luminance_bits[num_Ys:]
-
-        # Ydc_bits = (bitarray(bin(r.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in Ydc_lengths)
-        # Yac_bits = (bitarray(bin(r.getrandbits(k))[2:].zfill(k)) if k else bitarray() for k in (x & 0x0F for x in Yac_lengths))
 
         # write huffman table for Y_dc
         write_dht(huffman_luminance_dc, 0, f)  # 0x00 = DC, ID0
