@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema version="1.0"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        targetNamespace="http://www.w3.org/1999/xhtml"
+        elementFormDefault="qualified">
+    <import namespace="http://www.w3.org/2000/svg" schemaLocation="svg-schema-trang.xsd"/>
+
+    <element name="html">
+        <complexType>
+            <sequence>
+                <element name="title" type="string"/>
+                <element name="body">
+                    <complexType>
+                        <sequence>
+                            <element ref="svg:svg"/>
+                            <element name="div">
+                                <complexType>
+                                    <attribute name="id" type="string" fixed="org.xmlmate.done" use="required"/>
+                                </complexType>
+                            </element>
+                        </sequence>
+                    </complexType>
+                </element>
+            </sequence>
+        </complexType>
+    </element>
+</schema>
