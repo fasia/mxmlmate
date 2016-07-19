@@ -32,6 +32,9 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     private double elemCoverage = 0.0d;
     private double attrCoverage = 0.0d;
     public static Stopwatch mutationClock = Stopwatch.createUnstarted();
+    
+    //faezeh
+    public boolean alivemut= false;
 
     private static final XMLCrossOverFunction crossoverFunction = new XMLCrossOverFunction();
     private static ExecutorService mutatorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Mutator %d").build());

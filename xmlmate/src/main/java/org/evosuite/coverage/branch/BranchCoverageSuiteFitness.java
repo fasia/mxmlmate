@@ -252,9 +252,6 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		Map<String, Integer> callCount = new HashMap<String, Integer>();
 		Set<Integer> covered_lines = new HashSet<Integer>();
 		
-		//faezeh
-		Set<Double> alive_mutants = new HashSet<Double>();
-		
 		
 		// Collect stats in the traces 
 		boolean hasTimeoutOrTestException = analyzeTraces(results, predicateCount,

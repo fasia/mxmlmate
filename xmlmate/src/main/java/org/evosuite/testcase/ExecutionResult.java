@@ -37,6 +37,7 @@ public class ExecutionResult implements Cloneable {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(ExecutionResult.class);
+	
 
 	/** Test case that produced this execution result */
 	public TestCase test;
@@ -107,6 +108,8 @@ public class ExecutionResult implements Cloneable {
 		trace = null;
 		mutation = null;
 		test = t;
+		
+		
 	}
 
 	/**

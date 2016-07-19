@@ -39,7 +39,16 @@ public class AwareDocument extends Document {
 	private static final Logger logger = LoggerFactory
 			.getLogger(AwareDocument.class);
 	private final Map<XSElementDeclaration, Set<AwareElement>> eleMap;
-	public static boolean mutated = false;
+	//faezeh
+	public boolean mutated = false;
+	
+	public boolean isMutated() {
+		return mutated;
+	}
+
+	public void setMutated(boolean mutated) {
+		this.mutated = mutated;
+	}
 
 	public AwareDocument(AwareDocument other) {
 		super(other);
@@ -212,7 +221,7 @@ public class AwareDocument extends Document {
 
 	private void mutateValue_lowerbound() {
 		logger.info("in mutation operator");
-		
+		setMutated(false);
 		int num=0;
 		// for each decl in elemap, we check weather the min
 		int facetfound=0;
@@ -257,7 +266,7 @@ public class AwareDocument extends Document {
 							//logger.info("current value is {}",actualElement.getChild(0).getValue());
 							actualElement.removeChildren();
 							actualElement.appendChild(Integer.toString( num- offset));
-							mutated= true;
+							setMutated(true);
 							
 						}// end of if
 						break;
@@ -286,7 +295,7 @@ public class AwareDocument extends Document {
 								//logger.info("simple content type of complex current value is {}",actualElement.getChild(0).getValue());
 								actualElement.removeChildren();
 								actualElement.appendChild(Integer.toString( num- offset));
-								mutated= true;
+								setMutated(true);
 								//logger.info("simple content type of complex new value is {}", actualElement.getValue());							
 							}
 							}
@@ -294,7 +303,7 @@ public class AwareDocument extends Document {
 					
 				}// end of switch
 			} // end of if getvalue
-				if (mutated)return;
+				if (isMutated()) return;
 			}//end of for
 		}//end of first for
 		

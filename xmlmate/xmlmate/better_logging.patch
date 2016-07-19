@@ -1,0 +1,22 @@
+Index: ../../projects/xmlmate-stable/xmlmate/src/xmlmate/resources/logback.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../../projects/xmlmate-stable/xmlmate/src/xmlmate/resources/logback.xml	(revision 8bdca426bf1f633dd5ec30e5e7fbd972ec9cdaf6)
++++ ../../projects/xmlmate-stable/xmlmate/src/xmlmate/resources/logback.xml	(revision )
+@@ -27,12 +27,12 @@
+ 
+     <!-- Loggers  -->
+ 
+-    <logger name="org.xmlmate" level="DEBUG">
++    <logger name="org.xmlmate" level="INFO">
+         <appender-ref ref="CONSOLE"/>
+         <appender-ref ref="FILE"/>
+     </logger>
+ 
+-    <logger name="org.evosuite" level="INFO">
++    <logger name="org.evosuite" level="ERROR">
+         <appender-ref ref="CONSOLE"/>
+         <appender-ref ref="FILE"/>
+     </logger>

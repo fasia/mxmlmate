@@ -1,0 +1,34 @@
+Index: ../src/xmlmate/java/org/xmlmate/xml/ValueGenerator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../../projects/xmlmate-stable/xmlmate/src/xmlmate/java/org/xmlmate/xml/ValueGenerator.java	(revision 8bdca426bf1f633dd5ec30e5e7fbd972ec9cdaf6)
++++ ../../projects/xmlmate-stable/xmlmate/src/xmlmate/java/org/xmlmate/xml/ValueGenerator.java	(revision )
+@@ -32,7 +32,7 @@
+ //        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
+         private final Automaton charAutomaton = new RegExp("[\n\r.a-zA-Z0-9]").toAutomaton();
+         private final Automaton hexBinary = new RegExp("([A-Fa-f0-9][A-Fa-f0-9])+").toAutomaton();
+-        private final Automaton idAutomaton = new RegExp("id[0-9]{3,}").toAutomaton();
++        private final Automaton idAutomaton = new RegExp("id[0-9]").toAutomaton(); // this makes sure id0 to id9 are only ever generated. use with caution!
+ 
+         @Override
+         public Automaton getAutomaton(String name) {
+@@ -42,14 +42,15 @@
+                 return charAutomaton.repeat();
+             if ("hexBinary".equalsIgnoreCase(name))
+                 return hexBinary;
+-            if ("ID".equalsIgnoreCase(name))
++            if ("ID".equalsIgnoreCase(name) || "IDREF".equalsIgnoreCase(name))
+                 return idAutomaton;
+             return super.getAutomaton(name);
+         }
+     };
+-    private static Automaton rndString = Automaton.minimize(automatonProvider.getAutomaton("Char").repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
++    private static Automaton rndString = Automaton.minimize(new RegExp("[a-zA-Z0-9_]").toAutomaton().repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
+     private static Set<String> knownTypes = new HashSet<>(Arrays.asList(
+         "ID",
++        "IDREF",
+         "NCName",
+         // "QName",
+         // "URI",

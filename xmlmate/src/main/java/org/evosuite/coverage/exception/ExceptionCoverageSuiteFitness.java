@@ -96,9 +96,8 @@ public class ExceptionCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		//return (coverageFitness / 1000) + exceptionFitness;
 		
 		//faezeh
-		double aliveFitness = XMLTestRunner.AliveFF;
 		suite.setFitness((coverageFitness/1000));
-		logger.info("coverage fitness is {} and is it alive? {}", coverageFitness/1000, aliveFitness);
+		logger.info("coverage fitness is {} and is it alive? {}", coverageFitness/1000);
 		return (coverageFitness/1000);
 	}
 

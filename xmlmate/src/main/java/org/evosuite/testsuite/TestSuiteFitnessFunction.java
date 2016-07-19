@@ -104,6 +104,7 @@ public abstract class TestSuiteFitnessFunction extends
 			} else {
 				results.add(chromosome.getLastExecutionResult());
 			}
+			
 		}
 
 		return results;

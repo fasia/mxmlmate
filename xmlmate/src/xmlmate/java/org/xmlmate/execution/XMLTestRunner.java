@@ -49,9 +49,6 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 
 	// faezeh
 	public static int totalmut;
-	//public static int AliveFF;
-	public double mutationGrade;
-	private ConsoleHandler ch = new ConsoleHandler();
 
 	public XMLTestRunner(XMLTestChromosome chromosome) {
 		reset();
@@ -61,8 +58,6 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 	private void reset() {
 		// faezeh
 		numExceptions = 0;
-		mutationGrade =chrom.mutgrade;
-		
 		
 		exceptionsThrown.clear();
 		runFinished = false;
@@ -111,7 +106,6 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 				//faezeh
 				if (chrom.isMutated()){
 					totalmut++;
-					chrom.mutgrade= 10;
 					logger.info("total mut number is now {}",totalmut);
 					logger.info("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
 				}
@@ -119,7 +113,6 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 				Throwable cause = e.getCause();
 				exceptionsThrown.put(numExceptions, cause);
 				numExceptions += 1;
-				chrom.mutgrade =0;
 				String message = cause.getMessage();
 				String exceptionName = cause.getClass().getSimpleName();
 				if (knownExceptions.add(exceptionName)) {
@@ -137,7 +130,6 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 				}
 			} catch (Exception e) {
 				numExceptions += 1;
-				chrom.mutgrade =0;
 				logger.error("Could not execute test due to ", e);
 			} finally {
 				TestGenerationContext.getInstance().doneWithExecuteingSUTCode();
