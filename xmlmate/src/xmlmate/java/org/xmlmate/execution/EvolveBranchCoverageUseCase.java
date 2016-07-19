@@ -3,10 +3,13 @@ package org.xmlmate.execution;
 import net.sf.corn.cps.CPScanner;
 import net.sf.corn.cps.ClassFilter;
 import net.sf.corn.cps.CombinedFilter;
+
 import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
+import org.evosuite.coverage.branch.BranchCoverageSuiteFitness;
 import org.evosuite.coverage.exception.ExceptionCoverageSuiteFitness;
 import org.evosuite.ga.*;
+import org.evosuite.ga.stoppingconditions.MaxMutationStoppingCondition;
 import org.evosuite.ga.stoppingconditions.MaxTimeStoppingCondition;
 import org.evosuite.ga.stoppingconditions.StoppingCondition;
 import org.evosuite.ga.stoppingconditions.ZeroFitnessStoppingCondition;
@@ -26,10 +29,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+
+
+
 public class EvolveBranchCoverageUseCase implements UseCase {
     private static final Logger logger = LoggerFactory.getLogger(EvolveBranchCoverageUseCase.class);
     private final XMLTestSuiteChromosomeFactory factory;
-
+    
     public EvolveBranchCoverageUseCase(XMLTestSuiteChromosomeFactory factory) {
         this.factory = factory;
     }
@@ -61,6 +67,12 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         // fitness function
         FitnessFunction fitnessFunction = chooseFitnessFunction();
         ga.setFitnessFunction(fitnessFunction);
+        
+        
+        //faezeh-fitness function
+       /* FitnessFunction fitnessFunction = chooseMyFitnessFunction();
+        ga.setFitnessFunction(fitnessFunction);*/
+        
         // make test suites aware of fitness orientation
         XMLTestSuiteChromosome.fitnessMaximization = fitnessFunction.isMaximizationFunction();
 
@@ -72,6 +84,11 @@ public class EvolveBranchCoverageUseCase implements UseCase {
         StoppingCondition stoppingCondition = new MaxTimeStoppingCondition();
         stoppingCondition.setLimit(XMLProperties.GLOBAL_TIMEOUT);
         ga.addStoppingCondition(stoppingCondition);
+        
+        // faezeh 
+       /* StoppingCondition stoppingCondition2 = new MaxMutationStoppingCondition();
+        stoppingCondition2.setLimit(1000);
+        ga.addStoppingCondition(stoppingCondition2);*/
 
         //secondary objectives
         XMLTestSuiteChromosome.addSecondaryObjective(new MinimizeSizeSecondaryObjective());
@@ -107,12 +124,19 @@ public class EvolveBranchCoverageUseCase implements UseCase {
 
         logger.debug("Cumulative time spent mutating:   {}.", XMLTestSuiteChromosome.mutationClock);
         logger.debug("Cumulative time spent evaluating: {}.", BinaryBackendFitnessFunction.evaluationClock);
+        logger.debug("total number of total mutations: {}", XMLTestRunner.totalmut);
+		
+
 
         // for some reason the process doesn't terminate on its own
         System.exit(0);
     }
 
-    protected SteadyStateGA<XMLTestSuiteChromosome> chooseGA(XMLTestSuiteChromosomeFactory fac) {
+    private FitnessFunction chooseMyFitnessFunction() {
+    	return new NoExceptionCoverageSuiteFitness();
+	}
+
+	protected SteadyStateGA<XMLTestSuiteChromosome> chooseGA(XMLTestSuiteChromosomeFactory fac) {
         return new SteadyStateGA<>(fac);
     }
 

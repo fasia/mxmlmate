@@ -38,6 +38,7 @@ import org.evosuite.testsuite.TestSuiteFitnessFunction;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlmate.execution.XMLTestRunner;
 
 /**
  * Fitness function for a whole test suite for all branches
@@ -49,7 +50,6 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 	private static final long serialVersionUID = 2991632394620406243L;
 
 	private final static Logger logger = LoggerFactory.getLogger(BranchCoverageSuiteFitness.class);
-
 	// Coverage targets
 	public final int totalMethods;
 	public final int totalBranches;
@@ -58,6 +58,7 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 	public final Set<Integer> lines;
 	private final Set<String> branchlessMethods;
 	private final Set<String> methods;
+	public static int round=0;
 
 	/**
 	 * <p>
@@ -75,7 +76,7 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 			numBranchlessMethods = BranchPool.getNumBranchlessMethods();
 			branchlessMethods = BranchPool.getBranchlessMethods();
 			methods = CFGMethodAdapter.getMethods();
-
+			
 		} else {
 			totalMethods = CFGMethodAdapter.getNumMethodsPrefix(prefix);
 			totalBranches = BranchPool.getBranchCountForPrefix(prefix);
@@ -93,7 +94,6 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
         logger.info("Total branches: {}", totalBranches);
         logger.info("Total branchless methods: {}", numBranchlessMethods);
         logger.info("Total methods: {}: {}", totalMethods, methods);
-
 		determineCoverageGoals();
 	}
 
@@ -240,16 +240,22 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 	@Override
 	public double getFitness(
 	        AbstractTestSuiteChromosome<? extends ExecutableChromosome> suite) {
-		logger.trace("Calculating branch fitness");
-		double fitness = 0.0;
-
+		logger.info("Calculating branch fitness");
+		//logger.info("new round ");
+	 	double fitness = 0.0;
+		suite.mutate();
+		
 		List<ExecutionResult> results = runTestSuite(suite);
 		Map<Integer, Double> trueDistance = new HashMap<Integer, Double>();
 		Map<Integer, Double> falseDistance = new HashMap<Integer, Double>();
 		Map<Integer, Integer> predicateCount = new HashMap<Integer, Integer>();
 		Map<String, Integer> callCount = new HashMap<String, Integer>();
 		Set<Integer> covered_lines = new HashSet<Integer>();
-
+		
+		//faezeh
+		Set<Double> alive_mutants = new HashSet<Double>();
+		
+		
 		// Collect stats in the traces 
 		boolean hasTimeoutOrTestException = analyzeTraces(results, predicateCount,
 		                                                  callCount, trueDistance,
@@ -290,10 +296,9 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 			if (dt == 0.0)
 				numCoveredBranches++;
 		}
-
+		//logger.info("After Collect branch distances of covered branches: fitness is now {}", fitness);
 		// +1 for every branch that was not executed
 		fitness += 2 * (totalBranches - predicateCount.size());
-
 		// Ensure all methods are called
 		int missingMethods = 0;
 		for (String e : methods) {
@@ -302,6 +307,7 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 				missingMethods += 1;
 			}
 		}
+		//logger.info("After checking missing methods: fitness is now {}", fitness);
 
 		// Add statement information
 		if (Properties.BRANCH_STATEMENT) {
@@ -310,6 +316,8 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 			fitness += normalize(totalLines - covered_lines.size());
 		}
 
+
+		
 		printStatusMessages(suite, numCoveredBranches, totalMethods - missingMethods,
 		                    fitness);
 
@@ -342,7 +350,7 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		        + "coverage: " + coverage + "/" + totalGoals;
 		assert (suite.getCoverage() <= 1.0) && (suite.getCoverage() >= 0.0) : "Wrong coverage value "
 		        + suite.getCoverage();
-
+		logger.info("branch fitness is {}", fitness);
 		return fitness;
 	}
 

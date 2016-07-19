@@ -10,6 +10,7 @@ public class XMLMate {
         // load schema, index classes, prebuild automata, inspect schema
         XMLProperties.initialize();
         // run use case
+        
         useCase.run();
         // terminate all auxiliary executors and daemon threads
         System.exit(0);

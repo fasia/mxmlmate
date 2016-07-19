@@ -32,8 +32,9 @@ public final class ValueGenerator {
 //        private final Automaton	charAutomaton	= new RegExp("[\t\n\r\u0020-\uD7FF\ue000-\ufffd]").toAutomaton();
         private final Automaton charAutomaton = new RegExp("[\n\r.a-zA-Z0-9]").toAutomaton();
         private final Automaton hexBinary = new RegExp("([A-Fa-f0-9][A-Fa-f0-9])+").toAutomaton();
-        private final Automaton idAutomaton = new RegExp("id[0-9]{3,}").toAutomaton();
-
+       // private final Automaton idAutomaton = new RegExp("id[0-9]{3,}").toAutomaton();
+        private final Automaton idAutomaton = new RegExp("id[0-9]").toAutomaton(); // this makes sure id0 to id9 are only ever generated. use with caution!
+        
         @Override
         public Automaton getAutomaton(String name) {
             if ("Char".equalsIgnoreCase(name))
@@ -42,14 +43,18 @@ public final class ValueGenerator {
                 return charAutomaton.repeat();
             if ("hexBinary".equalsIgnoreCase(name))
                 return hexBinary;
-            if ("ID".equalsIgnoreCase(name))
+            //if ("ID".equalsIgnoreCase(name))
+            if ("ID".equalsIgnoreCase(name) || "IDREF".equalsIgnoreCase(name))
                 return idAutomaton;
             return super.getAutomaton(name);
         }
     };
-    private static Automaton rndString = Automaton.minimize(automatonProvider.getAutomaton("Char").repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
+    private static Automaton rndString = Automaton.minimize(new RegExp("[a-zA-Z0-9_]").toAutomaton().repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
+
+    //private static Automaton rndString = Automaton.minimize(automatonProvider.getAutomaton("Char").repeat(XMLProperties.MIN_STRING_LENGTH, XMLProperties.MAX_STRING_LENGTH));
     private static Set<String> knownTypes = new HashSet<>(Arrays.asList(
         "ID",
+        "IDREF",
         "NCName",
         // "QName",
         // "URI",

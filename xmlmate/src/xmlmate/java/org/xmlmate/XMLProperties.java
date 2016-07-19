@@ -487,6 +487,8 @@ public class XMLProperties {
         prebuildAutomata();
         traverseSchema();
         logger.info("Initialization complete");
+        /*AwareDocument.muxml();
+        logger.info("xml file is now mutated");*/
     }
 
 }

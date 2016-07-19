@@ -35,8 +35,9 @@ import org.slf4j.LoggerFactory;
 
 public class ExecutionResult implements Cloneable {
 
-	private static final Logger logger = LoggerFactory.getLogger(ExecutionResult.class);
-	
+	private static final Logger logger = LoggerFactory
+			.getLogger(ExecutionResult.class);
+
 	/** Test case that produced this execution result */
 	public TestCase test;
 
@@ -46,7 +47,8 @@ public class ExecutionResult implements Cloneable {
 	/** Map statement number to raised exception */
 	protected Map<Integer, Throwable> exceptions = new HashMap<Integer, Throwable>();
 
-	/** Record for each exception if it was explicitly thrown 
+	/**
+	 * Record for each exception if it was explicitly thrown
 	 * 
 	 * <p>
 	 * FIXME: internal data structures should never be null...
@@ -67,12 +69,12 @@ public class ExecutionResult implements Cloneable {
 
 	/** Set of System properties that were read during test execution */
 	protected Set<String> readProperties;
-	
+
 	/**
 	 * Keep track of whether any System property was written
 	 */
 	protected boolean wasAnyPropertyWritten;
-	
+
 	/**
 	 * @return the executedStatements
 	 */
@@ -91,8 +93,9 @@ public class ExecutionResult implements Cloneable {
 	/** Output traces produced by observers */
 	protected final Map<Class<?>, OutputTrace<?>> traces = new HashMap<Class<?>, OutputTrace<?>>();
 
-	// experiment .. tried to remember intermediately calculated ControlFlowDistances .. no real speed up
-	//	public Map<Branch, ControlFlowDistance> intermediateDistances;
+	// experiment .. tried to remember intermediately calculated
+	// ControlFlowDistances .. no real speed up
+	// public Map<Branch, ControlFlowDistance> intermediateDistances;
 
 	/**
 	 * Default constructor when executing without mutation
@@ -122,7 +125,6 @@ public class ExecutionResult implements Cloneable {
 		}
 	}
 
-	
 	/**
 	 * <p>
 	 * getFirstPositionOfThrownException
@@ -273,8 +275,8 @@ public class ExecutionResult implements Cloneable {
 	 * @param trace
 	 *            a {@link org.evosuite.testcase.ExecutionTrace} object.
 	 */
-	public void setTrace(ExecutionTrace trace) throws IllegalArgumentException{
-		if(trace==null){
+	public void setTrace(ExecutionTrace trace) throws IllegalArgumentException {
+		if (trace == null) {
 			throw new IllegalArgumentException("Trace cannot be null");
 		}
 		this.trace = trace;
@@ -359,11 +361,12 @@ public class ExecutionResult implements Cloneable {
 
 		for (Integer i : exceptions.keySet()) {
 			Throwable t = exceptions.get(i);
-			assert i>=0 && i<test.size();
-			if(i >= test.size())
+			assert i >= 0 && i < test.size();
+			if (i >= test.size())
 				continue;
-			
-			if (!test.getStatement(i).getDeclaredExceptions().contains(t.getClass()))
+
+			if (!test.getStatement(i).getDeclaredExceptions()
+					.contains(t.getClass()))
 				return true;
 		}
 
@@ -380,7 +383,8 @@ public class ExecutionResult implements Cloneable {
 	}
 
 	public void setSecurityException(boolean value) {
-        logger.debug("Changing hasSecurityException from {} to {}", hasSecurityException, value);
+		logger.debug("Changing hasSecurityException from {} to {}",
+				hasSecurityException, value);
 		hasSecurityException = value;
 	}
 
@@ -404,13 +408,13 @@ public class ExecutionResult implements Cloneable {
 	public ExecutionResult clone() {
 		ExecutionResult copy = new ExecutionResult(test, mutation);
 		copy.exceptions.putAll(exceptions);
-		copy.trace = null==trace?null:trace.lazyClone();
+		copy.trace = null == trace ? null : trace.lazyClone();
 		copy.explicitExceptions.putAll(explicitExceptions);
 		copy.executionTime = executionTime;
 		for (Class<?> clazz : traces.keySet()) {
 			copy.traces.put(clazz, traces.get(clazz).clone());
 		}
-		if(readProperties!=null){
+		if (readProperties != null) {
 			copy.readProperties = new LinkedHashSet<String>();
 			copy.readProperties.addAll(readProperties);
 		}

@@ -192,7 +192,7 @@ public class SteadyStateGA<T extends Chromosome> extends GeneticAlgorithm<T> {
 		if (fitnessFunction.isMaximizationFunction())
 			bestFitness = 0.0;
 		while (!isFinished()) {
-            logger.debug("Population size before: {}", population.size());
+            logger.info("Population size before: {}", population.size());
 			evolve();
 
 			sortPopulation();
@@ -211,9 +211,9 @@ public class SteadyStateGA<T extends Chromosome> extends GeneticAlgorithm<T> {
             logger.debug("Current iteration: {}", currentIteration);
 			this.notifyIteration();
 
-            logger.debug("Population size: {}", population.size());
-            logger.debug("Best individual has fitness: {}", population.get(0).getFitness());
-            logger.debug("Worst individual has fitness: {}", population.get(population.size() - 1).getFitness());
+            logger.info("Population size: {}", population.size());
+            logger.info("Best individual has fitness: {}", population.get(0).getFitness());
+            logger.info("Worst individual has fitness: {}", population.get(population.size() - 1).getFitness());
 		}
 
 		notifySearchFinished();

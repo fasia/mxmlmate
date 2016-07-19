@@ -40,6 +40,7 @@ import org.evosuite.utils.Randomness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Abstract superclass of genetic algorithms
  * 

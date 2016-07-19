@@ -41,21 +41,33 @@ public class XMLTestChromosome extends ExecutableChromosome {
     private static final List<SecondaryObjective> secondaryObjectives = new ArrayList<>();
     private static FormatConverter converter;
     private AwareDocument doc = null;
+    //faezeh : creating a flag to check if the chrom will be mutated by my mutation operators
+    public boolean mutated =doc.mutated;
+    public double mutgrade =0;
 
     public XMLTestChromosome(String rootElem) {
         QName root = QName.valueOf(rootElem);
         doc = AwareInstantiator.generate(root);
         setChanged(true);
+        
+        //faezeh = fresh chromosome with no mutation
+        setMutated(doc.mutated);
     }
 
     public XMLTestChromosome(AwareDocument document) {
         doc = document;
         setChanged(true);
+        
+        //faezeh = fresh chromosome with no mutation
+        setMutated(doc.mutated);
     }
 
     public XMLTestChromosome() {
         doc = AwareInstantiator.generate();
         setChanged(true);
+        
+        //faezeh = fresh chromosome with no mutation
+        setMutated(doc.mutated);
     }
 
     public XMLTestChromosome(XMLTestChromosome other) {
@@ -63,6 +75,9 @@ public class XMLTestChromosome extends ExecutableChromosome {
         age = other.age;
         setChanged(other.isChanged());
         copyCachedResults(other);
+        
+        //faezeh = fresh chromosome with no mutation
+        setMutated(other.isMutated());
     }
 
     public static void addSecondaryObjective(SecondaryObjective objective) {
@@ -118,7 +133,12 @@ public class XMLTestChromosome extends ExecutableChromosome {
         if (doc.mutate()) {
             setChanged(true);
             clearCachedResults();
+            
+            
+            //faezeh = if the awaredocument is mutated then we set it to true
+            setMutated(doc.mutated);
         }
+        
     }
 
     @Override
@@ -226,5 +246,13 @@ public class XMLTestChromosome extends ExecutableChromosome {
     public AwareDocument getDocument() {
         return doc;
     }
+
+	public boolean isMutated() {
+		return mutated;
+	}
+
+	public void setMutated(boolean mutated) {
+		this.mutated = mutated;
+	}
 
 }
