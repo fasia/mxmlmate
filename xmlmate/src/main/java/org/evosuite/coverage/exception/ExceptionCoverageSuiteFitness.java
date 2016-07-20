@@ -41,6 +41,7 @@ import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.execution.XMLTestRunner;
+import org.xmlmate.genetics.XMLTestChromosome;
 
 public class ExceptionCoverageSuiteFitness extends TestSuiteFitnessFunction {
 
@@ -95,11 +96,15 @@ public class ExceptionCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		//suite.setFitness((coverageFitness / 1000) + exceptionFitness);
 		//return (coverageFitness / 1000) + exceptionFitness;
 		
-		//faezeh
+		//faezeh for each test in the suite, we need to check whether it is mutated and passed (alive) or not
+		
+		
+		
 		suite.setFitness((coverageFitness/1000));
 		logger.info("coverage fitness is {} and is it alive? {}", coverageFitness/1000);
 		return (coverageFitness/1000);
 	}
+
 
 	/**
 	 * given the list of results, fill the 2 given (empty) maps with exception
@@ -123,6 +128,8 @@ public class ExceptionCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		}
 
 		Map<TestCase, Map<Integer, Boolean>> isExceptionExplicit = new HashMap<TestCase, Map<Integer, Boolean>>();
+
+		
 
 		// for each test case
 		for (ExecutionResult result : results) {

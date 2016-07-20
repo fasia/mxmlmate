@@ -46,6 +46,7 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 	private int numExceptions;
 	private boolean runFinished;
 	private ExecutionResult executionResult;
+	
 
 	// faezeh
 	public static int totalmut;
@@ -108,6 +109,8 @@ public class XMLTestRunner implements InterfaceTestRunnable {
 					totalmut++;
 					logger.info("total mut number is now {}",totalmut);
 					logger.info("//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////");
+					// if mutated and passed the test (alive mut) then it should get 0. otherwise, 100
+					chrom.setAlive(true);
 				}
 				} catch (InvocationTargetException e) {
 				Throwable cause = e.getCause();

@@ -225,7 +225,7 @@ public abstract class AbstractTestSuiteChromosome<T extends ExecutableChromosome
 		if (changed) {
 			this.setChanged(true);
 		}
-		if (test.)
+		
 	
 	}
 

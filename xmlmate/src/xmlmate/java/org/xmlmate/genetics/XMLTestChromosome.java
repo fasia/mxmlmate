@@ -42,7 +42,8 @@ public class XMLTestChromosome extends ExecutableChromosome {
     private static FormatConverter converter;
     private AwareDocument doc = null;
     //faezeh : creating a flag to check if the chrom will be mutated by my mutation operators
-    public boolean mutated =doc.mutated;
+    public boolean mutated;
+    public boolean isalive;
     public double mutgrade =0;
 
     public XMLTestChromosome(String rootElem) {
@@ -252,7 +253,15 @@ public class XMLTestChromosome extends ExecutableChromosome {
 	}
 
 	public void setMutated(boolean mutated) {
-		this.mutated = mutated;
+		this.mutated = doc.isMutated();
+	}
+	
+	public boolean isAlive() {
+		return isalive;
 	}
 
+	public void setAlive(boolean isalive) {
+		this.isalive = isalive;
+	}
+	
 }

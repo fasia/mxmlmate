@@ -34,11 +34,14 @@ import org.evosuite.testcase.ExecutionResult;
 import org.evosuite.testcase.StatementInterface;
 import org.evosuite.testcase.TestFitnessFunction;
 import org.evosuite.testsuite.AbstractTestSuiteChromosome;
+import org.evosuite.testsuite.TestSuiteChromosome;
 import org.evosuite.testsuite.TestSuiteFitnessFunction;
 import org.objectweb.asm.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlmate.execution.XMLTestRunner;
+import org.xmlmate.genetics.XMLTestChromosome;
+import org.xmlmate.genetics.XMLTestSuiteChromosome;
 
 /**
  * Fitness function for a whole test suite for all branches
@@ -240,6 +243,12 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 	@Override
 	public double getFitness(
 	        AbstractTestSuiteChromosome<? extends ExecutableChromosome> suite) {
+		//faezeh
+		XMLTestSuiteChromosome test = (XMLTestSuiteChromosome) suite;
+		/*	if (IsMutatedByMO(test)){
+			double ff = 
+		}*/
+		
 		logger.info("Calculating branch fitness");
 		//logger.info("new round ");
 	 	double fitness = 0.0;
@@ -331,6 +340,7 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 			suite.setCoverage((double) coverage / (double) totalGoals);
 
 		suite.setNumOfCoveredGoals(coverage);
+		
 
 		if (hasTimeoutOrTestException) {
             logger.info("Test suite has timed out, setting fitness to max value {}", totalBranches * 2 + totalMethods);
@@ -348,7 +358,19 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		assert (suite.getCoverage() <= 1.0) && (suite.getCoverage() >= 0.0) : "Wrong coverage value "
 		        + suite.getCoverage();
 		logger.info("branch fitness is {}", fitness);
+		
+		
+		// faezeh : checking whether this was an alive mutant or not
+		if (IsMutatedByMO(test)) fitness-=1000;
+		
+		logger.info("alive fitness is {}", fitness);
+		
 		return fitness;
+	}
+
+	private boolean IsMutatedByMO(XMLTestSuiteChromosome test) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/**

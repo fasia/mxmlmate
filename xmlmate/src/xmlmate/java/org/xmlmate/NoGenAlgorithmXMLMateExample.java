@@ -63,9 +63,9 @@ public class NoGenAlgorithmXMLMateExample {
 			x.mutate();
 			x.writeToFile(outputFile);
 			String path = outputFile.getAbsolutePath();
-			boolean mut = ismutated(outputFile);
+			//boolean mut = ismutated(outputFile);///////////////////////////////**********************IMPORTANT//*****************
 			//execute the xml file
-			if (mut){
+	
 
 				try{
 					Class<?> cls = Properties.getTargetClass();
@@ -100,17 +100,13 @@ public class NoGenAlgorithmXMLMateExample {
 				} catch (Exception e) {
 					logger.error("Could not execute test due to ", e);
 				} //end of catch (Exception e)
-			}//end if
+		
 		}//end while loop
 		logger.info("the number of total mutants: {}"+allMuts);
 		logger.info("the number of alive mutants: {}"+number);
 		
 	}//end main
 
-	private static boolean ismutated(File outputFile) {
-
-		return AwareDocument.mutated;
-	}
 
 
 }

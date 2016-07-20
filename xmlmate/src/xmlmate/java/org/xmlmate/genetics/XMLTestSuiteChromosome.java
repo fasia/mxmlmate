@@ -32,10 +32,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
     private double elemCoverage = 0.0d;
     private double attrCoverage = 0.0d;
     public static Stopwatch mutationClock = Stopwatch.createUnstarted();
-    
-    //faezeh
-    public boolean alivemut= false;
-
+   
     private static final XMLCrossOverFunction crossoverFunction = new XMLCrossOverFunction();
     private static ExecutorService mutatorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Mutator %d").build());
     private static ExecutorService xoverService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder().setNameFormat("Xover %d").build());
@@ -48,6 +45,7 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             this.original = original;
         }
 
+
         @Override
         public List<XMLTestChromosome> call() throws Exception {
             XMLTestChromosome clone = new XMLTestChromosome(original);
@@ -57,6 +55,13 @@ public class XMLTestSuiteChromosome extends AbstractTestSuiteChromosome<XMLTestC
             return Collections.singletonList(original);
         }
 
+    }
+    
+    
+    //faezeh 
+    // check if the chromosome is mutated by a mutation operator
+    public boolean IsMutatedByMO(XMLTestChromosome t){
+		return t.isAlive();
     }
 
     private static class Crossover implements Callable<List<XMLTestChromosome>> {
