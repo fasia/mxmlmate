@@ -243,11 +243,7 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 	@Override
 	public double getFitness(
 	        AbstractTestSuiteChromosome<? extends ExecutableChromosome> suite) {
-		//faezeh
-		XMLTestSuiteChromosome test = (XMLTestSuiteChromosome) suite;
-		/*	if (IsMutatedByMO(test)){
-			double ff = 
-		}*/
+		
 		
 		logger.info("Calculating branch fitness");
 		//logger.info("new round ");
@@ -360,18 +356,16 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		logger.info("branch fitness is {}", fitness);
 		
 		
-		// faezeh : checking whether this was an alive mutant or not
-		if (IsMutatedByMO(test)) fitness-=1000;
+		// faezeh : adding alive number to the 
+		int alivenum = ((XMLTestSuiteChromosome) suite).calculateNumofAliveXml();
+		fitness-=alivenum*100;
 		
-		logger.info("alive fitness is {}", fitness);
+		logger.info("alive  is {}", alivenum);
 		
 		return fitness;
 	}
 
-	private boolean IsMutatedByMO(XMLTestSuiteChromosome test) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+
 
 	/**
 	 * Some useful debug information
