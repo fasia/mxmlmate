@@ -96,12 +96,11 @@ public class ExceptionCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		//suite.setFitness((coverageFitness / 1000) + exceptionFitness);
 		//return (coverageFitness / 1000) + exceptionFitness;
 		
-		//faezeh for each test in the suite, we need to check whether it is mutated and passed (alive) or not
-		
+	
 		
 		
 		suite.setFitness((coverageFitness/1000));
-		logger.info("coverage fitness is {} and is it alive? {}", coverageFitness/1000);
+		logger.info("coverage fitness is {}", coverageFitness/1000);
 		return (coverageFitness/1000);
 	}
 

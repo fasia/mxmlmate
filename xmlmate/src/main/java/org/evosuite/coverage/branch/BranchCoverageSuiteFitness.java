@@ -356,9 +356,9 @@ public class BranchCoverageSuiteFitness extends TestSuiteFitnessFunction {
 		logger.info("branch fitness is {}", fitness);
 		
 		
-		// faezeh : adding alive number to the 
+		// faezeh : adding alive number to the ff
 		int alivenum = ((XMLTestSuiteChromosome) suite).calculateNumofAliveXml();
-		fitness-=alivenum*100;
+		fitness-=alivenum*10;
 		
 		logger.info("alive  is {}", alivenum);
 		

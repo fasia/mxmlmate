@@ -162,7 +162,7 @@ public class AwareDocument extends Document {
 	public boolean mutate() {
 
 		boolean result = chooseRandom().mutate();
-	     mutateValue_lowerbound();
+	    // mutateValue_lowerbound();
 		//mutateValue_upperbound();
 		 //mutateTypeInteger();
 		//mutateTypeString();
@@ -171,7 +171,7 @@ public class AwareDocument extends Document {
 		 //it is not doneappendAttr();
 		//it is not done removeAttr();
 		 //changeOrderofChildren();
-		 //appendElement();
+		 appendElement();
 		 //removeElement();
 		// removeElementChildren();
 
@@ -310,7 +310,7 @@ public class AwareDocument extends Document {
 	}
 
 	public void mutateValue_upperbound() {
-		mutated = false;
+		setMutated(false);
 		int num = 0;
 		// for each decl in elemap, we check weather the min
 		int facetfound = 0;
@@ -368,7 +368,7 @@ public class AwareDocument extends Document {
 							actualElement.removeChildren();
 							actualElement.appendChild(Integer.toString(num
 									- offset));
-							mutated = true;
+							setMutated(true);
 							return;
 
 						}// end of if
@@ -388,10 +388,10 @@ public class AwareDocument extends Document {
 							for (int f = 0; f < facets1.size(); f++) {
 
 								facet = (XSFacet) facets1.item(f);
-								logger.info(
-										"COMPLEX-SIMPLE type and facet is {} and its value is  {}",
-										facet.getFacetKind(),
-										facet.getActualFacetValue());
+							//	logger.info(
+							//			"COMPLEX-SIMPLE type and facet is {} and its value is  {}",
+							//			facet.getFacetKind(),
+							//			facet.getActualFacetValue());
 								if (facet.getFacetKind() == XSSimpleTypeDefinition.FACET_MAXEXCLUSIVE)
 									facetfound++;
 								if (facet.getFacetKind() == XSSimpleTypeDefinition.FACET_MAXINCLUSIVE)
@@ -403,16 +403,16 @@ public class AwareDocument extends Document {
 													// facet.getIntFacetValue());
 								// change the value of the element
 								int offset = Randomness.nextInt(1, 11);
-								logger.info(
-										"simple content type of complex current value is {}",
-										actualElement.getChild(0).getValue());
+								//logger.info(
+								//		"simple content type of complex current value is {}",
+								//		actualElement.getChild(0).getValue());
 								actualElement.removeChildren();
 								actualElement.appendChild(Integer.toString(num
 										- offset));
-								mutated = true;
-								logger.info(
-										"simple content type of complex new value is {}",
-										actualElement.getValue());
+								setMutated(true);
+							//	logger.info(
+								//		"simple content type of complex new value is {}",
+							//			actualElement.getValue());
 								return;
 							}
 						}
